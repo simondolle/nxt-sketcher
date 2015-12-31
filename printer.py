@@ -1,31 +1,39 @@
 import math
 import matplotlib.pyplot as plt
 
+degrees_to_radians = math.pi / 180
+radians_to_degrees = 180 / math.pi
+
 def get_xy(alpha, beta):
 
-    r = 3
-    a = 8
-    b = a + 1
+    r = 3  # short arm length (attached to the rotative axis)
+    a = 8  # long arm length
+    b = a + 1  # distance from short arm extremity to pen
 
-    xa = -5
-    xb = 5
+    xa = -5 #left short arm x
+    xb = 5 #right short arm x
 
+    # d is the first short arm extremity
     xd = xa - r * math.sin(alpha)
     yd = r * math.cos(alpha)
 
+    # e is the first short arm extremity
     xe = xb - r * math.sin(beta)
     ye = r * math.cos(beta)
 
     de = compute_distance(xd, yd, xe, ye)
 
+    #theta is the angle formed by de and the left long arm
     cos_theta = de/float(2 * a)
     cos_theta = min(cos_theta, 1.0)
     cos_theta = max(cos_theta, -1.0)
     theta = math.acos(cos_theta)
 
+    #gamma is the angle formed by an horizontal axis and de
     gamma = math.acos(math.pow(xd-xe, 2)/float(math.pow(xd-xe, 2) + math.pow(yd-ye, 2)))
     gamma = math.copysign(gamma, ye-yd)
 
+    #lambda is the angle formed by an horizontal axis and the left long arm
     lam = theta + gamma
     xt = xd + b * math.cos(lam)
     yt = yd + b * math.sin(lam)
@@ -39,10 +47,6 @@ def get_closest_grid_point(x, y, points_per_lego_unit = 2):
 
 def compute_distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x2-x1, 2) + math.pow(y2-y1, 2))
-
-degrees_to_radians = math.pi / 180
-radians_to_degrees = 180 / math.pi
-
 
 def spirograph(nb_loops, beta_coefficient):
     xs=[]
