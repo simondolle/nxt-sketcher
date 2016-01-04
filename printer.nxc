@@ -1,0 +1,373 @@
+#define SPEED 25
+#define MULTIPLICATOR 3
+
+#define WIDTH 10
+#define HEIGHT 10
+int pos_to_alpha[];
+int pos_to_beta[];
+
+int alpha;
+int beta;
+
+int target_alpha;
+int target_beta;
+
+int rotation_a;
+int rotation_b;
+
+int result;
+
+sub init_arrays() {
+ ArrayInit(pos_to_alpha, 0, 100);
+ pos_to_alpha[0] = 46;
+ pos_to_alpha[1] = 41;
+ pos_to_alpha[2] = 35;
+ pos_to_alpha[3] = 29;
+ pos_to_alpha[4] = 22;
+ pos_to_alpha[5] = 292;
+ pos_to_alpha[6] = 295;
+ pos_to_alpha[7] = 300;
+ pos_to_alpha[8] = 346;
+ pos_to_alpha[9] = 324;
+ pos_to_alpha[10] = 54;
+ pos_to_alpha[11] = 279;
+ pos_to_alpha[12] = 43;
+ pos_to_alpha[13] = 279;
+ pos_to_alpha[14] = 30;
+ pos_to_alpha[15] = 23;
+ pos_to_alpha[16] = 284;
+ pos_to_alpha[17] = 7;
+ pos_to_alpha[18] = 358;
+ pos_to_alpha[19] = 298;
+ pos_to_alpha[20] = 62;
+ pos_to_alpha[21] = 269;
+ pos_to_alpha[22] = 50;
+ pos_to_alpha[23] = 269;
+ pos_to_alpha[24] = 37;
+ pos_to_alpha[25] = 30;
+ pos_to_alpha[26] = 22;
+ pos_to_alpha[27] = 14;
+ pos_to_alpha[28] = 6;
+ pos_to_alpha[29] = 285;
+ pos_to_alpha[30] = 70;
+ pos_to_alpha[31] = 64;
+ pos_to_alpha[32] = 57;
+ pos_to_alpha[33] = 260;
+ pos_to_alpha[34] = 43;
+ pos_to_alpha[35] = 36;
+ pos_to_alpha[36] = 264;
+ pos_to_alpha[37] = 267;
+ pos_to_alpha[38] = 270;
+ pos_to_alpha[39] = 275;
+ pos_to_alpha[40] = 78;
+ pos_to_alpha[41] = 71;
+ pos_to_alpha[42] = 249;
+ pos_to_alpha[43] = 57;
+ pos_to_alpha[44] = 251;
+ pos_to_alpha[45] = 42;
+ pos_to_alpha[46] = 34;
+ pos_to_alpha[47] = 26;
+ pos_to_alpha[48] = 261;
+ pos_to_alpha[49] = 265;
+ pos_to_alpha[50] = 239;
+ pos_to_alpha[51] = 79;
+ pos_to_alpha[52] = 239;
+ pos_to_alpha[53] = 240;
+ pos_to_alpha[54] = 241;
+ pos_to_alpha[55] = 243;
+ pos_to_alpha[56] = 39;
+ pos_to_alpha[57] = 31;
+ pos_to_alpha[58] = 252;
+ pos_to_alpha[59] = 256;
+ pos_to_alpha[60] = 227;
+ pos_to_alpha[61] = 88;
+ pos_to_alpha[62] = 79;
+ pos_to_alpha[63] = 229;
+ pos_to_alpha[64] = 231;
+ pos_to_alpha[65] = 53;
+ pos_to_alpha[66] = 44;
+ pos_to_alpha[67] = 35;
+ pos_to_alpha[68] = 27;
+ pos_to_alpha[69] = 18;
+ pos_to_alpha[70] = 212;
+ pos_to_alpha[71] = 213;
+ pos_to_alpha[72] = 88;
+ pos_to_alpha[73] = 217;
+ pos_to_alpha[74] = 68;
+ pos_to_alpha[75] = 58;
+ pos_to_alpha[76] = 227;
+ pos_to_alpha[77] = 39;
+ pos_to_alpha[78] = 235;
+ pos_to_alpha[79] = 239;
+ pos_to_alpha[80] = 125;
+ pos_to_alpha[81] = 196;
+ pos_to_alpha[82] = 200;
+ pos_to_alpha[83] = 204;
+ pos_to_alpha[84] = 74;
+ pos_to_alpha[85] = 213;
+ pos_to_alpha[86] = 217;
+ pos_to_alpha[87] = 43;
+ pos_to_alpha[88] = 226;
+ pos_to_alpha[89] = 231;
+ pos_to_alpha[90] = 156;
+ pos_to_alpha[91] = 134;
+ pos_to_alpha[92] = 181;
+ pos_to_alpha[93] = 95;
+ pos_to_alpha[94] = 195;
+ pos_to_alpha[95] = 201;
+ pos_to_alpha[96] = 57;
+ pos_to_alpha[97] = 212;
+ pos_to_alpha[98] = 217;
+ pos_to_alpha[99] = 28;
+ ArrayInit(pos_to_beta, 0, 100);
+ pos_to_beta[0] = 41;
+ pos_to_beta[1] = 18;
+ pos_to_beta[2] = 6;
+ pos_to_beta[3] = 356;
+ pos_to_beta[4] = 78;
+ pos_to_beta[5] = 342;
+ pos_to_beta[6] = 334;
+ pos_to_beta[7] = 79;
+ pos_to_beta[8] = 319;
+ pos_to_beta[9] = 313;
+ pos_to_beta[10] = 20;
+ pos_to_beta[11] = 61;
+ pos_to_beta[12] = 358;
+ pos_to_beta[13] = 352;
+ pos_to_beta[14] = 341;
+ pos_to_beta[15] = 91;
+ pos_to_beta[16] = 86;
+ pos_to_beta[17] = 319;
+ pos_to_beta[18] = 312;
+ pos_to_beta[19] = 306;
+ pos_to_beta[20] = 11;
+ pos_to_beta[21] = 4;
+ pos_to_beta[22] = 352;
+ pos_to_beta[23] = 86;
+ pos_to_beta[24] = 98;
+ pos_to_beta[25] = 328;
+ pos_to_beta[26] = 103;
+ pos_to_beta[27] = 313;
+ pos_to_beta[28] = 106;
+ pos_to_beta[29] = 299;
+ pos_to_beta[30] = 89;
+ pos_to_beta[31] = 95;
+ pos_to_beta[32] = 347;
+ pos_to_beta[33] = 339;
+ pos_to_beta[34] = 331;
+ pos_to_beta[35] = 323;
+ pos_to_beta[36] = 314;
+ pos_to_beta[37] = 307;
+ pos_to_beta[38] = 299;
+ pos_to_beta[39] = 110;
+ pos_to_beta[40] = 0;
+ pos_to_beta[41] = 351;
+ pos_to_beta[42] = 342;
+ pos_to_beta[43] = 113;
+ pos_to_beta[44] = 325;
+ pos_to_beta[45] = 120;
+ pos_to_beta[46] = 123;
+ pos_to_beta[47] = 302;
+ pos_to_beta[48] = 292;
+ pos_to_beta[49] = 121;
+ pos_to_beta[50] = 356;
+ pos_to_beta[51] = 112;
+ pos_to_beta[52] = 337;
+ pos_to_beta[53] = 114;
+ pos_to_beta[54] = 320;
+ pos_to_beta[55] = 311;
+ pos_to_beta[56] = 133;
+ pos_to_beta[57] = 297;
+ pos_to_beta[58] = 131;
+ pos_to_beta[59] = 133;
+ pos_to_beta[60] = 108;
+ pos_to_beta[61] = 345;
+ pos_to_beta[62] = 126;
+ pos_to_beta[63] = 124;
+ pos_to_beta[64] = 315;
+ pos_to_beta[65] = 311;
+ pos_to_beta[66] = 143;
+ pos_to_beta[67] = 147;
+ pos_to_beta[68] = 151;
+ pos_to_beta[69] = 155;
+ pos_to_beta[70] = 348;
+ pos_to_beta[71] = 339;
+ pos_to_beta[72] = 134;
+ pos_to_beta[73] = 134;
+ pos_to_beta[74] = 144;
+ pos_to_beta[75] = 149;
+ pos_to_beta[76] = 148;
+ pos_to_beta[77] = 286;
+ pos_to_beta[78] = 267;
+ pos_to_beta[79] = 254;
+ pos_to_beta[80] = 348;
+ pos_to_beta[81] = 336;
+ pos_to_beta[82] = 327;
+ pos_to_beta[83] = 317;
+ pos_to_beta[84] = 314;
+ pos_to_beta[85] = 155;
+ pos_to_beta[86] = 284;
+ pos_to_beta[87] = 281;
+ pos_to_beta[88] = 255;
+ pos_to_beta[89] = 235;
+ pos_to_beta[90] = 344;
+ pos_to_beta[91] = 144;
+ pos_to_beta[92] = 325;
+ pos_to_beta[93] = 321;
+ pos_to_beta[94] = 161;
+ pos_to_beta[95] = 291;
+ pos_to_beta[96] = 289;
+ pos_to_beta[97] = 187;
+ pos_to_beta[98] = 231;
+ pos_to_beta[99] = 224;
+}
+
+sub calibrate() {
+ /*
+ if (SENSOR_3 != INPUT_REDCOLOR) {
+  OnFwd(OUT_C, SPEED);
+  until (SENSOR_3 == INPUT_REDCOLOR);
+ }
+ */
+ OnFwd(OUT_A, SPEED);
+ until (SENSOR_1 == 1);
+ RotateMotorEx(OUT_A, SPEED, 180, 0, false, false);
+ OnFwd(OUT_A, SPEED);
+ until (SENSOR_1 == 1);
+ Off(OUT_A);
+ RotateMotorEx(OUT_A, SPEED, -46, 0, false, true);
+ Wait(500);
+ alpha = 0;
+
+
+ OnFwd(OUT_B, SPEED);
+ until (SENSOR_2 == 1);
+ RotateMotorEx(OUT_B, SPEED, 180, 0, false, false);
+ OnFwd(OUT_B, SPEED);
+ until (SENSOR_2 == 1);
+ Off(OUT_B);
+ RotateMotorEx(OUT_B, SPEED, -54, 0, false, true);
+ Wait(500);
+ beta = 0;
+}
+
+
+inline int get_alpha(int x, int y) {
+ return pos_to_alpha[y * WIDTH + x];
+}
+
+inline int get_beta(int x, int y) {
+ return pos_to_beta[y * WIDTH + x];
+}
+
+
+inline int compute_rotation(int position, int target) {
+ int rotation = (target - position);
+ while (rotation > 180) {
+    rotation = rotation - 360;
+ }
+ while (rotation < -180) {
+    rotation = rotation + 360;
+ }
+
+ return MULTIPLICATOR * rotation;
+}
+
+sub goto_position(int x, int y) {
+ target_alpha = get_alpha(x, y);
+ target_beta = get_beta(x, y);
+
+
+ rotation_a = compute_rotation(alpha, target_alpha);
+ rotation_b = compute_rotation(beta, target_beta);
+
+ ClearScreen();
+ NumOut(8, 32, target_alpha);
+ NumOut(32, 32, target_beta);
+
+ NumOut(8, 8, (target_alpha - alpha) % 360);
+ NumOut(32, 8, (target_beta - beta) % 360);
+
+ Wait(2000);
+
+
+
+ //RotateMotor(OUT_A, SPEED, rotation_a);
+ RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
+ alpha = target_alpha;
+
+
+ //RotateMotor(OUT_B, SPEED, -rotation_b);
+ RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
+ beta = target_beta;
+
+
+}
+
+sub print_point(int x, int y) {
+  goto_position(x, y);
+  RotateMotor(OUT_C, SPEED, 360);
+}
+
+sub print_heart() {
+ print_point(3, 0);
+ print_point(2, 0);
+ print_point(1, 1);
+ print_point(0, 2);
+ print_point(0, 3);
+ print_point(0, 4);
+ print_point(1, 5);
+ print_point(2, 6);
+ print_point(3, 7);
+ print_point(4, 8);
+ print_point(5, 9);
+ print_point(6, 8);
+ print_point(7, 7);
+ print_point(8, 6);
+ print_point(9, 5);
+ print_point(10, 4);
+ print_point(10, 3);
+ print_point(10, 2);
+ print_point(9, 1);
+ print_point(8, 0);
+ print_point(7, 0);
+ print_point(6, 1);
+ print_point(5, 2);
+ print_point(4, 1);
+}
+
+task main()
+{
+ SetSensorColorFull(IN_3);
+ SetSensorTouch(IN_1);
+ SetSensorTouch(IN_2);
+ init_arrays();
+ calibrate();
+ /*
+ repeat(36) {
+   RotateMotor(OUT_B, SPEED, -3 * 10);
+   RotateMotor(OUT_C, SPEED, 360);
+   Wait(200);
+ }
+ */
+/*
+ print_point(0, 0);
+ //calibrate();
+ print_point(1, 0);
+ //calibrate();
+ print_point(2, 0);
+ //calibrate();
+ print_point(3, 0);
+ //calibrate();
+ print_point(4, 0);
+ //calibrate();
+ print_point(5, 0);
+*/
+/*
+ print_point(0, 0);
+ print_point(WIDTH - 1, 0);
+ print_point(0, HEIGHT - 1);
+ print_point(WIDTH - 1, HEIGHT - 1);
+*/
+
+}
