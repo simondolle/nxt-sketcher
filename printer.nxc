@@ -235,7 +235,13 @@ sub calibrate() {
  OnFwd(OUT_A, SPEED);
  until (SENSOR_1 == 1);
  Off(OUT_A);
- RotateMotorEx(OUT_A, SPEED, -46, 0, false, true);
+ //RotateMotorEx(OUT_A, SPEED, -43, 0, false, true);
+ int i = 0;
+ while(SENSOR_1 == 1) {
+  RotateMotorEx(OUT_A, SPEED, 1, 0, false, true);
+  i += 1;
+ }
+ RotateMotorEx(OUT_A, SPEED, -i/2, 0, false, true);
  Wait(500);
  alpha = 0;
 
@@ -246,11 +252,40 @@ sub calibrate() {
  OnFwd(OUT_B, SPEED);
  until (SENSOR_2 == 1);
  Off(OUT_B);
- RotateMotorEx(OUT_B, SPEED, -54, 0, false, true);
+ //RotateMotorEx(OUT_B, SPEED, -81, 0, false, true);
  Wait(500);
  beta = 0;
 }
 
+
+inline void calibrate_offset(int a_offset, int b_offset) {
+ /*
+ if (SENSOR_3 != INPUT_REDCOLOR) {
+  OnFwd(OUT_C, SPEED);
+  until (SENSOR_3 == INPUT_REDCOLOR);
+ }
+ */
+ OnFwd(OUT_A, SPEED);
+ until (SENSOR_1 == 1);
+ RotateMotorEx(OUT_A, SPEED, 180, 0, false, false);
+ OnFwd(OUT_A, SPEED);
+ until (SENSOR_1 == 1);
+ Off(OUT_A);
+ //RotateMotorEx(OUT_A, SPEED, a_offset, 0, false, true);
+ Wait(500);
+ alpha = 0;
+
+
+ OnFwd(OUT_B, SPEED);
+ until (SENSOR_2 == 1);
+ RotateMotorEx(OUT_B, SPEED, 180, 0, false, false);
+ OnFwd(OUT_B, SPEED);
+ until (SENSOR_2 == 1);
+ Off(OUT_B);
+ //RotateMotorEx(OUT_B, SPEED, b_offset, 0, false, true);
+ Wait(500);
+ beta = 0;
+}
 
 inline int get_alpha(int x, int y) {
  return pos_to_alpha[y * WIDTH + x];
@@ -288,7 +323,7 @@ sub goto_position(int x, int y) {
  NumOut(8, 8, (target_alpha - alpha) % 360);
  NumOut(32, 8, (target_beta - beta) % 360);
 
- Wait(2000);
+ Wait(1000);
 
 
 
@@ -336,6 +371,14 @@ sub print_heart() {
  print_point(4, 1);
 }
 
+sub plot_vertical_line() {
+ int y = 0;
+ repeat(10) {
+   print_point(0, y);
+   y += 1;
+ }
+}
+
 task main()
 {
  SetSensorColorFull(IN_3);
@@ -343,31 +386,23 @@ task main()
  SetSensorTouch(IN_2);
  init_arrays();
  calibrate();
- /*
- repeat(36) {
-   RotateMotor(OUT_B, SPEED, -3 * 10);
-   RotateMotor(OUT_C, SPEED, 360);
-   Wait(200);
- }
- */
-/*
- print_point(0, 0);
- //calibrate();
- print_point(1, 0);
- //calibrate();
- print_point(2, 0);
- //calibrate();
- print_point(3, 0);
- //calibrate();
- print_point(4, 0);
- //calibrate();
- print_point(5, 0);
-*/
-/*
- print_point(0, 0);
- print_point(WIDTH - 1, 0);
- print_point(0, HEIGHT - 1);
- print_point(WIDTH - 1, HEIGHT - 1);
-*/
 
+ //plot_vertical_line();
+
+ /*
+ int a_offset = -43;
+ OnFwd(OUT_A, SPEED);
+ until (SENSOR_1 == 1);
+ Off(OUT_A);
+ RotateMotorEx(OUT_A, SPEED, a_offset, 0, false, true);
+ Wait(500);
+ */
+ /*
+ int b_offset = -81;
+ OnFwd(OUT_B, SPEED);
+ until (SENSOR_2 == 1);
+ Off(OUT_B);
+ RotateMotorEx(OUT_B, SPEED, b_offset, 0, false, true);
+ Wait(500);
+ */
 }
