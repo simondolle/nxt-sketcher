@@ -99,6 +99,10 @@ def compute_grid_to_angle(points_per_lego_unit = 4, angle_step = 1):
     for alpha_degrees in range(0, 360, angle_step):
         alpha = alpha_degrees * degrees_to_radians
         for beta_degrees in range(0, 360, angle_step):
+            if 135 < alpha_degrees and alpha_degrees < -135 + 360:
+                continue
+            if 135 < beta_degrees and beta_degrees < -135 + 360:
+                continue
             #print "*" * 100
             #print "alpha", alpha_degrees, "beta", beta_degrees
             beta = beta_degrees * degrees_to_radians
@@ -278,8 +282,8 @@ for x_grid, y_grid in grid_to_angle.keys():
 
 
 for b_noise in range(0, 1):
-    a_noise = 2
-    b_noise = -2
+    a_noise = 0
+    b_noise = -0
     for a_noise in range(0, 1):
         print a_noise, b_noise
         xs_print_area = []
@@ -299,7 +303,7 @@ for b_noise in range(0, 1):
         #plt.scatter(pixel_to_angle[(0, 0)][0], pixel_to_angle[(0, 0)][1], c="b")
         plt.axis('equal')
         plt.show()
-        #export_pixel_to_angle(pixel_to_angle)
+        export_pixel_to_angle(pixel_to_angle)
 
 """
 print get_xy(102, 33)
