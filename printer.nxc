@@ -1,8 +1,8 @@
 #define SPEED 25
 #define MULTIPLICATOR 3
 
-#define WIDTH 10
-#define HEIGHT 10
+#define WIDTH 11
+#define HEIGHT 8
 int pos_to_alpha[];
 int pos_to_beta[];
 
@@ -18,208 +18,221 @@ int rotation_b;
 int result;
 
 sub init_arrays() {
- ArrayInit(pos_to_alpha, 0, 100);
- pos_to_alpha[0] = 46;
- pos_to_alpha[1] = 41;
- pos_to_alpha[2] = 35;
- pos_to_alpha[3] = 29;
- pos_to_alpha[4] = 22;
- pos_to_alpha[5] = 292;
- pos_to_alpha[6] = 295;
- pos_to_alpha[7] = 300;
- pos_to_alpha[8] = 346;
- pos_to_alpha[9] = 324;
- pos_to_alpha[10] = 54;
- pos_to_alpha[11] = 279;
- pos_to_alpha[12] = 43;
- pos_to_alpha[13] = 279;
- pos_to_alpha[14] = 30;
- pos_to_alpha[15] = 23;
- pos_to_alpha[16] = 284;
- pos_to_alpha[17] = 7;
- pos_to_alpha[18] = 358;
- pos_to_alpha[19] = 298;
- pos_to_alpha[20] = 62;
- pos_to_alpha[21] = 269;
- pos_to_alpha[22] = 50;
- pos_to_alpha[23] = 269;
- pos_to_alpha[24] = 37;
- pos_to_alpha[25] = 30;
- pos_to_alpha[26] = 22;
- pos_to_alpha[27] = 14;
- pos_to_alpha[28] = 6;
- pos_to_alpha[29] = 285;
- pos_to_alpha[30] = 70;
- pos_to_alpha[31] = 64;
- pos_to_alpha[32] = 57;
- pos_to_alpha[33] = 260;
- pos_to_alpha[34] = 43;
- pos_to_alpha[35] = 36;
- pos_to_alpha[36] = 264;
- pos_to_alpha[37] = 267;
- pos_to_alpha[38] = 270;
- pos_to_alpha[39] = 275;
- pos_to_alpha[40] = 78;
- pos_to_alpha[41] = 71;
- pos_to_alpha[42] = 249;
- pos_to_alpha[43] = 57;
- pos_to_alpha[44] = 251;
- pos_to_alpha[45] = 42;
- pos_to_alpha[46] = 34;
- pos_to_alpha[47] = 26;
- pos_to_alpha[48] = 261;
- pos_to_alpha[49] = 265;
- pos_to_alpha[50] = 239;
- pos_to_alpha[51] = 79;
- pos_to_alpha[52] = 239;
- pos_to_alpha[53] = 240;
- pos_to_alpha[54] = 241;
- pos_to_alpha[55] = 243;
- pos_to_alpha[56] = 39;
- pos_to_alpha[57] = 31;
- pos_to_alpha[58] = 252;
- pos_to_alpha[59] = 256;
- pos_to_alpha[60] = 227;
- pos_to_alpha[61] = 88;
- pos_to_alpha[62] = 79;
- pos_to_alpha[63] = 229;
- pos_to_alpha[64] = 231;
- pos_to_alpha[65] = 53;
- pos_to_alpha[66] = 236;
- pos_to_alpha[67] = 240;
- pos_to_alpha[68] = 243;
- pos_to_alpha[69] = 18;
- pos_to_alpha[70] = 108;
- pos_to_alpha[71] = 98;
- pos_to_alpha[72] = 88;
- pos_to_alpha[73] = 77;
- pos_to_alpha[74] = 68;
- pos_to_alpha[75] = 58;
- pos_to_alpha[76] = 227;
- pos_to_alpha[77] = 39;
- pos_to_alpha[78] = 235;
- pos_to_alpha[79] = 239;
- pos_to_alpha[80] = 125;
- pos_to_alpha[81] = 111;
- pos_to_alpha[82] = 98;
- pos_to_alpha[83] = 86;
- pos_to_alpha[84] = 74;
- pos_to_alpha[85] = 63;
- pos_to_alpha[86] = 53;
- pos_to_alpha[87] = 43;
- pos_to_alpha[88] = 226;
- pos_to_alpha[89] = 231;
- pos_to_alpha[90] = 135;
- pos_to_alpha[91] = 134;
- pos_to_alpha[92] = 111;
- pos_to_alpha[93] = 95;
- pos_to_alpha[94] = 82;
- pos_to_alpha[95] = 69;
- pos_to_alpha[96] = 57;
- pos_to_alpha[97] = 47;
- pos_to_alpha[98] = 37;
- pos_to_alpha[99] = 28;
- ArrayInit(pos_to_beta, 0, 100);
- pos_to_beta[0] = 41;
- pos_to_beta[1] = 18;
- pos_to_beta[2] = 6;
- pos_to_beta[3] = 356;
- pos_to_beta[4] = 78;
- pos_to_beta[5] = 342;
- pos_to_beta[6] = 334;
- pos_to_beta[7] = 79;
- pos_to_beta[8] = 319;
- pos_to_beta[9] = 313;
- pos_to_beta[10] = 20;
- pos_to_beta[11] = 61;
- pos_to_beta[12] = 358;
- pos_to_beta[13] = 352;
- pos_to_beta[14] = 341;
- pos_to_beta[15] = 91;
- pos_to_beta[16] = 86;
- pos_to_beta[17] = 319;
- pos_to_beta[18] = 312;
- pos_to_beta[19] = 306;
- pos_to_beta[20] = 11;
- pos_to_beta[21] = 4;
- pos_to_beta[22] = 352;
- pos_to_beta[23] = 86;
- pos_to_beta[24] = 98;
- pos_to_beta[25] = 328;
- pos_to_beta[26] = 103;
- pos_to_beta[27] = 313;
- pos_to_beta[28] = 106;
- pos_to_beta[29] = 299;
- pos_to_beta[30] = 89;
- pos_to_beta[31] = 95;
- pos_to_beta[32] = 347;
- pos_to_beta[33] = 339;
- pos_to_beta[34] = 331;
- pos_to_beta[35] = 323;
- pos_to_beta[36] = 314;
- pos_to_beta[37] = 307;
- pos_to_beta[38] = 299;
- pos_to_beta[39] = 110;
- pos_to_beta[40] = 0;
- pos_to_beta[41] = 351;
- pos_to_beta[42] = 342;
- pos_to_beta[43] = 113;
- pos_to_beta[44] = 325;
- pos_to_beta[45] = 120;
- pos_to_beta[46] = 123;
- pos_to_beta[47] = 302;
- pos_to_beta[48] = 292;
- pos_to_beta[49] = 121;
- pos_to_beta[50] = 356;
- pos_to_beta[51] = 112;
- pos_to_beta[52] = 337;
- pos_to_beta[53] = 114;
- pos_to_beta[54] = 320;
- pos_to_beta[55] = 311;
- pos_to_beta[56] = 133;
- pos_to_beta[57] = 297;
- pos_to_beta[58] = 131;
- pos_to_beta[59] = 133;
- pos_to_beta[60] = 108;
- pos_to_beta[61] = 345;
- pos_to_beta[62] = 126;
- pos_to_beta[63] = 124;
- pos_to_beta[64] = 315;
- pos_to_beta[65] = 311;
- pos_to_beta[66] = 296;
- pos_to_beta[67] = 287;
- pos_to_beta[68] = 276;
- pos_to_beta[69] = 270;
- pos_to_beta[70] = 123;
- pos_to_beta[71] = 342;
- pos_to_beta[72] = 134;
- pos_to_beta[73] = 325;
- pos_to_beta[74] = 317;
- pos_to_beta[75] = 307;
- pos_to_beta[76] = 290;
- pos_to_beta[77] = 286;
- pos_to_beta[78] = 267;
- pos_to_beta[79] = 254;
- pos_to_beta[80] = 348;
- pos_to_beta[81] = 340;
- pos_to_beta[82] = 332;
- pos_to_beta[83] = 323;
- pos_to_beta[84] = 314;
- pos_to_beta[85] = 304;
- pos_to_beta[86] = 293;
- pos_to_beta[87] = 281;
- pos_to_beta[88] = 255;
- pos_to_beta[89] = 235;
- pos_to_beta[90] = 344;
- pos_to_beta[91] = 337;
- pos_to_beta[92] = 329;
- pos_to_beta[93] = 321;
- pos_to_beta[94] = 312;
- pos_to_beta[95] = 301;
- pos_to_beta[96] = 289;
- pos_to_beta[97] = 275;
- pos_to_beta[98] = 256;
- pos_to_beta[99] = 225;
+ ArrayInit(pos_to_alpha, 0, 88);
+ pos_to_alpha[0] = 54;
+ pos_to_alpha[1] = 48;
+ pos_to_alpha[2] = 42;
+ pos_to_alpha[3] = 35;
+ pos_to_alpha[4] = 28;
+ pos_to_alpha[5] = 21;
+ pos_to_alpha[6] = 13;
+ pos_to_alpha[7] = 4;
+ pos_to_alpha[8] = -5;
+ pos_to_alpha[9] = -16;
+ pos_to_alpha[10] = -35;
+ pos_to_alpha[11] = 62;
+ pos_to_alpha[12] = 55;
+ pos_to_alpha[13] = 49;
+ pos_to_alpha[14] = 42;
+ pos_to_alpha[15] = 34;
+ pos_to_alpha[16] = 27;
+ pos_to_alpha[17] = 19;
+ pos_to_alpha[18] = 11;
+ pos_to_alpha[19] = 2;
+ pos_to_alpha[20] = -7;
+ pos_to_alpha[21] = -19;
+ pos_to_alpha[22] = 70;
+ pos_to_alpha[23] = 63;
+ pos_to_alpha[24] = 55;
+ pos_to_alpha[25] = 48;
+ pos_to_alpha[26] = 40;
+ pos_to_alpha[27] = 32;
+ pos_to_alpha[28] = 24;
+ pos_to_alpha[29] = 16;
+ pos_to_alpha[30] = 7;
+ pos_to_alpha[31] = -1;
+ pos_to_alpha[32] = -11;
+ pos_to_alpha[33] = 77;
+ pos_to_alpha[34] = 70;
+ pos_to_alpha[35] = 62;
+ pos_to_alpha[36] = 54;
+ pos_to_alpha[37] = 46;
+ pos_to_alpha[38] = 38;
+ pos_to_alpha[39] = 29;
+ pos_to_alpha[40] = 21;
+ pos_to_alpha[41] = 12;
+ pos_to_alpha[42] = 3;
+ pos_to_alpha[43] = -6;
+ pos_to_alpha[44] = 86;
+ pos_to_alpha[45] = 77;
+ pos_to_alpha[46] = 69;
+ pos_to_alpha[47] = 60;
+ pos_to_alpha[48] = 51;
+ pos_to_alpha[49] = 42;
+ pos_to_alpha[50] = 34;
+ pos_to_alpha[51] = 25;
+ pos_to_alpha[52] = 16;
+ pos_to_alpha[53] = 7;
+ pos_to_alpha[54] = -1;
+ pos_to_alpha[55] = 96;
+ pos_to_alpha[56] = 86;
+ pos_to_alpha[57] = 76;
+ pos_to_alpha[58] = 66;
+ pos_to_alpha[59] = 56;
+ pos_to_alpha[60] = 47;
+ pos_to_alpha[61] = 38;
+ pos_to_alpha[62] = 29;
+ pos_to_alpha[63] = 20;
+ pos_to_alpha[64] = 11;
+ pos_to_alpha[65] = 1;
+ pos_to_alpha[66] = 108;
+ pos_to_alpha[67] = 95;
+ pos_to_alpha[68] = 84;
+ pos_to_alpha[69] = 72;
+ pos_to_alpha[70] = 61;
+ pos_to_alpha[71] = 51;
+ pos_to_alpha[72] = 41;
+ pos_to_alpha[73] = 32;
+ pos_to_alpha[74] = 23;
+ pos_to_alpha[75] = 13;
+ pos_to_alpha[76] = 4;
+ pos_to_alpha[77] = 128;
+ pos_to_alpha[78] = 108;
+ pos_to_alpha[79] = 93;
+ pos_to_alpha[80] = 79;
+ pos_to_alpha[81] = 67;
+ pos_to_alpha[82] = 55;
+ pos_to_alpha[83] = 45;
+ pos_to_alpha[84] = 35;
+ pos_to_alpha[85] = 25;
+ pos_to_alpha[86] = 16;
+ pos_to_alpha[87] = 6;
+ ArrayInit(pos_to_beta, 0, 88);
+ pos_to_beta[0] = 35;
+ pos_to_beta[1] = 16;
+ pos_to_beta[2] = 5;
+ pos_to_beta[3] = -4;
+ pos_to_beta[4] = -13;
+ pos_to_beta[5] = -21;
+ pos_to_beta[6] = -28;
+ pos_to_beta[7] = -35;
+ pos_to_beta[8] = -42;
+ pos_to_beta[9] = -48;
+ pos_to_beta[10] = -54;
+ pos_to_beta[11] = 19;
+ pos_to_beta[12] = 7;
+ pos_to_beta[13] = -2;
+ pos_to_beta[14] = -11;
+ pos_to_beta[15] = -19;
+ pos_to_beta[16] = -27;
+ pos_to_beta[17] = -34;
+ pos_to_beta[18] = -42;
+ pos_to_beta[19] = -49;
+ pos_to_beta[20] = -55;
+ pos_to_beta[21] = -62;
+ pos_to_beta[22] = 11;
+ pos_to_beta[23] = 1;
+ pos_to_beta[24] = -7;
+ pos_to_beta[25] = -16;
+ pos_to_beta[26] = -24;
+ pos_to_beta[27] = -32;
+ pos_to_beta[28] = -40;
+ pos_to_beta[29] = -48;
+ pos_to_beta[30] = -55;
+ pos_to_beta[31] = -63;
+ pos_to_beta[32] = -70;
+ pos_to_beta[33] = 6;
+ pos_to_beta[34] = -3;
+ pos_to_beta[35] = -12;
+ pos_to_beta[36] = -21;
+ pos_to_beta[37] = -29;
+ pos_to_beta[38] = -38;
+ pos_to_beta[39] = -46;
+ pos_to_beta[40] = -54;
+ pos_to_beta[41] = -62;
+ pos_to_beta[42] = -70;
+ pos_to_beta[43] = -77;
+ pos_to_beta[44] = 1;
+ pos_to_beta[45] = -7;
+ pos_to_beta[46] = -16;
+ pos_to_beta[47] = -25;
+ pos_to_beta[48] = -34;
+ pos_to_beta[49] = -42;
+ pos_to_beta[50] = -51;
+ pos_to_beta[51] = -60;
+ pos_to_beta[52] = -69;
+ pos_to_beta[53] = -77;
+ pos_to_beta[54] = -86;
+ pos_to_beta[55] = -1;
+ pos_to_beta[56] = -11;
+ pos_to_beta[57] = -20;
+ pos_to_beta[58] = -29;
+ pos_to_beta[59] = -38;
+ pos_to_beta[60] = -47;
+ pos_to_beta[61] = -56;
+ pos_to_beta[62] = -66;
+ pos_to_beta[63] = -76;
+ pos_to_beta[64] = -86;
+ pos_to_beta[65] = -96;
+ pos_to_beta[66] = -4;
+ pos_to_beta[67] = -13;
+ pos_to_beta[68] = -23;
+ pos_to_beta[69] = -32;
+ pos_to_beta[70] = -41;
+ pos_to_beta[71] = -51;
+ pos_to_beta[72] = -61;
+ pos_to_beta[73] = -72;
+ pos_to_beta[74] = -84;
+ pos_to_beta[75] = -95;
+ pos_to_beta[76] = -108;
+ pos_to_beta[77] = -6;
+ pos_to_beta[78] = -16;
+ pos_to_beta[79] = -25;
+ pos_to_beta[80] = -35;
+ pos_to_beta[81] = -45;
+ pos_to_beta[82] = -55;
+ pos_to_beta[83] = -67;
+ pos_to_beta[84] = -79;
+ pos_to_beta[85] = -93;
+ pos_to_beta[86] = -108;
+ pos_to_beta[87] = -128;
+}
+
+inline bool is_stalled(byte output)
+{
+ long t0 = CurrentTick();
+ long previousCount = MotorTachoCount(output);
+ while(CurrentTick() < t0 + 100) {
+  Wait(10);
+  long count = MotorTachoCount(output);
+  int stallThreshold = 2;
+  if (abs(count - previousCount) >= stallThreshold)
+  {
+   return false;
+  }
+  previousCount = count;
+ }
+ return true;
+}
+
+inline void calibrate_motor(byte output) {
+ OnRev(output, SPEED);
+ until (is_stalled(output));
+ Off(output);
+ long initialCount = MotorRotationCount(output);
+ Wait(100);
+ OnFwd(output, SPEED);
+ until (is_stalled(output));
+ Off(output);
+ long finalCount = MotorRotationCount(output);
+ Wait(100);
+ RotateMotorEx(output, -SPEED, (finalCount - initialCount) / 2, 0, false, true);
+ Wait(100);
+}
+
+inline void calibrate_stalled() {
+  calibrate_motor(OUT_A);
+  calibrate_motor(OUT_B);
 }
 
 sub calibrate() {
@@ -279,7 +292,7 @@ inline int normalize_angle(int angle) {
 
 inline int compute_rotation(int position, int target) {
  target = normalize_angle(target);
- position = normalize_angle(target);
+ position = normalize_angle(position);
 
  int rotation = (target - position);
 
@@ -298,8 +311,8 @@ sub goto_position(int x, int y) {
  NumOut(8, 32, target_alpha);
  NumOut(32, 32, target_beta);
 
- NumOut(8, 8, (target_alpha - alpha) % 360);
- NumOut(32, 8, (target_beta - beta) % 360);
+ NumOut(8, 8, rotation_a);
+ NumOut(32, 8, rotation_b);
 
  Wait(1000);
 
@@ -351,36 +364,33 @@ sub print_heart() {
 
 sub plot_vertical_line() {
  int y = 0;
- repeat(10) {
+ repeat(HEIGHT) {
    print_point(0, y);
    y += 1;
  }
 }
 
+sub plot_grid() {
+ int x = 0;
+ repeat(WIDTH) {
+  int y = 0;
+  repeat(HEIGHT) {
+   print_point(x, y);
+   y += 1;
+  }
+  x += 1;
+ }
+
+}
+
 task main()
 {
- SetSensorColorFull(IN_3);
- SetSensorTouch(IN_1);
- SetSensorTouch(IN_2);
+ //SetSensorColorFull(IN_3);
+ //SetSensorTouch(IN_1);
+ //SetSensorTouch(IN_2);
  init_arrays();
- calibrate();
+ calibrate_stalled();
 
- plot_vertical_line();
+ plot_grid();
 
- /*
- int a_offset = -43;
- OnFwd(OUT_A, SPEED);
- until (SENSOR_1 == 1);
- Off(OUT_A);
- RotateMotorEx(OUT_A, SPEED, a_offset, 0, false, true);
- Wait(500);
- */
- /*
- int b_offset = -81;
- OnFwd(OUT_B, SPEED);
- until (SENSOR_2 == 1);
- Off(OUT_B);
- RotateMotorEx(OUT_B, SPEED, b_offset, 0, false, true);
- Wait(500);
- */
 }

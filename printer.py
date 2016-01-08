@@ -9,7 +9,7 @@ def get_xy(alpha, beta):
     r = 3  # short arm length (attached to the rotative axis)
     a = 8  # long arm length
     b = a  # distance from short arm extremity to pen
-    s = 1  # pen distance
+    s = 0  # pen distance
 
     xa = -5 #left short arm x
     xb = 5 #right short arm x
@@ -47,10 +47,65 @@ def get_xy(alpha, beta):
 
     return xt, yt
 
-def compute_gradient(alpha, beta):
-    g_x = get_xy(alpha + 0.5, beta)[0] - get_xy(alpha - 0.5, beta)[0]
-    g_y = get_xy(alpha, beta + 0.5)[1] - get_xy(alpha, beta - 0.5)[1]
-    return math.sqrt(g_x * g_x + g_y * g_y)
+class StructureSetting:
+    def __init__(self):
+        self.r = 3  # short arm length (attached to the rotative axis)
+        self.a = 8  # long arm length
+        self.b = self.a  # distance from short arm extremity to pen
+        self.s = 1  # pen distance
+
+        self.xa = -5 #left short arm x
+        self.xb = 5 #right short arm x
+
+def compute_circle_intersection(x0, y0, x1, y1, r0, r1):
+    d = compute_distance(x0, y0, x1, y1)
+    if d < math.fabs(r0 - r1) or r0 +r1 < d:
+        return None
+
+    a = (math.pow(r0, 2) - math.pow(r1, 2) + math.pow(d, 2))/float(2 * d)
+    h = math.sqrt(math.pow(r0, 2) - math.pow(a, 2))
+
+    x2 = x0 + a * (x1 - x0)/float(d)
+    y2 = y0 + a * (y1 - y0)/float(d)
+
+    x3 = x2 + h * (y1 - y0)/ d
+    y3 = y2 - h * (x1 - x0)/ d
+
+    x3_prime = x2 - h * (y1 - y0)/ d
+    y3_prime = y2 + h * (x1 - x0)/ d
+    print "intersections", (x3, y3), (x3_prime, y3_prime)
+    return (x3, y3), (x3_prime, y3_prime)
+
+
+
+def get_alpha_beta(x, y, structure_settings):
+    intersection1 = compute_circle_intersection(structure_settings.xa, 0, x, y, structure_settings.r, structure_settings.a)
+    if intersection1 is None:
+        return None
+    (x1, y1), (x1_prime, y1_prime) = intersection1
+    alpha = math.atan2(structure_settings.xa - x1, y1) * radians_to_degrees
+    alpha_prime = math.atan2(structure_settings.xa - x1_prime, y1_prime) * radians_to_degrees
+
+    if x1 < x1_prime:
+        alpha_result = alpha
+    else:
+        alpha_result = alpha_prime
+
+    intersection2 = compute_circle_intersection(structure_settings.xb, 0, x, y, structure_settings.r, structure_settings.a)
+    if intersection2 is None:
+        return None
+    (x2, y2), (x2_prime, y2_prime) = intersection2
+
+    beta = math.atan2(structure_settings.xb - x2, y2) * radians_to_degrees
+    beta_prime = math.atan2(structure_settings.xb - x2_prime, y2_prime) * radians_to_degrees
+
+    if x2 > x2_prime:
+        beta_result = beta
+    else:
+        beta_result = beta_prime
+
+    return alpha_result, beta_result
+
 
 def change_referential(x, y):
     angle = 0 * degrees_to_radians
@@ -123,7 +178,6 @@ def compute_grid_to_angle(points_per_lego_unit = 4, angle_step = 1):
     result = grid_to_angle
     #for (x, y), (alpha, beta, d) in grid_to_angle.items():
     #    print x, y, compute_distance(x, y, get_xy(alpha * degrees_to_radians, beta * degrees_to_radians)[0], get_xy(alpha * degrees_to_radians, beta * degrees_to_radians)[1])
-    print gradients
     return result
 
 def find_largest_print_area(grid_coordinates, points_per_lego_unit):
@@ -152,12 +206,12 @@ def find_largest_print_area(grid_coordinates, points_per_lego_unit):
                     value = min(result[(x + step, y)], result[(x, y - step)], result[(x + step, y - step)]) + 1
                     result[(x, y)] = value
     max_dim = max(result.values())
-    print "nb_points", max_dim
+
     top_left_coordinates = []
     for (x, y), dim in result.items():
         if dim == max_dim:
             top_left_coordinates.append((x, y))
-    print top_left_coordinates
+
 
 def is_rectangle(x0, y0, x1, y1, grid_coordinates, xs, ys):
     for x in xs:
@@ -208,7 +262,6 @@ def build_pixel_to_angle(print_area, grid_to_angle):
     xs = sorted(list(xs))
     ys = sorted(list(ys))
     x0, y0, x1, y1 = print_area
-    print print_area
     xs = [x for x in xs if x0 <= x and x <= x1]
     ys = [y for y in ys if y0 <= y and y <= y1]
     pixel_to_angle = {}
@@ -231,12 +284,6 @@ def export_pixel_to_angle(pixel_to_angle):
             result_a.append(pixel_to_angle[(x, y)][0])
             result_b.append(pixel_to_angle[(x, y)][1])
 
-    """
-    print pixel_to_angle[(0, 0)]
-    print pixel_to_angle[(width - 1, 0)]
-    print pixel_to_angle[(0, height - 1)]
-    print pixel_to_angle[(width - 1, height - 1)]
-    """
     print width, height
     print " ArrayInit(pos_to_alpha, 0, %d);" % (width * height)
     for i, a in enumerate(result_a):
@@ -255,23 +302,35 @@ x_grids = []
 y_grids = []
 points_per_lego_unit = 2
 grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
+
+#print get_xy(0, 0)
+#print get_alpha_beta(0, 9.24, StructureSetting())
+#print get_alpha_beta(4, 0, StructureSetting())
+#print compute_circle_intersection(-5, 0, 5, 0, 6, 6)
+
+grid_to_angle_backward_kinematics = {}
+for (x_grid, y_grid), (alpha, beta, distance) in sorted(grid_to_angle.items()):
+    angles = get_alpha_beta(x_grid, y_grid, StructureSetting())
+    if angles is None:
+        continue
+    alpha2, beta2 = angles
+    grid_to_angle_backward_kinematics[(x_grid, y_grid)] = (alpha2, beta2, 0)
+    #print "***********************"
+    #print x_grid, y_grid
+    #print alpha, alpha2
+    #print beta, beta2
+#print "*" * 50
+#print get_alpha_beta(-2.5, -5.5, StructureSetting())
+#print get_alpha_beta(-2.5, -6, StructureSetting())
+
+grid_to_angle = grid_to_angle_backward_kinematics
 print_area = find_largest_rectange(grid_to_angle)
 
 #print_area = (-3.5, 5.0, 2.0, 8.5)
 x0, y0, x1, y1 = print_area
 
-
-"""
-print ""
-print print_area
-for i in range(6):
-    x, y = x0 + i * 0.5, y1
-    print grid_to_angle[(x, y)], get_xy(grid_to_angle[(x, y)][0] * degrees_to_radians, grid_to_angle[(x, y)][1] * degrees_to_radians)
-"""
 pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
 
-for i in range(6):
-    print pixel_to_angle[(i, 0)]
 
 for x_grid, y_grid in grid_to_angle.keys():
     x_grids.append(x_grid)
@@ -285,7 +344,6 @@ for b_noise in range(0, 1):
     a_noise = 0
     b_noise = -0
     for a_noise in range(0, 1):
-        print a_noise, b_noise
         xs_print_area = []
         ys_print_area = []
         for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
@@ -315,7 +373,7 @@ print get_xy(279, 25)
 """
 
 #plt.scatter(x_grids, y_grids, c="r")
-plt.scatter(xs_print_area, ys_print_area, c="b")
+#plt.scatter(xs_print_area, ys_print_area, c="b")
 #plt.scatter(pixel_to_angle[(0, 0)][0], pixel_to_angle[(0, 0)][1], c="b")
-plt.axis('equal')
-plt.show()
+#plt.axis('equal')
+#plt.show()
