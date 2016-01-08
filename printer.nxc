@@ -3,8 +3,8 @@
 
 #define WIDTH 11
 #define HEIGHT 8
-int pos_to_alpha[];
-int pos_to_beta[];
+float pos_to_alpha[];
+float pos_to_beta[];
 
 int alpha;
 int beta;
@@ -19,182 +19,182 @@ int result;
 
 sub init_arrays() {
  ArrayInit(pos_to_alpha, 0, 88);
- pos_to_alpha[0] = 54;
- pos_to_alpha[1] = 48;
+ pos_to_alpha[0] = 55;
+ pos_to_alpha[1] = 49;
  pos_to_alpha[2] = 42;
- pos_to_alpha[3] = 35;
- pos_to_alpha[4] = 28;
+ pos_to_alpha[3] = 36;
+ pos_to_alpha[4] = 29;
  pos_to_alpha[5] = 21;
  pos_to_alpha[6] = 13;
- pos_to_alpha[7] = 4;
+ pos_to_alpha[7] = 5;
  pos_to_alpha[8] = -5;
- pos_to_alpha[9] = -16;
- pos_to_alpha[10] = -35;
+ pos_to_alpha[9] = -17;
+ pos_to_alpha[10] = -36;
  pos_to_alpha[11] = 62;
- pos_to_alpha[12] = 55;
+ pos_to_alpha[12] = 56;
  pos_to_alpha[13] = 49;
  pos_to_alpha[14] = 42;
- pos_to_alpha[15] = 34;
+ pos_to_alpha[15] = 35;
  pos_to_alpha[16] = 27;
  pos_to_alpha[17] = 19;
  pos_to_alpha[18] = 11;
  pos_to_alpha[19] = 2;
- pos_to_alpha[20] = -7;
- pos_to_alpha[21] = -19;
+ pos_to_alpha[20] = -8;
+ pos_to_alpha[21] = -20;
  pos_to_alpha[22] = 70;
  pos_to_alpha[23] = 63;
- pos_to_alpha[24] = 55;
+ pos_to_alpha[24] = 56;
  pos_to_alpha[25] = 48;
- pos_to_alpha[26] = 40;
- pos_to_alpha[27] = 32;
- pos_to_alpha[28] = 24;
- pos_to_alpha[29] = 16;
- pos_to_alpha[30] = 7;
+ pos_to_alpha[26] = 41;
+ pos_to_alpha[27] = 33;
+ pos_to_alpha[28] = 25;
+ pos_to_alpha[29] = 17;
+ pos_to_alpha[30] = 8;
  pos_to_alpha[31] = -1;
- pos_to_alpha[32] = -11;
- pos_to_alpha[33] = 77;
+ pos_to_alpha[32] = -12;
+ pos_to_alpha[33] = 78;
  pos_to_alpha[34] = 70;
  pos_to_alpha[35] = 62;
  pos_to_alpha[36] = 54;
  pos_to_alpha[37] = 46;
  pos_to_alpha[38] = 38;
- pos_to_alpha[39] = 29;
+ pos_to_alpha[39] = 30;
  pos_to_alpha[40] = 21;
- pos_to_alpha[41] = 12;
- pos_to_alpha[42] = 3;
+ pos_to_alpha[41] = 13;
+ pos_to_alpha[42] = 4;
  pos_to_alpha[43] = -6;
  pos_to_alpha[44] = 86;
- pos_to_alpha[45] = 77;
+ pos_to_alpha[45] = 78;
  pos_to_alpha[46] = 69;
  pos_to_alpha[47] = 60;
- pos_to_alpha[48] = 51;
- pos_to_alpha[49] = 42;
+ pos_to_alpha[48] = 52;
+ pos_to_alpha[49] = 43;
  pos_to_alpha[50] = 34;
  pos_to_alpha[51] = 25;
- pos_to_alpha[52] = 16;
- pos_to_alpha[53] = 7;
- pos_to_alpha[54] = -1;
+ pos_to_alpha[52] = 17;
+ pos_to_alpha[53] = 8;
+ pos_to_alpha[54] = -2;
  pos_to_alpha[55] = 96;
  pos_to_alpha[56] = 86;
  pos_to_alpha[57] = 76;
  pos_to_alpha[58] = 66;
- pos_to_alpha[59] = 56;
+ pos_to_alpha[59] = 57;
  pos_to_alpha[60] = 47;
  pos_to_alpha[61] = 38;
  pos_to_alpha[62] = 29;
  pos_to_alpha[63] = 20;
  pos_to_alpha[64] = 11;
- pos_to_alpha[65] = 1;
- pos_to_alpha[66] = 108;
- pos_to_alpha[67] = 95;
+ pos_to_alpha[65] = 2;
+ pos_to_alpha[66] = 109;
+ pos_to_alpha[67] = 96;
  pos_to_alpha[68] = 84;
- pos_to_alpha[69] = 72;
- pos_to_alpha[70] = 61;
- pos_to_alpha[71] = 51;
- pos_to_alpha[72] = 41;
+ pos_to_alpha[69] = 73;
+ pos_to_alpha[70] = 62;
+ pos_to_alpha[71] = 52;
+ pos_to_alpha[72] = 42;
  pos_to_alpha[73] = 32;
  pos_to_alpha[74] = 23;
- pos_to_alpha[75] = 13;
- pos_to_alpha[76] = 4;
+ pos_to_alpha[75] = 14;
+ pos_to_alpha[76] = 5;
  pos_to_alpha[77] = 128;
- pos_to_alpha[78] = 108;
+ pos_to_alpha[78] = 109;
  pos_to_alpha[79] = 93;
- pos_to_alpha[80] = 79;
+ pos_to_alpha[80] = 80;
  pos_to_alpha[81] = 67;
- pos_to_alpha[82] = 55;
+ pos_to_alpha[82] = 56;
  pos_to_alpha[83] = 45;
  pos_to_alpha[84] = 35;
- pos_to_alpha[85] = 25;
+ pos_to_alpha[85] = 26;
  pos_to_alpha[86] = 16;
- pos_to_alpha[87] = 6;
+ pos_to_alpha[87] = 7;
  ArrayInit(pos_to_beta, 0, 88);
- pos_to_beta[0] = 35;
- pos_to_beta[1] = 16;
+ pos_to_beta[0] = 36;
+ pos_to_beta[1] = 17;
  pos_to_beta[2] = 5;
- pos_to_beta[3] = -4;
+ pos_to_beta[3] = -5;
  pos_to_beta[4] = -13;
  pos_to_beta[5] = -21;
- pos_to_beta[6] = -28;
- pos_to_beta[7] = -35;
+ pos_to_beta[6] = -29;
+ pos_to_beta[7] = -36;
  pos_to_beta[8] = -42;
- pos_to_beta[9] = -48;
- pos_to_beta[10] = -54;
- pos_to_beta[11] = 19;
- pos_to_beta[12] = 7;
+ pos_to_beta[9] = -49;
+ pos_to_beta[10] = -55;
+ pos_to_beta[11] = 20;
+ pos_to_beta[12] = 8;
  pos_to_beta[13] = -2;
  pos_to_beta[14] = -11;
  pos_to_beta[15] = -19;
  pos_to_beta[16] = -27;
- pos_to_beta[17] = -34;
+ pos_to_beta[17] = -35;
  pos_to_beta[18] = -42;
  pos_to_beta[19] = -49;
- pos_to_beta[20] = -55;
+ pos_to_beta[20] = -56;
  pos_to_beta[21] = -62;
- pos_to_beta[22] = 11;
+ pos_to_beta[22] = 12;
  pos_to_beta[23] = 1;
- pos_to_beta[24] = -7;
- pos_to_beta[25] = -16;
- pos_to_beta[26] = -24;
- pos_to_beta[27] = -32;
- pos_to_beta[28] = -40;
+ pos_to_beta[24] = -8;
+ pos_to_beta[25] = -17;
+ pos_to_beta[26] = -25;
+ pos_to_beta[27] = -33;
+ pos_to_beta[28] = -41;
  pos_to_beta[29] = -48;
- pos_to_beta[30] = -55;
+ pos_to_beta[30] = -56;
  pos_to_beta[31] = -63;
  pos_to_beta[32] = -70;
  pos_to_beta[33] = 6;
- pos_to_beta[34] = -3;
- pos_to_beta[35] = -12;
+ pos_to_beta[34] = -4;
+ pos_to_beta[35] = -13;
  pos_to_beta[36] = -21;
- pos_to_beta[37] = -29;
+ pos_to_beta[37] = -30;
  pos_to_beta[38] = -38;
  pos_to_beta[39] = -46;
  pos_to_beta[40] = -54;
  pos_to_beta[41] = -62;
  pos_to_beta[42] = -70;
- pos_to_beta[43] = -77;
- pos_to_beta[44] = 1;
- pos_to_beta[45] = -7;
- pos_to_beta[46] = -16;
+ pos_to_beta[43] = -78;
+ pos_to_beta[44] = 2;
+ pos_to_beta[45] = -8;
+ pos_to_beta[46] = -17;
  pos_to_beta[47] = -25;
  pos_to_beta[48] = -34;
- pos_to_beta[49] = -42;
- pos_to_beta[50] = -51;
+ pos_to_beta[49] = -43;
+ pos_to_beta[50] = -52;
  pos_to_beta[51] = -60;
  pos_to_beta[52] = -69;
- pos_to_beta[53] = -77;
+ pos_to_beta[53] = -78;
  pos_to_beta[54] = -86;
- pos_to_beta[55] = -1;
+ pos_to_beta[55] = -2;
  pos_to_beta[56] = -11;
  pos_to_beta[57] = -20;
  pos_to_beta[58] = -29;
  pos_to_beta[59] = -38;
  pos_to_beta[60] = -47;
- pos_to_beta[61] = -56;
+ pos_to_beta[61] = -57;
  pos_to_beta[62] = -66;
  pos_to_beta[63] = -76;
  pos_to_beta[64] = -86;
  pos_to_beta[65] = -96;
- pos_to_beta[66] = -4;
- pos_to_beta[67] = -13;
+ pos_to_beta[66] = -5;
+ pos_to_beta[67] = -14;
  pos_to_beta[68] = -23;
  pos_to_beta[69] = -32;
- pos_to_beta[70] = -41;
- pos_to_beta[71] = -51;
- pos_to_beta[72] = -61;
- pos_to_beta[73] = -72;
+ pos_to_beta[70] = -42;
+ pos_to_beta[71] = -52;
+ pos_to_beta[72] = -62;
+ pos_to_beta[73] = -73;
  pos_to_beta[74] = -84;
- pos_to_beta[75] = -95;
- pos_to_beta[76] = -108;
- pos_to_beta[77] = -6;
+ pos_to_beta[75] = -96;
+ pos_to_beta[76] = -109;
+ pos_to_beta[77] = -7;
  pos_to_beta[78] = -16;
- pos_to_beta[79] = -25;
+ pos_to_beta[79] = -26;
  pos_to_beta[80] = -35;
  pos_to_beta[81] = -45;
- pos_to_beta[82] = -55;
+ pos_to_beta[82] = -56;
  pos_to_beta[83] = -67;
- pos_to_beta[84] = -79;
+ pos_to_beta[84] = -80;
  pos_to_beta[85] = -93;
- pos_to_beta[86] = -108;
+ pos_to_beta[86] = -109;
  pos_to_beta[87] = -128;
 }
 
@@ -235,43 +235,6 @@ inline void calibrate_stalled() {
   calibrate_motor(OUT_B);
 }
 
-sub calibrate() {
- /*
- if (SENSOR_3 != INPUT_REDCOLOR) {
-  OnFwd(OUT_C, SPEED);
-  until (SENSOR_3 == INPUT_REDCOLOR);
- }
- */
- OnFwd(OUT_A, SPEED);
- until (SENSOR_1 == 1);
- RotateMotorEx(OUT_A, SPEED, 180, 0, false, false);
- OnFwd(OUT_A, SPEED);
- until (SENSOR_1 == 1);
- Off(OUT_A);
- //RotateMotorEx(OUT_A, SPEED, -43, 0, false, true);
- int i = 0;
- while(SENSOR_1 == 1) {
-  RotateMotorEx(OUT_A, SPEED, 1, 0, false, true);
-  i += 1;
- }
- RotateMotorEx(OUT_A, SPEED, -i/2, 0, false, true);
- Wait(500);
- alpha = 0;
-
-
- OnFwd(OUT_B, SPEED);
- until (SENSOR_2 == 1);
- RotateMotorEx(OUT_B, SPEED, 180, 0, false, false);
- OnFwd(OUT_B, SPEED);
- until (SENSOR_2 == 1);
- Off(OUT_B);
- //RotateMotorEx(OUT_B, SPEED, -81, 0, false, true);
- Wait(500);
- beta = 0;
-}
-
-
-
 inline int get_alpha(int x, int y) {
  return pos_to_alpha[y * WIDTH + x];
 }
@@ -307,27 +270,11 @@ sub goto_position(int x, int y) {
  rotation_a = compute_rotation(alpha, target_alpha);
  rotation_b = compute_rotation(beta, target_beta);
 
- ClearScreen();
- NumOut(8, 32, target_alpha);
- NumOut(32, 32, target_beta);
-
- NumOut(8, 8, rotation_a);
- NumOut(32, 8, rotation_b);
-
- Wait(1000);
-
-
-
- //RotateMotor(OUT_A, SPEED, rotation_a);
  RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
  alpha = target_alpha;
 
-
- //RotateMotor(OUT_B, SPEED, -rotation_b);
  RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
  beta = target_beta;
-
-
 }
 
 sub print_point(int x, int y) {

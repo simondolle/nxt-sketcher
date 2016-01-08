@@ -73,7 +73,7 @@ def compute_circle_intersection(x0, y0, x1, y1, r0, r1):
 
     x3_prime = x2 - h * (y1 - y0)/ d
     y3_prime = y2 + h * (x1 - x0)/ d
-    print "intersections", (x3, y3), (x3_prime, y3_prime)
+    #print "intersections", (x3, y3), (x3_prime, y3_prime)
     return (x3, y3), (x3_prime, y3_prime)
 
 
@@ -104,7 +104,7 @@ def get_alpha_beta(x, y, structure_settings):
     else:
         beta_result = beta_prime
 
-    return alpha_result, beta_result
+    return round(alpha_result), round(beta_result)
 
 
 def change_referential(x, y):
@@ -341,16 +341,16 @@ for x_grid, y_grid in grid_to_angle.keys():
 
 
 for b_noise in range(0, 1):
-    a_noise = 0
-    b_noise = -0
     for a_noise in range(0, 1):
+        a_noise = 0
+        b_noise = 0
         xs_print_area = []
         ys_print_area = []
         for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
+
             alpha = alpha + a_noise
             beta = beta + b_noise
             x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians)
-
             x_grids.append(x)
             y_grids.append(y)
             #if x0 <= x_grid and x_grid <= x1 and y0 <= y_grid and y_grid <= y1:
