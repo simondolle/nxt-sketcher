@@ -32,9 +32,6 @@ def get_xy(alpha, beta):
 
 
     #gamma is the angle formed by an horizontal axis and de
-    #gamma = math.acos(math.pow(xd-xe, 2)/float(math.pow(xd-xe, 2) + math.pow(yd-ye, 2)))
-    #gamma = math.copysign(gamma, ye-yd)
-
     tan_gamma = (ye-yd)/float(xe-xd)
     gamma = math.atan(tan_gamma)
     #print gamma * radians_to_degrees, gamma2 * radians_to_degrees
@@ -73,7 +70,6 @@ def compute_circle_intersection(x0, y0, x1, y1, r0, r1):
 
     x3_prime = x2 - h * (y1 - y0)/ d
     y3_prime = y2 + h * (x1 - x0)/ d
-    #print "intersections", (x3, y3), (x3_prime, y3_prime)
     return (x3, y3), (x3_prime, y3_prime)
 
 
@@ -158,14 +154,9 @@ def compute_grid_to_angle(points_per_lego_unit = 4, angle_step = 1):
                 continue
             if 135 < beta_degrees and beta_degrees < -135 + 360:
                 continue
-            #print "*" * 100
-            #print "alpha", alpha_degrees, "beta", beta_degrees
             beta = beta_degrees * degrees_to_radians
             x, y = get_xy(alpha, beta)
-            #print "x:", x, "y:", y
-            #x, y = change_referential(x, y)
             x_grid, y_grid = get_closest_grid_point(x, y, points_per_lego_unit)
-            #print "x_grid:", x_grid, "y_grid:", y_grid
             distance = compute_distance(x_grid, y_grid, x, y)
             if (x_grid, y_grid) not in grid_to_angle:
                 grid_to_angle[(x_grid, y_grid)] = (alpha_degrees, beta_degrees, distance)
@@ -174,10 +165,7 @@ def compute_grid_to_angle(points_per_lego_unit = 4, angle_step = 1):
                 if distance < best_distance:
                     grid_to_angle[(x_grid, y_grid)] = (alpha_degrees, beta_degrees, distance)
     distance_threshold = 0.2/points_per_lego_unit
-    #result = {a: (x, y, distance) for a, (x, y, distance) in grid_to_angle.items() if distance <= distance_threshold }
     result = grid_to_angle
-    #for (x, y), (alpha, beta, d) in grid_to_angle.items():
-    #    print x, y, compute_distance(x, y, get_xy(alpha * degrees_to_radians, beta * degrees_to_radians)[0], get_xy(alpha * degrees_to_radians, beta * degrees_to_radians)[1])
     return result
 
 def find_largest_print_area(grid_coordinates, points_per_lego_unit):
@@ -293,20 +281,10 @@ def export_pixel_to_angle(pixel_to_angle):
         print " pos_to_beta[%d] = %d;" % (j, b)
     return result_a, result_b
 
-#alpha_degrees = 0
-#beta_degrees = 180
-#get_xy(alpha_degrees * degrees_to_radians, beta_degrees * degrees_to_radians)
-#display_print_area()
-
 x_grids = []
 y_grids = []
 points_per_lego_unit = 2
 grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
-
-#print get_xy(0, 0)
-#print get_alpha_beta(0, 9.24, StructureSetting())
-#print get_alpha_beta(4, 0, StructureSetting())
-#print compute_circle_intersection(-5, 0, 5, 0, 6, 6)
 
 grid_to_angle_backward_kinematics = {}
 for (x_grid, y_grid), (alpha, beta, distance) in sorted(grid_to_angle.items()):
@@ -315,13 +293,6 @@ for (x_grid, y_grid), (alpha, beta, distance) in sorted(grid_to_angle.items()):
         continue
     alpha2, beta2 = angles
     grid_to_angle_backward_kinematics[(x_grid, y_grid)] = (alpha2, beta2, 0)
-    #print "***********************"
-    #print x_grid, y_grid
-    #print alpha, alpha2
-    #print beta, beta2
-#print "*" * 50
-#print get_alpha_beta(-2.5, -5.5, StructureSetting())
-#print get_alpha_beta(-2.5, -6, StructureSetting())
 
 grid_to_angle = grid_to_angle_backward_kinematics
 print_area = find_largest_rectange(grid_to_angle)
@@ -336,10 +307,6 @@ for x_grid, y_grid in grid_to_angle.keys():
     x_grids.append(x_grid)
     y_grids.append(y_grid)
 
-#xs_print_area = []
-#ys_print_area = []
-
-
 for b_noise in range(0, 1):
     for a_noise in range(0, 1):
         a_noise = 0
@@ -353,8 +320,6 @@ for b_noise in range(0, 1):
             x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians)
             x_grids.append(x)
             y_grids.append(y)
-            #if x0 <= x_grid and x_grid <= x1 and y0 <= y_grid and y_grid <= y1:
-            #if x_grid < 1:
             xs_print_area.append(x)
             ys_print_area.append(y)
         plt.scatter(xs_print_area, ys_print_area, c="b")
