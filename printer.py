@@ -46,11 +46,6 @@ def get_xy(alpha, beta, structure_settings):
     xt = xd + b * math.cos(lam) - s * math.sin(lam)
     yt = yd + b * math.sin(lam) + s * math.cos(lam)
 
-    """
-    offset = -1
-    zeta = math.atan2(offset, 6+yt)
-    yt = yt + 6 * math.sin(zeta)
-    """
     return xt, yt
 
 class StructureSetting:
@@ -58,7 +53,7 @@ class StructureSetting:
         self.r = 3  # short arm length (attached to the rotative axis)
         self.a = 12  # long arm length
         self.b = self.a  # distance from short arm extremity to pen
-        self.s = 0  # pen distance
+        self.s = 1  # pen distance
 
         self.xa = -5 #left short arm x
         self.xb = 5 #right short arm x
@@ -84,7 +79,9 @@ def compute_circle_intersection(x0, y0, x1, y1, r0, r1):
 
 
 def get_alpha_beta(x, y, structure_settings):
-    intersection1 = compute_circle_intersection(structure_settings.xa, 0, x, y, structure_settings.r, structure_settings.a)
+    r_pen = math.sqrt(math.pow(structure_settings.a, 2) + math.pow(structure_settings.s, 2))
+
+    intersection1 = compute_circle_intersection(structure_settings.xa, 0, x, y, structure_settings.r, r_pen)
     if intersection1 is None:
         return None
     (x1, y1), (x1_prime, y1_prime) = intersection1
@@ -93,10 +90,25 @@ def get_alpha_beta(x, y, structure_settings):
 
     if x1 < x1_prime:
         alpha_result = alpha
+        x1_actual = x1
+        y1_actual = y1
     else:
         alpha_result = alpha_prime
+        x1_actual = x1_prime
+        y1_actual = y1_prime
 
-    intersection2 = compute_circle_intersection(structure_settings.xb, 0, x, y, structure_settings.r, structure_settings.a)
+    intersection_cross = compute_circle_intersection(x1_actual, y1_actual, x, y, structure_settings.a, structure_settings.s)
+    if intersection_cross is None:
+        return None
+    (x_cross, y_cross), (x_cross_prime, y_cross_prime) = intersection_cross
+    if (x_cross - x1_actual) * (y - y_cross) - (y_cross - y1_actual) * (x - x_cross) > 0:
+        x_cross_actual = x_cross
+        y_cross_actual = y_cross
+    else:
+        x_cross_actual = x_cross_prime
+        y_cross_actual = y_cross_prime
+
+    intersection2 = compute_circle_intersection(structure_settings.xb, 0, x_cross_actual, y_cross_actual, structure_settings.r, structure_settings.a)
     if intersection2 is None:
         return None
     (x2, y2), (x2_prime, y2_prime) = intersection2
@@ -287,7 +299,7 @@ def export_pixel_to_angle(pixel_to_angle):
     result_a = []
     result_b = []
     for y in ys:
-        for x in xs[0:12]:
+        for x in xs:
             result_a.append(pixel_to_angle[(x, y)][0])
             result_b.append(pixel_to_angle[(x, y)][1])
 
@@ -302,7 +314,7 @@ def export_pixel_to_angle(pixel_to_angle):
 
 x_grids = []
 y_grids = []
-points_per_lego_unit = 4
+points_per_lego_unit = 2
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit)
 
@@ -327,31 +339,21 @@ for x_grid, y_grid in grid_to_angle.keys():
     x_grids.append(x_grid)
     y_grids.append(y_grid)
 
-for b_noise in range(0, 1):
-    for a_noise in range(0, 1):
-        a_noise = 0
-        b_noise = 0
-        xs_print_area = []
-        ys_print_area = []
-        for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
 
-            alpha = alpha + a_noise
-            beta = beta + b_noise
-            structure_settings = StructureSetting()
-            structure_settings.s = 1
-            #structure_settings.r = 3
-            #structure_settings.xa = -5
-            #structure_settings.xb = 5
-            x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians, structure_settings)
-            x_grids.append(x)
-            y_grids.append(y)
-            xs_print_area.append(x)
-            ys_print_area.append(y)
-        plt.scatter(xs_print_area, ys_print_area, c="b")
-        #plt.scatter(pixel_to_angle[(0, 0)][0], pixel_to_angle[(0, 0)][1], c="b")
-        plt.axis('equal')
-        plt.show()
-        export_pixel_to_angle(pixel_to_angle)
+xs_print_area = []
+ys_print_area = []
+for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
+    structure_settings = StructureSetting()
+    x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians, structure_settings)
+    x_grids.append(x)
+    y_grids.append(y)
+    xs_print_area.append(x)
+    ys_print_area.append(y)
+plt.scatter(xs_print_area, ys_print_area, c="b")
+#plt.scatter(pixel_to_angle[(0, 0)][0], pixel_to_angle[(0, 0)][1], c="b")
+plt.axis('equal')
+plt.show()
+export_pixel_to_angle(pixel_to_angle)
 
 
 #print get_alpha_beta(0, 4.5, StructureSetting())
