@@ -302,6 +302,8 @@ def export_pixel_to_angle(pixel_to_angle):
     ys = set([y for x, y in pixel_to_angle.keys()])
     xs = sorted(list(xs))
     ys = sorted(list(ys))
+
+    #xs = xs[0:13]
     width = len(xs)
     height = len(ys)
     result_a = []
@@ -320,8 +322,7 @@ def export_pixel_to_angle(pixel_to_angle):
         print " pos_to_beta[%d] = %d;" % (j, b)
     return result_a, result_b
 
-x_grids = []
-y_grids = []
+
 points_per_lego_unit = 2
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit)
@@ -343,25 +344,26 @@ x0, y0, x1, y1 = print_area
 pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
 
 
-for x_grid, y_grid in grid_to_angle.keys():
+x_grids = []
+y_grids = []
+for (x_grid, y_grid), (alpha, beta, d) in grid_to_angle.items():
     x_grids.append(x_grid)
     y_grids.append(y_grid)
-
 
 xs_print_area = []
 ys_print_area = []
 for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
     structure_settings = StructureSetting()
+    structure_settings.s = 1.5
     x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians, structure_settings)
-    x_grids.append(x)
-    y_grids.append(y)
     xs_print_area.append(x)
     ys_print_area.append(y)
+
+#plt.scatter(x_grids, y_grids, c="r")
 plt.scatter(xs_print_area, ys_print_area, c="b")
-#plt.scatter(pixel_to_angle[(0, 0)][0], pixel_to_angle[(0, 0)][1], c="b")
 plt.axis('equal')
 plt.show()
-export_pixel_to_angle(pixel_to_angle)
+#export_pixel_to_angle(pixel_to_angle)
 
 
 #print get_alpha_beta(0, 4.5, StructureSetting())
