@@ -56,6 +56,8 @@ class StructureSetting:
         self.xa = -5 #left short arm x
         self.xb = 5 #right short arm x
 
+        self.gear_ratio = 3
+
 def compute_circle_intersection(x0, y0, x1, y1, r0, r1):
     d = compute_distance(x0, y0, x1, y1)
     if d < math.fabs(r0 - r1) or r0 +r1 < d:
@@ -170,31 +172,6 @@ def display_print_area():
     plt.show()
     return xs, ys
 
-
-def compute_grid_to_angle(points_per_lego_unit = 4, angle_step = 1):
-    grid_to_angle = {}
-    gradients = []
-    for alpha_degrees in range(0, 360, angle_step):
-        alpha = alpha_degrees * degrees_to_radians
-        for beta_degrees in range(0, 360, angle_step):
-            if 135 < alpha_degrees and alpha_degrees < -135 + 360:
-                continue
-            if 135 < beta_degrees and beta_degrees < -135 + 360:
-                continue
-            beta = beta_degrees * degrees_to_radians
-            x, y = get_xy(alpha, beta, StructureSetting())
-            x_grid, y_grid = get_closest_grid_point(x, y, points_per_lego_unit)
-            distance = compute_distance(x_grid, y_grid, x, y)
-            if (x_grid, y_grid) not in grid_to_angle:
-                grid_to_angle[(x_grid, y_grid)] = (alpha_degrees, beta_degrees, distance)
-            else:
-                _, _, best_distance = grid_to_angle[(x_grid, y_grid)]
-                if distance < best_distance:
-                    grid_to_angle[(x_grid, y_grid)] = (alpha_degrees, beta_degrees, distance)
-    distance_threshold = 0.2/points_per_lego_unit
-    result = grid_to_angle
-    return result
-
 def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego_unit = 4):
     grid_to_angle = {}
     for x in np.arange(-10, 10 + 1, 1/float(points_per_lego_unit)):
@@ -202,7 +179,7 @@ def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego
         angles = get_alpha_beta(x, y, structure_settings)
         if angles is None:
           continue
-        grid_to_angle[(x, y)] = (angles[0], angles[1], 0)
+        grid_to_angle[(x, y)] = (structure_settings.gear_ratio * angles[0], structure_settings.gear_ratio * angles[1], 0)
     return grid_to_angle
 
 def find_largest_print_area(grid_coordinates, points_per_lego_unit):
@@ -322,15 +299,6 @@ points_per_lego_unit = 4
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit)
 
-grid_to_angle_backward_kinematics = {}
-for (x_grid, y_grid), (alpha, beta, distance) in sorted(grid_to_angle.items()):
-    angles = get_alpha_beta(x_grid, y_grid, StructureSetting())
-    if angles is None:
-        continue
-    alpha2, beta2 = angles
-    grid_to_angle_backward_kinematics[(x_grid, y_grid)] = (alpha2, beta2, 0)
-
-grid_to_angle = grid_to_angle_backward_kinematics
 print_area = find_largest_rectange(grid_to_angle)
 
 #print_area = (-3.5, 5.0, 2.0, 8.5)
@@ -350,7 +318,7 @@ ys_print_area = []
 for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
     structure_settings = StructureSetting()
     structure_settings.s = 1
-    x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians, structure_settings)
+    x, y = get_xy(structure_settings.gear_ratio * alpha * degrees_to_radians, structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
     xs_print_area.append(x)
     ys_print_area.append(y)
 
