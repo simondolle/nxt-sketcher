@@ -1,18 +1,21 @@
 import math
+import numpy as np
 import matplotlib.pyplot as plt
 
 degrees_to_radians = math.pi / 180
 radians_to_degrees = 180 / math.pi
 
-def get_xy(alpha, beta):
+def get_xy(alpha, beta, structure_settings):
 
-    r = 3  # short arm length (attached to the rotative axis)
-    a = 8  # long arm length
-    b = a  # distance from short arm extremity to pen
-    s = 0  # pen distance
 
-    xa = -5 #left short arm x
-    xb = 5 #right short arm x
+    r = structure_settings.r  # short arm length (attached to the rotative axis)
+    a = structure_settings.a  # long arm length
+    b = structure_settings.b # distance from short arm extremity to pen
+    s = structure_settings.s  # pen distance
+
+    xa = structure_settings.xa #left short arm x
+    xb = structure_settings.xb #right short arm x
+
 
     # d is the first short arm extremity
     xd = xa - r * math.sin(alpha)
@@ -37,19 +40,25 @@ def get_xy(alpha, beta):
     #print gamma * radians_to_degrees, gamma2 * radians_to_degrees
 
 
+
     #lambda is the angle formed by an horizontal axis and the left long arm
     lam = theta + gamma
     xt = xd + b * math.cos(lam) - s * math.sin(lam)
     yt = yd + b * math.sin(lam) + s * math.cos(lam)
 
+    """
+    offset = -1
+    zeta = math.atan2(offset, 6+yt)
+    yt = yt + 6 * math.sin(zeta)
+    """
     return xt, yt
 
 class StructureSetting:
     def __init__(self):
         self.r = 3  # short arm length (attached to the rotative axis)
-        self.a = 8  # long arm length
+        self.a = 12  # long arm length
         self.b = self.a  # distance from short arm extremity to pen
-        self.s = 1  # pen distance
+        self.s = 0  # pen distance
 
         self.xa = -5 #left short arm x
         self.xb = 5 #right short arm x
@@ -155,7 +164,7 @@ def compute_grid_to_angle(points_per_lego_unit = 4, angle_step = 1):
             if 135 < beta_degrees and beta_degrees < -135 + 360:
                 continue
             beta = beta_degrees * degrees_to_radians
-            x, y = get_xy(alpha, beta)
+            x, y = get_xy(alpha, beta, StructureSetting())
             x_grid, y_grid = get_closest_grid_point(x, y, points_per_lego_unit)
             distance = compute_distance(x_grid, y_grid, x, y)
             if (x_grid, y_grid) not in grid_to_angle:
@@ -167,6 +176,16 @@ def compute_grid_to_angle(points_per_lego_unit = 4, angle_step = 1):
     distance_threshold = 0.2/points_per_lego_unit
     result = grid_to_angle
     return result
+
+def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego_unit = 4):
+    grid_to_angle = {}
+    for x in np.arange(-10, 10 + 1, 1/float(points_per_lego_unit)):
+      for y in np.arange(0, 15, 1/float(points_per_lego_unit) ):
+        angles = get_alpha_beta(x, y, structure_settings)
+        if angles is None:
+          continue
+        grid_to_angle[(x, y)] = (angles[0], angles[1], 0)
+    return grid_to_angle
 
 def find_largest_print_area(grid_coordinates, points_per_lego_unit):
     xs = set([x for x, y in grid_coordinates.keys()])
@@ -268,7 +287,7 @@ def export_pixel_to_angle(pixel_to_angle):
     result_a = []
     result_b = []
     for y in ys:
-        for x in xs:
+        for x in xs[0:12]:
             result_a.append(pixel_to_angle[(x, y)][0])
             result_b.append(pixel_to_angle[(x, y)][1])
 
@@ -283,8 +302,9 @@ def export_pixel_to_angle(pixel_to_angle):
 
 x_grids = []
 y_grids = []
-points_per_lego_unit = 2
-grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
+points_per_lego_unit = 4
+#grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
+grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit)
 
 grid_to_angle_backward_kinematics = {}
 for (x_grid, y_grid), (alpha, beta, distance) in sorted(grid_to_angle.items()):
@@ -317,7 +337,12 @@ for b_noise in range(0, 1):
 
             alpha = alpha + a_noise
             beta = beta + b_noise
-            x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians)
+            structure_settings = StructureSetting()
+            structure_settings.s = 1
+            #structure_settings.r = 3
+            #structure_settings.xa = -5
+            #structure_settings.xb = 5
+            x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians, structure_settings)
             x_grids.append(x)
             y_grids.append(y)
             xs_print_area.append(x)
@@ -328,6 +353,9 @@ for b_noise in range(0, 1):
         plt.show()
         export_pixel_to_angle(pixel_to_angle)
 
+
+#print get_alpha_beta(0, 4.5, StructureSetting())
+#print get_xy(60*degrees_to_radians, -60 * degrees_to_radians, StructureSetting())
 """
 print get_xy(102, 33)
 print get_xy(91, 28)
