@@ -121,7 +121,15 @@ def get_alpha_beta(x, y, structure_settings):
     else:
         beta_result = beta_prime
 
-    return round(alpha_result), round(beta_result)
+    result =  round(alpha_result), round(beta_result)
+
+    if round(alpha_result) < -135 or 135 < round(alpha_result):
+        return None
+
+    if round(beta_result) < -135 or 135 < round(beta_result):
+        return None
+
+    return result
 
 
 def change_referential(x, y):
