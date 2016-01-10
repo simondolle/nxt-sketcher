@@ -1,11 +1,13 @@
 #define SPEED 40
 #define MULTIPLICATOR 3
 
-#define WIDTH 13
-#define HEIGHT 13
-float pos_to_alpha[];
-float pos_to_beta[];
+#define RAD_TO_DEGS 180/PI
+#define DEG_TO_RADS PI/180
 
+#define WIDTH 27
+#define HEIGHT 13
+short pos_to_alpha[] = {60,58,57,55,53,51,50,47,45,43,41,38,36,33,31,28,25,22,19,15,12,8,4,-1,-6,-12,-22,64,63,61,60,58,56,54,52,50,48,45,43,41,38,35,33,30,27,24,20,17,14,10,6,1,-4,-9,69,67,66,64,62,60,58,56,54,52,50,47,45,42,40,37,34,31,28,25,22,18,15,11,7,3,-2,74,72,70,69,67,65,63,61,58,56,54,52,49,46,44,41,38,35,32,29,26,23,19,16,12,8,4,78,76,75,73,71,69,67,65,63,60,58,56,53,51,48,45,42,39,36,33,30,27,24,20,17,13,9,83,81,79,77,75,73,71,69,67,65,62,60,57,55,52,49,46,43,40,37,34,31,28,24,21,17,13,87,86,84,82,80,78,76,73,71,69,66,64,61,58,56,53,50,47,44,41,38,35,31,28,25,21,17,92,90,88,87,84,82,80,78,75,73,70,68,65,62,60,57,54,51,48,45,42,38,35,32,28,25,21,97,95,93,91,89,87,85,82,80,77,75,72,69,66,64,61,58,55,52,48,45,42,39,35,32,28,25,102,100,98,96,94,92,89,87,84,82,79,76,73,70,67,64,61,58,55,52,49,45,42,39,35,32,28,108,106,104,101,99,97,94,92,89,86,83,80,77,74,71,68,65,62,59,55,52,49,45,42,38,35,31,113,111,109,107,104,102,99,97,94,91,88,85,82,79,75,72,69,66,62,59,56,52,49,45,42,38,34,120,118,115,113,110,108,105,102,99,96,93,89,86,83,80,76,73,69,66,63,59,56,52,48,45,41,37};
+short pos_to_beta[] = {27,15,8,2,-3,-7,-11,-15,-19,-23,-26,-29,-32,-35,-38,-41,-44,-46,-49,-51,-54,-56,-58,-60,-62,-64,-65,13,6,1,-4,-8,-13,-16,-20,-24,-27,-30,-33,-37,-40,-42,-45,-48,-51,-53,-56,-58,-60,-62,-65,-67,-69,-70,5,0,-5,-9,-13,-17,-21,-24,-28,-31,-34,-38,-41,-44,-47,-49,-52,-55,-57,-60,-62,-65,-67,-69,-71,-73,-75,0,-5,-10,-14,-18,-21,-25,-29,-32,-35,-38,-42,-45,-48,-51,-53,-56,-59,-61,-64,-67,-69,-71,-74,-76,-78,-80,-5,-10,-14,-18,-22,-25,-29,-32,-36,-39,-42,-45,-48,-51,-54,-57,-60,-63,-66,-68,-71,-73,-76,-78,-80,-83,-85,-10,-14,-18,-22,-25,-29,-33,-36,-39,-43,-46,-49,-52,-55,-58,-61,-64,-67,-70,-73,-75,-78,-80,-83,-85,-87,-90,-13,-18,-21,-25,-29,-33,-36,-40,-43,-46,-50,-53,-56,-59,-62,-65,-68,-71,-74,-77,-80,-82,-85,-87,-90,-92,-95,-17,-21,-25,-29,-32,-36,-40,-43,-46,-50,-53,-56,-60,-63,-66,-69,-72,-75,-78,-81,-84,-87,-90,-92,-95,-97,-100,-20,-24,-28,-32,-36,-39,-43,-46,-50,-53,-57,-60,-63,-67,-70,-73,-76,-80,-83,-86,-89,-92,-95,-97,-100,-103,-105,-24,-28,-31,-35,-39,-43,-46,-50,-53,-57,-60,-64,-67,-71,-74,-77,-81,-84,-87,-90,-94,-97,-100,-103,-106,-109,-111,-27,-31,-34,-38,-42,-46,-49,-53,-57,-60,-64,-67,-71,-75,-78,-82,-85,-89,-92,-95,-99,-102,-106,-109,-112,-115,-118,-30,-34,-37,-41,-45,-49,-53,-56,-60,-64,-67,-71,-75,-79,-82,-86,-90,-93,-97,-101,-105,-108,-112,-115,-119,-122,-126,-32,-36,-40,-44,-48,-52,-56,-60,-63,-67,-71,-75,-79,-83,-87,-91,-95,-99,-103,-107,-111,-115,-119,-123,-127,-131,-135};
 short alpha;
 short beta;
 
@@ -17,347 +19,71 @@ short rotation_b;
 
 short result;
 
+struct Structure_settings {
+  int r;  // short arm length (attached to the rotative axis)
+  int a; // long arm length
+
+  int ss;  // pen distance
+
+  int xa; // left short arm x
+  int xb; // right short arm x
+};
+
+struct Point {
+  float x;
+  float y;
+};
+
+struct PointPair {
+  Point p0;
+  Point p1;
+};
+
+struct AnglePair {
+  int alpha;
+  int beta;
+};
+
+float compute_distance(Point p1, Point p2) {
+  return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+}
+
+PointPair compute_circle_intersection(Point p0, Point p1, float r0, float r1) {
+    float d = compute_distance(p0, p1);
+    return NULL;
+
+    if (d  < abs(r0 - r1) || r0 + r1 < d) {
+      return NULL;
+    }
+
+    float a = (r0 * r0 - r1 * r1 + d * d)/(2 * d);
+    float h = sqrt(r0 * r0 - a * a);
+
+    float x2 = p0.x + a * (p1.x - p0.x)/d;
+    float y2 = p0.y + a * (p1.y - p0.y)/d;
+
+    float x3 = x2 + h * (p1.y - p0.y)/ d;
+    float y3 = y2 - h * (p1.x - p0.x)/ d;
+
+    float x3_prime = x2 - h * (p1.y - p0.y)/ d;
+    float y3_prime = y2 + h * (p1.x - p0.x)/ d;
+
+    Point p3;
+    p3.x = x3;
+    p3.y = y3;
+
+    Point p3_prime;
+    p3_prime.x = x3_prime;
+    p3_prime.y = y3_prime;
+
+    PointPair result;
+    result.p0 = p3;
+    result.p1 = p3_prime;
+    return result;
+}
+
 sub init_arrays() {
-ArrayInit(pos_to_alpha, 0, 169);
- pos_to_alpha[0] = 60;
- pos_to_alpha[1] = 58;
- pos_to_alpha[2] = 57;
- pos_to_alpha[3] = 55;
- pos_to_alpha[4] = 53;
- pos_to_alpha[5] = 51;
- pos_to_alpha[6] = 50;
- pos_to_alpha[7] = 47;
- pos_to_alpha[8] = 45;
- pos_to_alpha[9] = 43;
- pos_to_alpha[10] = 41;
- pos_to_alpha[11] = 38;
- pos_to_alpha[12] = 36;
- pos_to_alpha[13] = 64;
- pos_to_alpha[14] = 63;
- pos_to_alpha[15] = 61;
- pos_to_alpha[16] = 60;
- pos_to_alpha[17] = 58;
- pos_to_alpha[18] = 56;
- pos_to_alpha[19] = 54;
- pos_to_alpha[20] = 52;
- pos_to_alpha[21] = 50;
- pos_to_alpha[22] = 48;
- pos_to_alpha[23] = 45;
- pos_to_alpha[24] = 43;
- pos_to_alpha[25] = 41;
- pos_to_alpha[26] = 69;
- pos_to_alpha[27] = 67;
- pos_to_alpha[28] = 66;
- pos_to_alpha[29] = 64;
- pos_to_alpha[30] = 62;
- pos_to_alpha[31] = 60;
- pos_to_alpha[32] = 58;
- pos_to_alpha[33] = 56;
- pos_to_alpha[34] = 54;
- pos_to_alpha[35] = 52;
- pos_to_alpha[36] = 50;
- pos_to_alpha[37] = 47;
- pos_to_alpha[38] = 45;
- pos_to_alpha[39] = 74;
- pos_to_alpha[40] = 72;
- pos_to_alpha[41] = 70;
- pos_to_alpha[42] = 69;
- pos_to_alpha[43] = 67;
- pos_to_alpha[44] = 65;
- pos_to_alpha[45] = 63;
- pos_to_alpha[46] = 61;
- pos_to_alpha[47] = 58;
- pos_to_alpha[48] = 56;
- pos_to_alpha[49] = 54;
- pos_to_alpha[50] = 52;
- pos_to_alpha[51] = 49;
- pos_to_alpha[52] = 78;
- pos_to_alpha[53] = 76;
- pos_to_alpha[54] = 75;
- pos_to_alpha[55] = 73;
- pos_to_alpha[56] = 71;
- pos_to_alpha[57] = 69;
- pos_to_alpha[58] = 67;
- pos_to_alpha[59] = 65;
- pos_to_alpha[60] = 63;
- pos_to_alpha[61] = 60;
- pos_to_alpha[62] = 58;
- pos_to_alpha[63] = 56;
- pos_to_alpha[64] = 53;
- pos_to_alpha[65] = 83;
- pos_to_alpha[66] = 81;
- pos_to_alpha[67] = 79;
- pos_to_alpha[68] = 77;
- pos_to_alpha[69] = 75;
- pos_to_alpha[70] = 73;
- pos_to_alpha[71] = 71;
- pos_to_alpha[72] = 69;
- pos_to_alpha[73] = 67;
- pos_to_alpha[74] = 65;
- pos_to_alpha[75] = 62;
- pos_to_alpha[76] = 60;
- pos_to_alpha[77] = 57;
- pos_to_alpha[78] = 87;
- pos_to_alpha[79] = 86;
- pos_to_alpha[80] = 84;
- pos_to_alpha[81] = 82;
- pos_to_alpha[82] = 80;
- pos_to_alpha[83] = 78;
- pos_to_alpha[84] = 76;
- pos_to_alpha[85] = 73;
- pos_to_alpha[86] = 71;
- pos_to_alpha[87] = 69;
- pos_to_alpha[88] = 66;
- pos_to_alpha[89] = 64;
- pos_to_alpha[90] = 61;
- pos_to_alpha[91] = 92;
- pos_to_alpha[92] = 90;
- pos_to_alpha[93] = 88;
- pos_to_alpha[94] = 87;
- pos_to_alpha[95] = 84;
- pos_to_alpha[96] = 82;
- pos_to_alpha[97] = 80;
- pos_to_alpha[98] = 78;
- pos_to_alpha[99] = 75;
- pos_to_alpha[100] = 73;
- pos_to_alpha[101] = 70;
- pos_to_alpha[102] = 68;
- pos_to_alpha[103] = 65;
- pos_to_alpha[104] = 97;
- pos_to_alpha[105] = 95;
- pos_to_alpha[106] = 93;
- pos_to_alpha[107] = 91;
- pos_to_alpha[108] = 89;
- pos_to_alpha[109] = 87;
- pos_to_alpha[110] = 85;
- pos_to_alpha[111] = 82;
- pos_to_alpha[112] = 80;
- pos_to_alpha[113] = 77;
- pos_to_alpha[114] = 75;
- pos_to_alpha[115] = 72;
- pos_to_alpha[116] = 69;
- pos_to_alpha[117] = 102;
- pos_to_alpha[118] = 100;
- pos_to_alpha[119] = 98;
- pos_to_alpha[120] = 96;
- pos_to_alpha[121] = 94;
- pos_to_alpha[122] = 92;
- pos_to_alpha[123] = 89;
- pos_to_alpha[124] = 87;
- pos_to_alpha[125] = 84;
- pos_to_alpha[126] = 82;
- pos_to_alpha[127] = 79;
- pos_to_alpha[128] = 76;
- pos_to_alpha[129] = 73;
- pos_to_alpha[130] = 108;
- pos_to_alpha[131] = 106;
- pos_to_alpha[132] = 104;
- pos_to_alpha[133] = 101;
- pos_to_alpha[134] = 99;
- pos_to_alpha[135] = 97;
- pos_to_alpha[136] = 94;
- pos_to_alpha[137] = 92;
- pos_to_alpha[138] = 89;
- pos_to_alpha[139] = 86;
- pos_to_alpha[140] = 83;
- pos_to_alpha[141] = 80;
- pos_to_alpha[142] = 77;
- pos_to_alpha[143] = 113;
- pos_to_alpha[144] = 111;
- pos_to_alpha[145] = 109;
- pos_to_alpha[146] = 107;
- pos_to_alpha[147] = 104;
- pos_to_alpha[148] = 102;
- pos_to_alpha[149] = 99;
- pos_to_alpha[150] = 97;
- pos_to_alpha[151] = 94;
- pos_to_alpha[152] = 91;
- pos_to_alpha[153] = 88;
- pos_to_alpha[154] = 85;
- pos_to_alpha[155] = 82;
- pos_to_alpha[156] = 120;
- pos_to_alpha[157] = 118;
- pos_to_alpha[158] = 115;
- pos_to_alpha[159] = 113;
- pos_to_alpha[160] = 110;
- pos_to_alpha[161] = 108;
- pos_to_alpha[162] = 105;
- pos_to_alpha[163] = 102;
- pos_to_alpha[164] = 99;
- pos_to_alpha[165] = 96;
- pos_to_alpha[166] = 93;
- pos_to_alpha[167] = 89;
- pos_to_alpha[168] = 86;
- ArrayInit(pos_to_beta, 0, 169);
- pos_to_beta[0] = 27;
- pos_to_beta[1] = 15;
- pos_to_beta[2] = 8;
- pos_to_beta[3] = 2;
- pos_to_beta[4] = -3;
- pos_to_beta[5] = -7;
- pos_to_beta[6] = -11;
- pos_to_beta[7] = -15;
- pos_to_beta[8] = -19;
- pos_to_beta[9] = -23;
- pos_to_beta[10] = -26;
- pos_to_beta[11] = -29;
- pos_to_beta[12] = -32;
- pos_to_beta[13] = 13;
- pos_to_beta[14] = 6;
- pos_to_beta[15] = 1;
- pos_to_beta[16] = -4;
- pos_to_beta[17] = -8;
- pos_to_beta[18] = -13;
- pos_to_beta[19] = -16;
- pos_to_beta[20] = -20;
- pos_to_beta[21] = -24;
- pos_to_beta[22] = -27;
- pos_to_beta[23] = -30;
- pos_to_beta[24] = -33;
- pos_to_beta[25] = -37;
- pos_to_beta[26] = 5;
- pos_to_beta[27] = 0;
- pos_to_beta[28] = -5;
- pos_to_beta[29] = -9;
- pos_to_beta[30] = -13;
- pos_to_beta[31] = -17;
- pos_to_beta[32] = -21;
- pos_to_beta[33] = -24;
- pos_to_beta[34] = -28;
- pos_to_beta[35] = -31;
- pos_to_beta[36] = -34;
- pos_to_beta[37] = -38;
- pos_to_beta[38] = -41;
- pos_to_beta[39] = 0;
- pos_to_beta[40] = -5;
- pos_to_beta[41] = -10;
- pos_to_beta[42] = -14;
- pos_to_beta[43] = -18;
- pos_to_beta[44] = -21;
- pos_to_beta[45] = -25;
- pos_to_beta[46] = -29;
- pos_to_beta[47] = -32;
- pos_to_beta[48] = -35;
- pos_to_beta[49] = -38;
- pos_to_beta[50] = -42;
- pos_to_beta[51] = -45;
- pos_to_beta[52] = -5;
- pos_to_beta[53] = -10;
- pos_to_beta[54] = -14;
- pos_to_beta[55] = -18;
- pos_to_beta[56] = -22;
- pos_to_beta[57] = -25;
- pos_to_beta[58] = -29;
- pos_to_beta[59] = -32;
- pos_to_beta[60] = -36;
- pos_to_beta[61] = -39;
- pos_to_beta[62] = -42;
- pos_to_beta[63] = -45;
- pos_to_beta[64] = -48;
- pos_to_beta[65] = -10;
- pos_to_beta[66] = -14;
- pos_to_beta[67] = -18;
- pos_to_beta[68] = -22;
- pos_to_beta[69] = -25;
- pos_to_beta[70] = -29;
- pos_to_beta[71] = -33;
- pos_to_beta[72] = -36;
- pos_to_beta[73] = -39;
- pos_to_beta[74] = -43;
- pos_to_beta[75] = -46;
- pos_to_beta[76] = -49;
- pos_to_beta[77] = -52;
- pos_to_beta[78] = -13;
- pos_to_beta[79] = -18;
- pos_to_beta[80] = -21;
- pos_to_beta[81] = -25;
- pos_to_beta[82] = -29;
- pos_to_beta[83] = -33;
- pos_to_beta[84] = -36;
- pos_to_beta[85] = -40;
- pos_to_beta[86] = -43;
- pos_to_beta[87] = -46;
- pos_to_beta[88] = -50;
- pos_to_beta[89] = -53;
- pos_to_beta[90] = -56;
- pos_to_beta[91] = -17;
- pos_to_beta[92] = -21;
- pos_to_beta[93] = -25;
- pos_to_beta[94] = -29;
- pos_to_beta[95] = -32;
- pos_to_beta[96] = -36;
- pos_to_beta[97] = -40;
- pos_to_beta[98] = -43;
- pos_to_beta[99] = -46;
- pos_to_beta[100] = -50;
- pos_to_beta[101] = -53;
- pos_to_beta[102] = -56;
- pos_to_beta[103] = -60;
- pos_to_beta[104] = -20;
- pos_to_beta[105] = -24;
- pos_to_beta[106] = -28;
- pos_to_beta[107] = -32;
- pos_to_beta[108] = -36;
- pos_to_beta[109] = -39;
- pos_to_beta[110] = -43;
- pos_to_beta[111] = -46;
- pos_to_beta[112] = -50;
- pos_to_beta[113] = -53;
- pos_to_beta[114] = -57;
- pos_to_beta[115] = -60;
- pos_to_beta[116] = -63;
- pos_to_beta[117] = -24;
- pos_to_beta[118] = -28;
- pos_to_beta[119] = -31;
- pos_to_beta[120] = -35;
- pos_to_beta[121] = -39;
- pos_to_beta[122] = -43;
- pos_to_beta[123] = -46;
- pos_to_beta[124] = -50;
- pos_to_beta[125] = -53;
- pos_to_beta[126] = -57;
- pos_to_beta[127] = -60;
- pos_to_beta[128] = -64;
- pos_to_beta[129] = -67;
- pos_to_beta[130] = -27;
- pos_to_beta[131] = -31;
- pos_to_beta[132] = -34;
- pos_to_beta[133] = -38;
- pos_to_beta[134] = -42;
- pos_to_beta[135] = -46;
- pos_to_beta[136] = -49;
- pos_to_beta[137] = -53;
- pos_to_beta[138] = -57;
- pos_to_beta[139] = -60;
- pos_to_beta[140] = -64;
- pos_to_beta[141] = -67;
- pos_to_beta[142] = -71;
- pos_to_beta[143] = -30;
- pos_to_beta[144] = -34;
- pos_to_beta[145] = -37;
- pos_to_beta[146] = -41;
- pos_to_beta[147] = -45;
- pos_to_beta[148] = -49;
- pos_to_beta[149] = -53;
- pos_to_beta[150] = -56;
- pos_to_beta[151] = -60;
- pos_to_beta[152] = -64;
- pos_to_beta[153] = -67;
- pos_to_beta[154] = -71;
- pos_to_beta[155] = -75;
- pos_to_beta[156] = -32;
- pos_to_beta[157] = -36;
- pos_to_beta[158] = -40;
- pos_to_beta[159] = -44;
- pos_to_beta[160] = -48;
- pos_to_beta[161] = -52;
- pos_to_beta[162] = -56;
- pos_to_beta[163] = -60;
- pos_to_beta[164] = -63;
- pos_to_beta[165] = -67;
- pos_to_beta[166] = -71;
- pos_to_beta[167] = -75;
- pos_to_beta[168] = -79;
+
 }
 
 inline bool is_stalled(byte output)

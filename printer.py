@@ -10,7 +10,6 @@ def get_xy(alpha, beta, structure_settings):
 
     r = structure_settings.r  # short arm length (attached to the rotative axis)
     a = structure_settings.a  # long arm length
-    b = structure_settings.b # distance from short arm extremity to pen
     s = structure_settings.s  # pen distance
 
     xa = structure_settings.xa #left short arm x
@@ -43,8 +42,8 @@ def get_xy(alpha, beta, structure_settings):
 
     #lambda is the angle formed by an horizontal axis and the left long arm
     lam = theta + gamma
-    xt = xd + b * math.cos(lam) - s * math.sin(lam)
-    yt = yd + b * math.sin(lam) + s * math.cos(lam)
+    xt = xd + a * math.cos(lam) - s * math.sin(lam)
+    yt = yd + a * math.sin(lam) + s * math.cos(lam)
 
     return xt, yt
 
@@ -52,7 +51,6 @@ class StructureSetting:
     def __init__(self):
         self.r = 3  # short arm length (attached to the rotative axis)
         self.a = 12  # long arm length
-        self.b = self.a  # distance from short arm extremity to pen
         self.s = 1  # pen distance
 
         self.xa = -5 #left short arm x
@@ -313,17 +311,14 @@ def export_pixel_to_angle(pixel_to_angle):
             result_a.append(pixel_to_angle[(x, y)][0])
             result_b.append(pixel_to_angle[(x, y)][1])
 
-    print width, height
-    print " ArrayInit(pos_to_alpha, 0, %d);" % (width * height)
-    for i, a in enumerate(result_a):
-        print " pos_to_alpha[%d] = %d;" % (i, a)
-    print " ArrayInit(pos_to_beta, 0, %d);" % (width * height)
-    for j, b in enumerate(result_b):
-        print " pos_to_beta[%d] = %d;" % (j, b)
+    print "#define WIDTH %d" % width
+    print "#define HEIGHT %d" % height
+    print "short pos_to_alpha[] = {" + ",".join([str(int(a)) for a in result_a]) + "};"
+    print "short pos_to_beta[] = {" + ",".join([str(int(b)) for b in result_b]) + "};"
     return result_a, result_b
 
 
-points_per_lego_unit = 2
+points_per_lego_unit = 4
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit)
 
@@ -354,7 +349,7 @@ xs_print_area = []
 ys_print_area = []
 for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
     structure_settings = StructureSetting()
-    structure_settings.s = 1.5
+    structure_settings.s = 1
     x, y = get_xy(alpha * degrees_to_radians, beta * degrees_to_radians, structure_settings)
     xs_print_area.append(x)
     ys_print_area.append(y)
@@ -363,7 +358,7 @@ for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
 plt.scatter(xs_print_area, ys_print_area, c="b")
 plt.axis('equal')
 plt.show()
-#export_pixel_to_angle(pixel_to_angle)
+export_pixel_to_angle(pixel_to_angle)
 
 
 #print get_alpha_beta(0, 4.5, StructureSetting())
