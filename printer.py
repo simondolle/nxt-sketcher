@@ -226,7 +226,7 @@ def is_rectangle(x0, y0, x1, y1, grid_coordinates, xs, ys):
                 return False
     return True
 
-origin = (2.5, 0)
+
 def find_largest_rectange(grid_coordinates):
     xs = set([x for x, y in grid_coordinates.keys()])
     ys = set([y for x, y in grid_coordinates.keys()])
@@ -239,6 +239,7 @@ def find_largest_rectange(grid_coordinates):
 
     min_y = min(ys)
     max_y = max(ys)
+    #print max_x, max_y
     rectangles = []
     max_area = None
     result = None
@@ -256,6 +257,57 @@ def find_largest_rectange(grid_coordinates):
                             max_area = area
                             result = (x_origin, y_origin, x, y)
     return result
+
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return str((self.x, self.y))
+
+def area(ll, ur):
+    return math.fabs((ll.x - ur.x) * (ll.y - ur.y))
+
+def grow_ones(ll, N, M, points, step):
+    ur = Point(ll.x-step, ll.y-step) # Zero area ur-choice
+    x_max = N # Right edge of growth zone
+    y = ll.y-step
+    while y + step <= M and (ll.x, y + step) in points:
+       y = y + step
+       x = ll.x # Scan a new layer
+       while x + step <= x_max and (x + step, y) in points:
+          x = x + step
+       x_max = x
+       if area(ll, Point(x, y)) > area(ll, ur):
+          ur = Point(x, y)
+    return ur
+
+def find_largest_rectange_quadratic(grid_coordinates, points_per_lego_unit):
+    xs = set([x for x, y in grid_coordinates.keys()])
+    ys = set([y for x, y in grid_coordinates.keys()])
+
+    xs = sorted(list(xs))
+    ys = sorted(list(ys))
+
+    min_x = min(xs)
+    max_x = max(xs)
+
+    min_y = min(ys)
+    max_y = max(ys)
+
+    points = set(grid_coordinates.keys())
+    step  = 1./points_per_lego_unit
+    best_ll = Point(xs[0], ys[0])
+    best_ur = Point(xs[0], ys[0])
+    for x in xs:
+        for y in ys:
+            ll = Point(x, y)
+            ur = grow_ones(ll, max_x, max_y, points, step)
+            if area(ll, ur)>area(best_ll, best_ur):
+                best_ll = ll
+                best_ur = ur
+    return (best_ll.x, best_ll.y, best_ur.x, best_ur.y)
 
 def build_pixel_to_angle(print_area, grid_to_angle):
 
@@ -295,12 +347,14 @@ def export_pixel_to_angle(pixel_to_angle):
     return result_a, result_b
 
 
-points_per_lego_unit = 4
+points_per_lego_unit = 2
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit)
 
-print_area = find_largest_rectange(grid_to_angle)
+#print_area = find_largest_rectange(grid_to_angle)
+#print print_area
 
+print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
 #print_area = (-3.5, 5.0, 2.0, 8.5)
 x0, y0, x1, y1 = print_area
 
@@ -318,11 +372,11 @@ ys_print_area = []
 for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
     structure_settings = StructureSetting()
     structure_settings.s = 1
-    x, y = get_xy(structure_settings.gear_ratio * alpha * degrees_to_radians, structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
+    x, y = get_xy(1./structure_settings.gear_ratio * alpha * degrees_to_radians, 1./structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
     xs_print_area.append(x)
     ys_print_area.append(y)
 
-#plt.scatter(x_grids, y_grids, c="r")
+plt.scatter(x_grids, y_grids, c="r")
 plt.scatter(xs_print_area, ys_print_area, c="b")
 plt.axis('equal')
 plt.show()
