@@ -132,8 +132,8 @@ def get_alpha_beta(x, y, structure_settings):
     return result
 
 
-def change_referential(x, y):
-    angle = 0 * degrees_to_radians
+def change_referential(x, y, angle):
+    angle = angle * degrees_to_radians
     return (x * math.cos(angle)  + y * math.sin(angle), -x * math.sin(angle) + y * math.cos(angle))
 
 def get_closest_grid_point(x, y, points_per_lego_unit = 2):
@@ -172,11 +172,13 @@ def display_print_area():
     plt.show()
     return xs, ys
 
-def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego_unit = 4):
+def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego_unit = 4, angle = -30):
     grid_to_angle = {}
     for x in np.arange(-10, 10 + 1, 1/float(points_per_lego_unit)):
       for y in np.arange(0, 15, 1/float(points_per_lego_unit) ):
-        angles = get_alpha_beta(x, y, structure_settings)
+        x_prime, y_prime = change_referential(x, y, angle)
+
+        angles = get_alpha_beta(x_prime, y_prime, structure_settings)
         if angles is None:
           continue
         grid_to_angle[(x, y)] = (structure_settings.gear_ratio * angles[0], structure_settings.gear_ratio * angles[1], 0)
@@ -361,7 +363,8 @@ def export_pixel_to_angle(pixel_to_angle):
 
 points_per_lego_unit = 8
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
-grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit)
+angle = -45
+grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
 
 #print_area = find_largest_rectange(grid_to_angle)
 #print print_area
@@ -386,8 +389,9 @@ for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
     structure_settings = StructureSetting()
     structure_settings.s = 1
     x, y = get_xy(1./structure_settings.gear_ratio * alpha * degrees_to_radians, 1./structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
-    xs_print_area.append(x)
-    ys_print_area.append(y)
+    x_prime, y_prime = change_referential(x, y, -angle)
+    xs_print_area.append(x_prime)
+    ys_print_area.append(y_prime)
 
 plt.scatter(x_grids, y_grids, c="r")
 plt.scatter(xs_print_area, ys_print_area, c="b")
