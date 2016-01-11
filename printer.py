@@ -121,12 +121,12 @@ def get_alpha_beta(x, y, structure_settings):
     else:
         beta_result = beta_prime
 
-    result =  round(alpha_result), round(beta_result)
+    result =  alpha_result, beta_result
 
-    if round(alpha_result) < -135 or 135 < round(alpha_result):
+    if alpha_result < -135 or 135 < alpha_result:
         return None
 
-    if round(beta_result) < -135 or 135 < round(beta_result):
+    if beta_result < -135 or 135 < beta_result:
         return None
 
     return result
@@ -181,7 +181,7 @@ def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego
         angles = get_alpha_beta(x_prime, y_prime, structure_settings)
         if angles is None:
           continue
-        grid_to_angle[(x, y)] = (structure_settings.gear_ratio * angles[0], structure_settings.gear_ratio * angles[1], 0)
+        grid_to_angle[(x, y)] = (round(structure_settings.gear_ratio * angles[0]), round(structure_settings.gear_ratio * angles[1]), 0)
     return grid_to_angle
 
 def find_largest_print_area(grid_coordinates, points_per_lego_unit):
@@ -361,7 +361,7 @@ def export_pixel_to_angle(pixel_to_angle):
     return result_a, result_b
 
 
-points_per_lego_unit = 8
+points_per_lego_unit = 16
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
 angle = -45
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
@@ -379,19 +379,26 @@ pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
 
 x_grids = []
 y_grids = []
+xs_print_area = []
+ys_print_area = []
+
 for (x_grid, y_grid), (alpha, beta, d) in grid_to_angle.items():
-    x_grids.append(x_grid)
-    y_grids.append(y_grid)
+    if print_area[0] <= x_grid and x_grid <= print_area[2] and  print_area[1] <= y_grid and y_grid <= print_area[3]:
+        x_grids.append(x_grid)
+        y_grids.append(y_grid)
 
 xs_print_area = []
 ys_print_area = []
 for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
+
     structure_settings = StructureSetting()
     structure_settings.s = 1
     x, y = get_xy(1./structure_settings.gear_ratio * alpha * degrees_to_radians, 1./structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
     x_prime, y_prime = change_referential(x, y, -angle)
     xs_print_area.append(x_prime)
     ys_print_area.append(y_prime)
+
+
 
 plt.scatter(x_grids, y_grids, c="r")
 plt.scatter(xs_print_area, ys_print_area, c="b")
