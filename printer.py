@@ -76,6 +76,37 @@ def compute_circle_intersection(x0, y0, x1, y1, r0, r1):
     y3_prime = y2 + h * (x1 - x0)/ d
     return (x3, y3), (x3_prime, y3_prime)
 
+def get_atan2(y, x):
+
+  t3 = math.fabs(x)
+  t1 = math.fabs(y)
+  t0 = max(t3, t1)
+  t1 = min(t3, t1)
+  t3 = float(1) / t0
+  t3 = t1 * t3
+
+  t4 = t3 * t3;
+  t0 =         - 0.013480470
+  t0 = t0 * t4 + 0.057477314
+  t0 = t0 * t4 - 0.121239071
+  t0 = t0 * t4 + 0.195635925
+  t0 = t0 * t4 - 0.332994597
+  t0 = t0 * t4 + 0.999995630
+  t3 = t0 * t3;
+
+  if math.fabs(y) > math.fabs(x):
+    t3 = float(1.570796327) - t3
+
+  if x < 0:
+    t3 = float(3.141592654) - t3
+
+  if y < 0:
+    t3 = -t3
+
+  print math.fabs(math.atan2(y, x) - t3 )
+
+  return t3;
+
 
 
 def get_alpha_beta(x, y, structure_settings):

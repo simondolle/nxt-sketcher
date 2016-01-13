@@ -15,6 +15,53 @@ short rotation_b;
 
 short result;
 
+float max(float x, float y) {
+  if (x >= y) {
+    return x;
+  }
+  return y;
+}
+
+float min(float x, float y) {
+  if (x <= y) {
+    return x;
+  }
+  return y;
+}
+
+float atan2(float y, float x) {
+  float t3 = abs(x);
+  float t1 = abs(y);
+  float t0 = max(t3, t1);
+  t1 = min(t3, t1);
+  t3 = 1.0 / t0;
+  t3 = t1 * t3;
+
+  float t4 = t3 * t3;
+  t0 =         - 0.013480470;
+  t0 = t0 * t4 + 0.057477314;
+  t0 = t0 * t4 - 0.121239071;
+  t0 = t0 * t4 + 0.195635925;
+  t0 = t0 * t4 - 0.332994597;
+  t0 = t0 * t4 + 0.999995630;
+  t3 = t0 * t3;
+
+  if (abs(y) > abs(x))
+  {
+    t3 = 1.570796327 - t3;
+  }
+
+  if (x < 0) {
+    t3 = 3.141592654 - t3;
+  }
+
+  if (y < 0) {
+    t3 = -t3;
+  }
+
+  return t3;
+}
+
 inline bool is_stalled(byte output)
 {
  long t0 = CurrentTick();
