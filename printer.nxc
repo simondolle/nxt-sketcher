@@ -98,7 +98,8 @@ PointPair compute_circle_intersection(Point p0, Point p1, float r0, float r1, bo
     float d = compute_distance(p0, p1);
 
     if (d  < abs(r0 - r1) || r0 + r1 < d) {
-      return result_set = false;
+      result_set = false;
+      return NULL;
     }
 
     float a = (r0 * r0 - r1 * r1 + d * d)/(2 * d);
@@ -208,7 +209,7 @@ AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool res
         result_set = false;
         return NULL;
     }
-
+    result_set = true;
     return result;
 }
 
