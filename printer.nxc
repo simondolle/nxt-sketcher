@@ -94,6 +94,24 @@ float compute_distance(Point p1, Point p2) {
   return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 }
 
+int round(float f) {
+  int int_part = f;
+  float f_int_part = int_part;
+  if (f >= 0) {
+    if ((f - int_part) >= 0.5) {
+      return int_part + 1;
+    } else {
+      return int_part;
+    }
+  } else {
+    if ((int_part - f) >= 0.5) {
+      return int_part - 1;
+    } else {
+      return int_part;
+    }
+  }
+}
+
 PointPair compute_circle_intersection(Point p0, Point p1, float r0, float r1, bool & result_set) {
     float d = compute_distance(p0, p1);
 
@@ -197,8 +215,8 @@ AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & r
         beta_result = beta_prime;
     }
     AnglePair result;
-    result.alpha = alpha_result;
-    result.beta = beta_result;
+    result.alpha = round(alpha_result);
+    result.beta = round(beta_result);
 
     if (alpha_result < -135 || 135 < alpha_result) {
         result_set = false;
@@ -403,23 +421,6 @@ sub plot_grid() {
 
 }
 
-int round(float f) {
-  int int_part = f;
-  float f_int_part = int_part;
-  if (f >= 0) {
-    if ((f - int_part) >= 0.5) {
-      return int_part + 1;
-    } else {
-      return int_part;
-    }
-  } else {
-    if ((int_part - f) >= 0.5) {
-      return int_part - 1;
-    } else {
-      return int_part;
-    }
-  }
-}
 
 task main()
 {
