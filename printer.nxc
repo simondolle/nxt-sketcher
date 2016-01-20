@@ -403,15 +403,34 @@ sub plot_grid() {
 
 }
 
+int round(float f) {
+  int int_part = f;
+  float f_int_part = int_part;
+  if (f >= 0) {
+    if ((f - int_part) >= 0.5) {
+      return int_part + 1;
+    } else {
+      return int_part;
+    }
+  } else {
+    if ((int_part - f) >= 0.5) {
+      return int_part - 1;
+    } else {
+      return int_part;
+    }
+  }
+}
+
 task main()
 {
  //SetSensorColorFull(IN_3);
  //SetSensorTouch(IN_1);
  //SetSensorTouch(IN_2);
  calibrate_stalled();
- RotateMotor(OUT_C, SPEED, 180);
+ //RotateMotor(OUT_C, SPEED, 180);
  plot_heart();
  //plot_invader();
  //plot_grid();
- float f= atan2(1, 0);
+ //float f= atan2(1, 0);
+
 }
