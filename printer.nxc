@@ -69,7 +69,7 @@ struct StructureSettings {
   int r;  // short arm length (attached to the rotative axis)
   int a; // long arm length
 
-  int ss;  // pen distance
+  int s;  // pen distance
 
   int xa; // left short arm x
   int xb; // right short arm x
@@ -129,7 +129,7 @@ PointPair compute_circle_intersection(Point p0, Point p1, float r0, float r1, bo
     return result;
 }
 
-AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool result_set) {
+AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & result_set) {
     float r_pen = sqrt(structure_settings.a ^ 2 + structure_settings.s ^ 2);
 
     Point a;
@@ -150,8 +150,8 @@ AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool res
     Point p1_actual;
     if (p1.x < p1_prime.x) {
         alpha_result = alpha;
-        p1_actual.x = p1.x1;
-        p1_actual.y = p1.y1;
+        p1_actual.x = p1.x;
+        p1_actual.y = p1.y;
     } else {
         alpha_result = alpha_prime;
         p1_actual.x = p1_prime.x;
