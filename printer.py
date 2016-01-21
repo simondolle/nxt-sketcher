@@ -392,16 +392,16 @@ def export_pixel_to_angle(pixel_to_angle):
     return result_a, result_b
 
 
-points_per_lego_unit = 16
+points_per_lego_unit = 4
 #grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
-angle = -45
+angle = 0
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
 
 #print_area = find_largest_rectange(grid_to_angle)
 #print print_area
 
 print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
-#print print_area
+print print_area
 #print_area = (-4.0, 10.0, 2.5, 13.0)
 x0, y0, x1, y1 = print_area
 
@@ -429,7 +429,10 @@ for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
     xs_print_area.append(x_prime)
     ys_print_area.append(y_prime)
 
-
+print pixel_to_angle[(0, 0)]
+print pixel_to_angle[(0, 12)]
+print pixel_to_angle[(26, 12)];
+print pixel_to_angle[(26, 0)];
 
 plt.scatter(x_grids, y_grids, c="r")
 plt.scatter(xs_print_area, ys_print_area, c="b")
