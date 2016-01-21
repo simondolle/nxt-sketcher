@@ -82,8 +82,8 @@ struct PointPair {
 };
 
 struct AnglePair {
-  int alpha;
-  int beta;
+  float alpha;
+  float beta;
 };
 
 struct PrintSettings {
@@ -228,8 +228,8 @@ AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & r
         beta_result = beta_prime;
     }
     AnglePair result;
-    result.alpha = round(alpha_result);
-    result.beta = round(beta_result);
+    result.alpha = alpha_result;
+    result.beta = beta_result;
 
     int amplitude_angle = structure_settings.amplitude_angle;
     if (alpha_result < -amplitude_angle || amplitude_angle < alpha_result) {
@@ -353,6 +353,16 @@ void goto_position(float x, float y)
   }
   short target_alpha = round(structure_settings.gear_ratio * angle_pair.alpha);
   short target_beta = round(structure_settings.gear_ratio * angle_pair.beta);
+
+  /*
+  ClearScreen();
+  NumOut(8, LCD_LINE6, structure_settings.gear_ratio * angle_pair.alpha);
+  NumOut(52, LCD_LINE6, structure_settings.gear_ratio * angle_pair.beta);
+
+  NumOut(8, LCD_LINE4, target_alpha);
+  NumOut(52, LCD_LINE4, target_beta);
+  Wait(2000);
+  */
 
   short rotation_a = compute_rotation(alpha, target_alpha);
   short rotation_b = compute_rotation(beta, target_beta);
@@ -487,9 +497,9 @@ task main()
  calibrate_stalled();
  //RotateMotor(OUT_C, SPEED, 180);
  //plot_rectangle();
- //plot_heart();
+ plot_heart();
  //plot_invader();
- plot_grid();
+ //plot_grid();
  //float f= atan2(1, 0);
 
 }
