@@ -86,6 +86,14 @@ struct AnglePair {
   int beta;
 };
 
+struct PrintSettings {
+  Point origin;
+  int width;
+  int height;
+  int points_per_lego_unit;
+};
+
+
 float compute_distance(Point p1, Point p2) {
   return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 }
@@ -289,24 +297,21 @@ inline short compute_rotation(short position, short target) {
  return rotation;
 }
 
-void goto_position(float x, float y)
-{
-  //convert to actual position
-  x = x/POINTS_PER_LEGO_UNIT;
-  y = y/POINTS_PER_LEGO_UNIT;
-  y = -y;
+PrintSettings get_print_settings() {
+ PrintSettings print_settings;
+ Point origin;
+ origin.x = 4;
+ origin.x = -origin.x;
+ origin.y = 13;
+ print_settings.origin = origin;
 
-  int origin_x = -4;
-  int origin_y = 13;
+ print_settings.width = 27;
+ print_settings.height = 13;
+ print_settings.points_per_lego_unit = 4;
+ return print_settings;
+}
 
-  x = x + origin_x;
-  y = y + origin_y;
-
-
-  Point p;
-  p.x = x;
-  p.y = y;
-
+StructureSettings get_structure_settings() {
   StructureSettings structure_settings;
   structure_settings.r = 3;  // short arm length (attached to the rotative axis)
   structure_settings.a = 12;  // long arm length
@@ -318,6 +323,26 @@ void goto_position(float x, float y)
   structure_settings.gear_ratio = 3;
 
   structure_settings.amplitude_angle = 135;
+  return structure_settings;
+}
+
+void goto_position(float x, float y)
+{
+  PrintSettings print_settings= get_print_settings();
+
+  //convert to actual position
+  x = x/print_settings.points_per_lego_unit;
+  y = y/print_settings.points_per_lego_unit;
+  y = -y;
+
+  x = x + print_settings.origin.x;
+  y = y + print_settings.origin.y;
+
+  Point p;
+  p.x = x;
+  p.y = y;
+
+  StructureSettings structure_settings = get_structure_settings();
 
   bool result_set = false;
   //get alpha beta
@@ -458,6 +483,7 @@ task main()
  //SetSensorColorFull(IN_3);
  //SetSensorTouch(IN_1);
  //SetSensorTouch(IN_2);
+
  calibrate_stalled();
  //RotateMotor(OUT_C, SPEED, 180);
  //plot_rectangle();
