@@ -10,6 +10,8 @@ short beta;
 float radians_to_degrees = 180/PI;
 float degrees_to_radians = PI/180;
 
+float direction = 1;
+
 float max(float x, float y) {
   if (x >= y) {
     return x;
@@ -377,7 +379,8 @@ void goto_position(float x, float y)
 
 sub print_point(short x, short y) {
   goto_position(x, y);
-  RotateMotor(OUT_C, SPEED, 360);
+  RotateMotor(OUT_C, SPEED, direction * 180);
+  direction = direction * -1;
 }
 
 sub plot_rectangle() {
@@ -495,7 +498,7 @@ task main()
  //SetSensorTouch(IN_2);
 
  calibrate_stalled();
- //RotateMotor(OUT_C, SPEED, 180);
+ RotateMotor(OUT_C, SPEED, 90);
  //plot_rectangle();
  plot_heart();
  //plot_invader();
