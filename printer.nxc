@@ -4,18 +4,8 @@
 #define HEIGHT 18
 
 int POINTS_PER_LEGO_UNIT = 4;
-short pos_to_alpha[] = {270,257,243,230,216,203,190,176,163,149,135,120,105,89,72,52,30,0,277,263,249,235,222,208,195,181,168,154,140,125,111,95,78,60,39,14,283,269,254,240,227,213,199,186,172,159,145,130,116,100,84,67,48,25,289,274,260,246,232,218,204,190,177,163,149,135,120,105,89,73,54,34,295,280,265,251,236,222,208,195,181,167,153,139,125,110,94,78,60,41,302,286,270,255,241,226,212,198,185,171,157,143,128,114,99,83,66,47,308,291,275,260,245,231,216,202,188,174,160,146,132,117,102,87,70,52,314,297,280,264,249,234,220,206,191,177,163,149,135,121,106,90,74,57,320,302,285,269,253,238,223,209,194,180,166,152,138,123,109,94,78,61,326,307,290,273,257,241,226,212,197,183,169,155,140,126,111,96,81,64,333,313,294,277,260,244,229,214,200,185,171,157,143,128,114,99,83,67,339,318,299,281,264,247,232,217,202,187,173,159,145,130,116,101,86,70,346,323,303,284,267,250,234,219,204,189,175,160,146,132,117,103,88,72,352,328,307,288,269,252,236,221,205,191,176,162,147,133,119,104,89,74,359,333,311,291,272,255,238,222,207,192,177,163,148,134,120,105,90,75,367,338,315,294,274,256,240,223,208,193,178,164,149,135,120,106,91,76,375,344,318,296,276,258,241,224,209,193,179,164,150,135,121,106,92,77,383,349,322,299,278,259,242,225,209,194,179,164,150,135,121,107,92,77};
-short pos_to_beta[] = {-54,-55,-55,-56,-56,-55,-54,-53,-52,-50,-47,-44,-40,-36,-30,-23,-15,-2,-70,-71,-71,-72,-72,-72,-71,-70,-69,-67,-65,-62,-59,-55,-51,-46,-39,-31,-85,-86,-87,-87,-87,-87,-87,-86,-85,-83,-82,-79,-77,-73,-70,-65,-60,-53,-99,-101,-101,-102,-102,-102,-102,-101,-100,-99,-97,-95,-93,-90,-87,-83,-78,-73,-114,-115,-116,-117,-117,-117,-117,-116,-115,-114,-113,-111,-109,-106,-103,-99,-95,-90,-128,-130,-131,-131,-132,-132,-132,-131,-130,-129,-128,-126,-124,-121,-118,-115,-111,-107,-143,-144,-145,-146,-146,-146,-146,-146,-145,-144,-142,-140,-138,-136,-133,-130,-126,-122,-157,-159,-160,-160,-161,-161,-161,-160,-159,-158,-157,-155,-153,-151,-148,-145,-141,-137,-172,-174,-175,-175,-176,-176,-175,-175,-174,-173,-171,-170,-167,-165,-162,-159,-156,-152,-188,-189,-190,-190,-191,-191,-190,-190,-189,-187,-186,-184,-182,-179,-177,-174,-170,-167,-203,-205,-205,-206,-206,-206,-206,-205,-204,-202,-201,-199,-197,-194,-191,-188,-185,-181,-220,-221,-222,-222,-222,-222,-221,-220,-219,-218,-216,-214,-211,-209,-206,-202,-199,-195,-237,-238,-239,-239,-239,-238,-238,-236,-235,-233,-231,-229,-226,-224,-220,-217,-213,-209,-256,-257,-257,-257,-257,-256,-255,-253,-252,-250,-247,-245,-242,-239,-235,-232,-228,-224,-277,-277,-277,-277,-276,-275,-273,-271,-269,-267,-264,-261,-258,-254,-251,-247,-243,-238,-299,-300,-299,-298,-297,-295,-293,-290,-288,-285,-282,-278,-275,-271,-267,-262,-258,-253,-327,-326,-324,-323,-320,-318,-315,-311,-308,-304,-300,-296,-292,-288,-283,-279,-274,-269,-362,-359,-356,-352,-348,-344,-340,-335,-330,-326,-321,-316,-311,-306,-301,-295,-290,-284};
 short alpha;
 short beta;
-
-short target_alpha;
-short target_beta;
-
-short rotation_a;
-short rotation_b;
-
-short result;
 
 float radians_to_degrees = 180/PI;
 float degrees_to_radians = PI/180;
@@ -77,6 +67,8 @@ struct StructureSettings {
   int xb; // right short arm x
 
   int gear_ratio;
+
+  int amplitude_angle;
 };
 
 struct Point {
@@ -231,12 +223,13 @@ AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & r
     result.alpha = round(alpha_result);
     result.beta = round(beta_result);
 
-    if (alpha_result < -135 || 135 < alpha_result) {
+    int amplitude_angle = structure_settings.amplitude_angle;
+    if (alpha_result < -amplitude_angle || amplitude_angle < alpha_result) {
         result_set = false;
         return NULL;
     }
 
-    if (beta_result < -135 || 135 < beta_result) {
+    if (beta_result < -amplitude_angle || amplitude_angle < beta_result) {
         result_set = false;
         return NULL;
     }
@@ -281,14 +274,6 @@ inline void calibrate_stalled() {
   calibrate_motor(OUT_B);
 }
 
-inline short get_alpha(short x, short y) {
- return pos_to_alpha[y * WIDTH + x];
-}
-
-inline short get_beta(short x, short y) {
- return pos_to_beta[y * WIDTH + x];
-}
-
 inline short normalize_angle(short angle) {
  while (angle > 180) {
     angle = angle - 360;
@@ -322,11 +307,6 @@ void goto_position(float x, float y)
   p.x = x;
   p.y = y;
 
-  ClearScreen();
-  NumOut(8, LCD_LINE4, p.x);
-  NumOut(32, LCD_LINE4, p.y);
-  Wait(1000);
-
   StructureSettings structure_settings;
   structure_settings.r = 3;  // short arm length (attached to the rotative axis)
   structure_settings.a = 12;  // long arm length
@@ -336,6 +316,8 @@ void goto_position(float x, float y)
   structure_settings.xb = 5; //right short arm x
 
   structure_settings.gear_ratio = 3;
+
+  structure_settings.amplitude_angle = 135;
 
   bool result_set = false;
   //get alpha beta
@@ -347,13 +329,8 @@ void goto_position(float x, float y)
   short target_alpha = round(structure_settings.gear_ratio * angle_pair.alpha);
   short target_beta = round(structure_settings.gear_ratio * angle_pair.beta);
 
-  ClearScreen();
-  NumOut(8, LCD_LINE4, target_alpha);
-  NumOut(32, LCD_LINE4, target_beta);
-  Wait(1000);
-
-  rotation_a = compute_rotation(alpha, target_alpha);
-  rotation_b = compute_rotation(beta, target_beta);
+  short rotation_a = compute_rotation(alpha, target_alpha);
+  short rotation_b = compute_rotation(beta, target_beta);
 
 
   RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
@@ -483,10 +460,10 @@ task main()
  //SetSensorTouch(IN_2);
  calibrate_stalled();
  //RotateMotor(OUT_C, SPEED, 180);
- plot_rectangle();
+ //plot_rectangle();
  //plot_heart();
  //plot_invader();
- //plot_grid();
+ plot_grid();
  //float f= atan2(1, 0);
 
 }
