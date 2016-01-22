@@ -315,7 +315,7 @@ PrintSettings get_print_settings() {
  print_settings.width = 27;
  print_settings.height = 13;
  print_settings.points_per_lego_unit = 4;
- print_settings.line_resolution = 10;
+ print_settings.line_resolution = 20;
  return print_settings;
 }
 
