@@ -7,6 +7,9 @@ int POINTS_PER_LEGO_UNIT = 4;
 short alpha;
 short beta;
 
+float X;
+float Y;
+
 float radians_to_degrees = 180/PI;
 float degrees_to_radians = PI/180;
 
@@ -383,6 +386,9 @@ void goto_position(float x, float y)
 
   RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
   beta = target_beta;
+
+  X = x;
+  Y = y;
 }
 
 sub print_point(short x, short y) {
@@ -391,10 +397,10 @@ sub print_point(short x, short y) {
   direction = direction * -1;
 }
 
-sub print_line(short x, short y, short target_x, short target_y) {
+sub print_line(short target_x, short target_y) {
   Point current_p;
-  current_p.x = x;
-  current_p.y = y;
+  current_p.x = X;
+  current_p.y = Y;
 
   Point target_p;
   target_p.x = target_x;
@@ -404,10 +410,10 @@ sub print_line(short x, short y, short target_x, short target_y) {
   PrintSettings print_settings = get_print_settings();
   float f_nb_steps = distance * print_settings.line_resolution;
 
-  float current_x = x;
-  float current_y = y;
-  float distance_x = target_x - x;
-  float distance_y = target_y - y;
+  float current_x = current_p.x;
+  float current_y = current_p.y;
+  float distance_x = target_x - current_p.x;
+  float distance_y = target_y - current_p.y;
 
   float step_x = distance_x/f_nb_steps;
   float step_y = distance_y/f_nb_steps;
@@ -422,7 +428,9 @@ sub print_line(short x, short y, short target_x, short target_y) {
     n = n + 1;
   }
   goto_position(target_x, target_y);
-  RotateMotor(OUT_C, 100, direction * 90);
+  X = target_x;
+  Y = target_y;
+  //RotateMotor(OUT_C, 100, direction * 90);
   direction = direction * -1;
 }
 
@@ -458,6 +466,58 @@ sub plot_heart() {
  print_point(6, 1);
  print_point(5, 2);
  print_point(4, 1);
+}
+
+void plot_heart_lines() {
+  goto_position(2, 0);
+  RotateMotor(OUT_C, 100, direction * 90);
+  print_line(2, 0);
+  print_line(2, 1);
+  print_line(1, 1);
+  print_line(1, 2);
+  print_line(0, 2);
+  print_line(0, 5);
+  print_line(1, 5);
+  print_line(1, 6);
+  print_line(2, 6);
+  print_line(2, 7);
+  print_line(3, 7);
+  print_line(3, 8);
+  print_line(4, 8);
+  print_line(4, 9);
+  print_line(5, 9);
+  print_line(5, 10);
+  print_line(6, 10);
+  print_line(6, 11);
+  print_line(7, 11);
+  print_line(7, 10);
+  print_line(8, 10);
+  print_line(8, 9);
+  print_line(9, 9);
+  print_line(9, 8);
+  print_line(10, 8);
+  print_line(10, 7);
+  print_line(11, 7);
+  print_line(11, 6);
+  print_line(12, 6);
+  print_line(12, 5);
+  print_line(13, 5);
+  print_line(13, 2);
+  print_line(12, 2);
+  print_line(12, 1);
+  print_line(11, 1);
+  print_line(11, 0);
+  print_line(8, 0);
+  print_line(8, 1);
+  print_line(7, 1);
+  print_line(7, 2);
+  print_line(6, 2);
+  print_line(6, 1);
+  print_line(5, 1);
+  print_line(5, 0);
+  print_line(2, 0);
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
 }
 
 sub plot_invader() {
@@ -536,10 +596,10 @@ sub plot_grid() {
 sub plot_rectangle() {
   goto_position(0, 0);
   RotateMotor(OUT_C, 100, direction * 90);
-  print_line(0, 0, 0, 12);
-  print_line(0, 12, 26, 12);
-  print_line(26, 12, 26, 0);
-  print_line(26, 0, 0, 0);
+  print_line(0, 12);
+  print_line(26, 12);
+  print_line(26, 0);
+  print_line(0, 0);
   RotateMotor(OUT_C, 100, direction * 90);
   direction = direction * -1;
 }
@@ -549,11 +609,10 @@ task main()
  //SetSensorColorFull(IN_3);
  //SetSensorTouch(IN_1);
  //SetSensorTouch(IN_2);
-
- calibrate_stalled();
  RotateMotor(OUT_C, 100, 90);
+ calibrate_stalled();
  //plot_corners();
- plot_rectangle();
+ plot_heart_lines();
  //plot_invader();
  //plot_grid();
  //float f= atan2(1, 0);
