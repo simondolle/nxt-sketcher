@@ -351,6 +351,77 @@ Point convert_to_actual_coordinates(float x, float y) {
   return p;
 }
 
+void move_motors(short rotation_a, short rotation_b) {
+  //ClearScreen();
+  //NumOut(8, LCD_LINE4, rotation_a);
+  //NumOut(52, LCD_LINE4, rotation_b);
+  //Wait(1000);
+
+  if (rotation_a == 0) {
+    RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
+    return;
+  }
+
+  if (rotation_b == 0) {
+    RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
+    return;
+  }
+
+  short a = rotation_a;
+  short b = rotation_b;
+
+ //-100: 2 angles positifs, A = B (A tourne en positif)
+ //-75 : 2 angles positifs, A = 2 * B
+ //-50 : 2 angles positifs, B ne bouge pas
+ //-25 : A positif, B négatif, A = 2 * B
+ //0 : A positif, B négatif, A = B
+ //25: A positif, B négatif, B = 2 * A
+ //50: A ne bouge pas, B négatif
+ //75: A négatif, B négatif, B = 2 * A
+ //100: A négatif, B négatif, B = A
+
+  //if (a >= 0 && a == b) {
+  //  RotateMotorEx(OUT_AB, SPEED, a, -100, true, true);
+  //  return;
+  //}
+
+  //if (a >= 0 && a == 2 * b) {
+  //  RotateMotorEx(OUT_AB, SPEED, a, -75, true, true);
+  //  return;
+  //}
+
+  //if (a >= 0 && a == -2 * b) {
+  //  RotateMotorEx(OUT_AB, SPEED, a, -25, true, true);
+  //  return;
+  //}
+
+  //if (a >= 0 && a == -b) {
+  //  RotateMotorEx(OUT_AB, SPEED, a, 0, true, true);
+  //  return;
+  //}
+
+  //if (a >= 0 && b == -2 * a) {
+  //  RotateMotorEx(OUT_AB, SPEED, b, 25, true, true);
+  //  return;
+  //}
+
+  //if (a < 0 && b == 2 * a) {
+  //  RotateMotorEx(OUT_AB, SPEED, b, 75, true, true);
+  //  return;
+  //}
+
+  //if (a < 0 && b == a) {
+  //  RotateMotorEx(OUT_AB, SPEED, b, 100, true, true);
+  //  return;
+  //}
+
+  RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
+  RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
+
+}
+
+
+
 void goto_position(float x, float y)
 {
   Point p = convert_to_actual_coordinates(x, y);
@@ -367,29 +438,17 @@ void goto_position(float x, float y)
   short target_alpha = round(structure_settings.gear_ratio * angle_pair.alpha);
   short target_beta = round(structure_settings.gear_ratio * angle_pair.beta);
 
-  /*
-  ClearScreen();
-  NumOut(8, LCD_LINE6, structure_settings.gear_ratio * angle_pair.alpha);
-  NumOut(52, LCD_LINE6, structure_settings.gear_ratio * angle_pair.beta);
-
-  NumOut(8, LCD_LINE4, target_alpha);
-  NumOut(52, LCD_LINE4, target_beta);
-  Wait(2000);
-  */
-
   short rotation_a = compute_rotation(alpha, target_alpha);
   short rotation_b = compute_rotation(beta, target_beta);
 
-
-  RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
+  move_motors(rotation_a, rotation_b);
   alpha = target_alpha;
-
-  RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
   beta = target_beta;
 
   X = x;
   Y = y;
 }
+
 
 sub print_point(short x, short y) {
   goto_position(x, y);
@@ -430,8 +489,6 @@ sub print_line(short target_x, short target_y) {
   goto_position(target_x, target_y);
   X = target_x;
   Y = target_y;
-  //RotateMotor(OUT_C, 100, direction * 90);
-  direction = direction * -1;
 }
 
 sub plot_corners() {
@@ -643,9 +700,21 @@ task main()
  //SetSensorTouch(IN_2);
  RotateMotor(OUT_C, 100, 90);
  calibrate_stalled();
+ //-100: 2 angles positifs, A = B (A tourne en positif)
+ //-75 : 2 angles positifs, A = 2 * B
+ //-50 : 2 angles positifs, B ne bouge pas
+ //-25 : A positif, B négatif, A = 2 * B
+ //0 : A positif, B négatif, A = B
+ //25: A positif, B négatif, B = 2 * A
+ //50: A ne bouge pas, B négatif
+ //75: A négatif, B négatif, B = 2 * A
+ //100: A négatif, B négatif, B = A
+ //RotateMotorEx(OUT_AB, SPEED, 3 * 90, 100, true, true);
+
+ plot_rectangle();
  //plot_corners();
  //plot_heart_lines();
- plot_grid_lines();
+ //plot_grid_lines();
  //plot_invader();
  //plot_grid();
  //float f= atan2(1, 0);
