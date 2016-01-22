@@ -315,7 +315,7 @@ PrintSettings get_print_settings() {
  print_settings.width = 27;
  print_settings.height = 13;
  print_settings.points_per_lego_unit = 4;
- print_settings.line_resolution = 20;
+ print_settings.line_resolution = 10;
  return print_settings;
 }
 
@@ -351,73 +351,45 @@ Point convert_to_actual_coordinates(float x, float y) {
   return p;
 }
 
+bool programm_over = false;
+
+short command_a;
+bool command_a_to_process = false;
+task move_a() {
+  while(!programm_over) {
+    if(command_a_to_process == true) {
+      RotateMotorEx(OUT_A, SPEED, command_a, 0, false, true);
+      command_a_to_process = false;
+      Wait(20);
+    }
+  }
+}
+
+short command_b;
+bool command_b_to_process = false;
+task move_b() {
+  while(!programm_over) {
+    if(command_b_to_process == true) {
+      RotateMotorEx(OUT_B, SPEED, -command_b, 0, false, true);
+      command_b_to_process = false;
+      Wait(20);
+    }
+  }
+}
+
+
 void move_motors(short rotation_a, short rotation_b) {
-  //ClearScreen();
-  //NumOut(8, LCD_LINE4, rotation_a);
-  //NumOut(52, LCD_LINE4, rotation_b);
-  //Wait(1000);
 
-  if (rotation_a == 0) {
-    RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
-    return;
+  command_a = rotation_a;
+  command_b = rotation_b;
+  command_a_to_process = true;
+  command_b_to_process = true;
+
+  while(command_a_to_process == true || command_b_to_process == true) {
+    Wait(10);
   }
 
-  if (rotation_b == 0) {
-    RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
-    return;
-  }
-
-  short a = rotation_a;
-  short b = rotation_b;
-
- //-100: 2 angles positifs, A = B (A tourne en positif)
- //-75 : 2 angles positifs, A = 2 * B
- //-50 : 2 angles positifs, B ne bouge pas
- //-25 : A positif, B négatif, A = 2 * B
- //0 : A positif, B négatif, A = B
- //25: A positif, B négatif, B = 2 * A
- //50: A ne bouge pas, B négatif
- //75: A négatif, B négatif, B = 2 * A
- //100: A négatif, B négatif, B = A
-
-  //if (a >= 0 && a == b) {
-  //  RotateMotorEx(OUT_AB, SPEED, a, -100, true, true);
-  //  return;
-  //}
-
-  //if (a >= 0 && a == 2 * b) {
-  //  RotateMotorEx(OUT_AB, SPEED, a, -75, true, true);
-  //  return;
-  //}
-
-  //if (a >= 0 && a == -2 * b) {
-  //  RotateMotorEx(OUT_AB, SPEED, a, -25, true, true);
-  //  return;
-  //}
-
-  //if (a >= 0 && a == -b) {
-  //  RotateMotorEx(OUT_AB, SPEED, a, 0, true, true);
-  //  return;
-  //}
-
-  //if (a >= 0 && b == -2 * a) {
-  //  RotateMotorEx(OUT_AB, SPEED, b, 25, true, true);
-  //  return;
-  //}
-
-  //if (a < 0 && b == 2 * a) {
-  //  RotateMotorEx(OUT_AB, SPEED, b, 75, true, true);
-  //  return;
-  //}
-
-  //if (a < 0 && b == a) {
-  //  RotateMotorEx(OUT_AB, SPEED, b, 100, true, true);
-  //  return;
-  //}
-
-  RotateMotorEx(OUT_A, SPEED, rotation_a, 0, false, true);
-  RotateMotorEx(OUT_B, SPEED, -rotation_b, 0, false, true);
-
+  return;
 }
 
 
@@ -693,7 +665,9 @@ sub plot_rectangle() {
   direction = direction * -1;
 }
 
-task main()
+
+
+task submain()
 {
  //SetSensorColorFull(IN_3);
  //SetSensorTouch(IN_1);
@@ -718,5 +692,9 @@ task main()
  //plot_invader();
  //plot_grid();
  //float f= atan2(1, 0);
+ programm_over = true;
+}
 
+task main() {
+  Precedes(move_a, move_b, submain);
 }
