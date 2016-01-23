@@ -1,11 +1,5 @@
-#define SPEED 40
-
-#define WIDTH 18
-#define HEIGHT 18
-
-int POINTS_PER_LEGO_UNIT = 4;
-short alpha;
-short beta;
+short ALPHA;
+short BETA;
 
 float X;
 float Y;
@@ -14,6 +8,76 @@ float radians_to_degrees = 180/PI;
 float degrees_to_radians = PI/180;
 
 float direction = 1;
+
+struct StructureSettings {
+  int r;  // short arm length (attached to the rotative axis)
+  int a; // long arm length
+
+  int s;  // pen distance
+
+  int xa; // left short arm x
+  int xb; // right short arm x
+
+  int gear_ratio;
+
+  int amplitude_angle;
+};
+
+struct Point {
+  float x;
+  float y;
+};
+
+struct PointPair {
+  Point p0;
+  Point p1;
+};
+
+struct AnglePair {
+  float alpha;
+  float beta;
+};
+
+struct PrintSettings {
+  Point origin;
+  int width;
+  int height;
+  int points_per_lego_unit;
+
+  int line_resolution; //nb points between two pixels
+
+  int speed;
+};
+
+PrintSettings get_print_settings() {
+ PrintSettings print_settings;
+ Point origin;
+ origin.x = 4;
+ origin.x = -origin.x;
+ origin.y = 13;
+ print_settings.origin = origin;
+
+ print_settings.width = 27;
+ print_settings.height = 13;
+ print_settings.points_per_lego_unit = 4;
+ print_settings.line_resolution = 10;
+ return print_settings;
+}
+
+StructureSettings get_structure_settings() {
+  StructureSettings structure_settings;
+  structure_settings.r = 3;  // short arm length (attached to the rotative axis)
+  structure_settings.a = 12;  // long arm length
+  structure_settings.s = 1;  // pen distance
+
+  structure_settings.xa = -5; //left short arm x
+  structure_settings.xb = 5; //right short arm x
+
+  structure_settings.gear_ratio = 3;
+
+  structure_settings.amplitude_angle = 135;
+  return structure_settings;
+}
 
 float max(float x, float y) {
   if (x >= y) {
@@ -61,45 +125,6 @@ float atan2(float y, float x) {
 
   return t3;
 }
-
-struct StructureSettings {
-  int r;  // short arm length (attached to the rotative axis)
-  int a; // long arm length
-
-  int s;  // pen distance
-
-  int xa; // left short arm x
-  int xb; // right short arm x
-
-  int gear_ratio;
-
-  int amplitude_angle;
-};
-
-struct Point {
-  float x;
-  float y;
-};
-
-struct PointPair {
-  Point p0;
-  Point p1;
-};
-
-struct AnglePair {
-  float alpha;
-  float beta;
-};
-
-struct PrintSettings {
-  Point origin;
-  int width;
-  int height;
-  int points_per_lego_unit;
-
-  int line_resolution; //nb points between two pixels
-};
-
 
 float compute_distance(Point p1, Point p2) {
   return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
@@ -270,17 +295,19 @@ inline bool is_stalled(byte output)
 }
 
 inline void calibrate_motor(byte output) {
- OnRev(output, SPEED);
+ PrintSettings print_settings = get_print_settings();
+
+ OnRev(output, print_settings.speed);
  until (is_stalled(output));
  Off(output);
  long initialCount = MotorRotationCount(output);
  Wait(100);
- OnFwd(output, SPEED);
+ OnFwd(output, print_settings.speed);
  until (is_stalled(output));
  Off(output);
  long finalCount = MotorRotationCount(output);
  Wait(100);
- RotateMotorEx(output, -SPEED, (finalCount - initialCount) / 2, 0, false, true);
+ RotateMotorEx(output, -print_settings.speed, (finalCount - initialCount) / 2, 0, false, true);
  Wait(100);
 }
 
@@ -304,35 +331,7 @@ inline short compute_rotation(short position, short target) {
  return rotation;
 }
 
-PrintSettings get_print_settings() {
- PrintSettings print_settings;
- Point origin;
- origin.x = 4;
- origin.x = -origin.x;
- origin.y = 13;
- print_settings.origin = origin;
 
- print_settings.width = 27;
- print_settings.height = 13;
- print_settings.points_per_lego_unit = 4;
- print_settings.line_resolution = 10;
- return print_settings;
-}
-
-StructureSettings get_structure_settings() {
-  StructureSettings structure_settings;
-  structure_settings.r = 3;  // short arm length (attached to the rotative axis)
-  structure_settings.a = 12;  // long arm length
-  structure_settings.s = 1;  // pen distance
-
-  structure_settings.xa = -5; //left short arm x
-  structure_settings.xb = 5; //right short arm x
-
-  structure_settings.gear_ratio = 3;
-
-  structure_settings.amplitude_angle = 135;
-  return structure_settings;
-}
 
 Point convert_to_actual_coordinates(float x, float y) {
   PrintSettings print_settings= get_print_settings();
@@ -356,9 +355,11 @@ bool programm_over = false;
 short command_a;
 bool command_a_to_process = false;
 task move_a() {
+  PrintSettings print_settings = get_print_settings();
+
   while(!programm_over) {
     if(command_a_to_process == true) {
-      RotateMotorEx(OUT_A, SPEED, command_a, 0, false, true);
+      RotateMotorEx(OUT_A, print_settings.speed, command_a, 0, false, true);
       command_a_to_process = false;
       Wait(20);
     }
@@ -368,9 +369,11 @@ task move_a() {
 short command_b;
 bool command_b_to_process = false;
 task move_b() {
+  PrintSettings print_settings = get_print_settings();
+
   while(!programm_over) {
     if(command_b_to_process == true) {
-      RotateMotorEx(OUT_B, SPEED, -command_b, 0, false, true);
+      RotateMotorEx(OUT_B, print_settings.speed, -command_b, 0, false, true);
       command_b_to_process = false;
       Wait(20);
     }
@@ -410,12 +413,12 @@ void goto_position(float x, float y)
   short target_alpha = round(structure_settings.gear_ratio * angle_pair.alpha);
   short target_beta = round(structure_settings.gear_ratio * angle_pair.beta);
 
-  short rotation_a = compute_rotation(alpha, target_alpha);
-  short rotation_b = compute_rotation(beta, target_beta);
+  short rotation_a = compute_rotation(ALPHA, target_alpha);
+  short rotation_b = compute_rotation(BETA, target_beta);
 
   move_motors(rotation_a, rotation_b);
-  alpha = target_alpha;
-  beta = target_beta;
+  ALPHA = target_alpha;
+  BETA = target_beta;
 
   X = x;
   Y = y;
@@ -549,6 +552,77 @@ void plot_heart_lines() {
   direction = direction * -1;
 }
 
+void plot_invader_lines() {
+  goto_position(2, 1);
+  RotateMotor(OUT_C, 100, direction * 90);
+  print_line(2, 0);
+  print_line(3, 0);
+  print_line(3, 2);
+  print_line(2, 2);
+  print_line(2, 3);
+  print_line(1, 3);
+  print_line(1, 4);
+  print_line(0, 4);
+  print_line(0, 7);
+  print_line(1, 7);
+  print_line(1, 5);
+  print_line(2, 5);
+  print_line(2, 7);
+  print_line(3, 7);
+  print_line(3, 8);
+  print_line(5, 8);
+  print_line(5, 7);
+  print_line(3, 7);
+  print_line(3, 6);
+  print_line(8, 6);
+  print_line(8, 8);
+  print_line(6, 8);
+  print_line(6, 7);
+  print_line(9, 7);
+  print_line(9, 5);
+  print_line(10, 5);
+  print_line(10, 7);
+  print_line(11, 7);
+  print_line(11, 4);
+  print_line(10, 4);
+  print_line(10, 3);
+  print_line(9, 3);
+  print_line(9, 2);
+  print_line(8, 2);
+  print_line(8, 0);
+  print_line(9, 0);
+  print_line(9, 1);
+  print_line(7, 1);
+  print_line(7, 2);
+  print_line(4, 2);
+  print_line(4, 1);
+  print_line(3, 1);
+
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+
+  goto_position(3, 3);
+  RotateMotor(OUT_C, 100, direction * 90);
+  print_line(3, 4);
+  print_line(4, 4);
+  print_line(4, 3);
+  print_line(3, 3);
+
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+
+  goto_position(7, 3);
+  RotateMotor(OUT_C, 100, direction * 90);
+  goto_position(8, 3);
+  goto_position(8, 4);
+  goto_position(8, 3);
+  goto_position(7, 3);
+
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+}
+
+
 sub plot_invader() {
  print_point(0, 4);
  print_point(0, 5);
@@ -601,14 +675,6 @@ sub plot_invader() {
  print_point(9, 4);
 }
 
-sub plot_vertical_line() {
- short y = 0;
- repeat(HEIGHT) {
-   print_point(5, y);
-   y += 1;
- }
-}
-
 void plot_grid_lines() {
 
   PrintSettings print_settings = get_print_settings();
@@ -642,10 +708,12 @@ void plot_grid_lines() {
 }
 
 sub plot_grid() {
+ PrintSettings print_settings = get_print_settings();
+
  short x = 0;
- repeat(WIDTH) {
+ repeat(print_settings.width) {
   short y = 0;
-  repeat(HEIGHT - 1) {
+  repeat(print_settings.height - 1) {
    print_point(x, y);
    y += 1;
   }
@@ -685,13 +753,14 @@ task submain()
  //100: A négatif, B négatif, B = A
  //RotateMotorEx(OUT_AB, SPEED, 3 * 90, 100, true, true);
 
- plot_rectangle();
+ //plot_rectangle();
+ plot_invader_lines();
  //plot_corners();
  //plot_heart_lines();
  //plot_grid_lines();
  //plot_invader();
  //plot_grid();
- //float f= atan2(1, 0);
+ //float f=  atan2(1, 0);
  programm_over = true;
 }
 
