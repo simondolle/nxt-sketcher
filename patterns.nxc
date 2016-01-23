@@ -93,7 +93,8 @@ void plot_invader_lines() {
   goto_position(2, 1);
   pen_down();
   print_line(2, 0);
-  print_line(3, 0);
+  print_line(2, 1);
+  print_line(3, 1);
   print_line(3, 2);
   print_line(2, 2);
   print_line(2, 3);
@@ -112,9 +113,12 @@ void plot_invader_lines() {
   print_line(3, 7);
   print_line(3, 6);
   print_line(8, 6);
-  print_line(8, 8);
-  print_line(6, 8);
+  print_line(8, 7);
   print_line(6, 7);
+  print_line(6, 8);
+  print_line(8, 8);
+  print_line(8, 7);
+  print_line(9, 7);
   print_line(9, 7);
   print_line(9, 5);
   print_line(10, 5);
@@ -134,25 +138,26 @@ void plot_invader_lines() {
   print_line(4, 2);
   print_line(4, 1);
   print_line(3, 1);
+  print_line(3, 0);
+  print_line(2, 0);
 
   pen_up();
-  goto_position(3, 3);
+  goto_position(3, 4);
   pen_down();
 
-  print_line(3, 4);
   print_line(4, 4);
   print_line(4, 3);
   print_line(3, 3);
+  print_line(3, 4);
 
   pen_up();
-  goto_position(7, 3);
+  goto_position(7, 4);
   pen_down();
 
-  goto_position(8, 3);
-  goto_position(8, 4);
-  goto_position(8, 3);
-  goto_position(7, 3);
-
+  print_line(8, 4);
+  print_line(8, 3);
+  print_line(7, 3);
+  print_line(7, 4);
   pen_up();
 }
 
@@ -218,7 +223,7 @@ void plot_grid_lines() {
     print_line(x, print_settings.height - 1);
 
     pen_up();
-    x= x + 1;
+    x= x + 3;
   }
 
   goto_position(0, 0);
@@ -230,7 +235,7 @@ void plot_grid_lines() {
     print_line(print_settings.width - 1, y);
 
     pen_up();
-    y= y + 1;
+    y= y + 3;
   }
 
 }
