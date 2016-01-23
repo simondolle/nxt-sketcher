@@ -1,0 +1,271 @@
+#ifndef PATTERNS_NXC
+#define PATTERNS_NXC
+
+#include "draw.nxc"
+
+sub plot_corners() {
+  print_point(0, 0);
+  print_point(0, 12);
+  print_point(26, 12);
+  print_point(26, 0);
+}
+
+sub plot_heart() {
+ print_point(3, 0);
+ print_point(2, 0);
+ print_point(1, 1);
+ print_point(0, 2);
+ print_point(0, 3);
+ print_point(0, 4);
+ print_point(1, 5);
+ print_point(2, 6);
+ print_point(3, 7);
+ print_point(4, 8);
+ print_point(5, 9);
+ print_point(6, 8);
+ print_point(7, 7);
+ print_point(8, 6);
+ print_point(9, 5);
+ print_point(10, 4);
+ print_point(10, 3);
+ print_point(10, 2);
+ print_point(9, 1);
+ print_point(8, 0);
+ print_point(7, 0);
+ print_point(6, 1);
+ print_point(5, 2);
+ print_point(4, 1);
+}
+
+void plot_heart_lines() {
+  goto_position(2, 0);
+  RotateMotor(OUT_C, 100, direction * 90);
+  print_line(2, 0);
+  print_line(2, 1);
+  print_line(1, 1);
+  print_line(1, 2);
+  print_line(0, 2);
+  print_line(0, 5);
+  print_line(1, 5);
+  print_line(1, 6);
+  print_line(2, 6);
+  print_line(2, 7);
+  print_line(3, 7);
+  print_line(3, 8);
+  print_line(4, 8);
+  print_line(4, 9);
+  print_line(5, 9);
+  print_line(5, 10);
+  print_line(6, 10);
+  print_line(6, 11);
+  print_line(7, 11);
+  print_line(7, 10);
+  print_line(8, 10);
+  print_line(8, 9);
+  print_line(9, 9);
+  print_line(9, 8);
+  print_line(10, 8);
+  print_line(10, 7);
+  print_line(11, 7);
+  print_line(11, 6);
+  print_line(12, 6);
+  print_line(12, 5);
+  print_line(13, 5);
+  print_line(13, 2);
+  print_line(12, 2);
+  print_line(12, 1);
+  print_line(11, 1);
+  print_line(11, 0);
+  print_line(8, 0);
+  print_line(8, 1);
+  print_line(7, 1);
+  print_line(7, 2);
+  print_line(6, 2);
+  print_line(6, 1);
+  print_line(5, 1);
+  print_line(5, 0);
+  print_line(2, 0);
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+}
+
+void plot_invader_lines() {
+  goto_position(2, 1);
+  RotateMotor(OUT_C, 100, direction * 90);
+  print_line(2, 0);
+  print_line(3, 0);
+  print_line(3, 2);
+  print_line(2, 2);
+  print_line(2, 3);
+  print_line(1, 3);
+  print_line(1, 4);
+  print_line(0, 4);
+  print_line(0, 7);
+  print_line(1, 7);
+  print_line(1, 5);
+  print_line(2, 5);
+  print_line(2, 7);
+  print_line(3, 7);
+  print_line(3, 8);
+  print_line(5, 8);
+  print_line(5, 7);
+  print_line(3, 7);
+  print_line(3, 6);
+  print_line(8, 6);
+  print_line(8, 8);
+  print_line(6, 8);
+  print_line(6, 7);
+  print_line(9, 7);
+  print_line(9, 5);
+  print_line(10, 5);
+  print_line(10, 7);
+  print_line(11, 7);
+  print_line(11, 4);
+  print_line(10, 4);
+  print_line(10, 3);
+  print_line(9, 3);
+  print_line(9, 2);
+  print_line(8, 2);
+  print_line(8, 0);
+  print_line(9, 0);
+  print_line(9, 1);
+  print_line(7, 1);
+  print_line(7, 2);
+  print_line(4, 2);
+  print_line(4, 1);
+  print_line(3, 1);
+
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+
+  goto_position(3, 3);
+  RotateMotor(OUT_C, 100, direction * 90);
+  print_line(3, 4);
+  print_line(4, 4);
+  print_line(4, 3);
+  print_line(3, 3);
+
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+
+  goto_position(7, 3);
+  RotateMotor(OUT_C, 100, direction * 90);
+  goto_position(8, 3);
+  goto_position(8, 4);
+  goto_position(8, 3);
+  goto_position(7, 3);
+
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+}
+
+sub plot_invader() {
+ print_point(0, 4);
+ print_point(0, 5);
+ print_point(0, 6);
+
+ print_point(1, 3);
+ print_point(1, 4);
+
+ print_point(2, 0);
+ print_point(2, 3);
+ print_point(2, 4);
+ print_point(2, 5);
+ print_point(2, 6);
+ print_point(2, 7);
+
+ print_point(3, 1);
+ print_point(3, 2);
+ print_point(3, 4);
+ print_point(3, 5);
+ print_point(3, 7);
+
+ print_point(4, 3);
+ print_point(4, 4);
+ print_point(4, 5);
+ print_point(4, 6);
+
+ print_point(5, 3);
+ print_point(5, 4);
+ print_point(5, 5);
+ print_point(5, 6);
+
+ print_point(6, 1);
+ print_point(6, 2);
+ print_point(6, 4);
+ print_point(6, 5);
+ print_point(6, 7);
+
+ print_point(7, 0);
+ print_point(7, 3);
+ print_point(7, 4);
+ print_point(7, 5);
+ print_point(7, 6);
+ print_point(7, 7);
+
+ print_point(8, 4);
+ print_point(8, 5);
+ print_point(8, 6);
+ print_point(9, 3);
+ print_point(9, 4);
+}
+
+void plot_grid_lines() {
+
+  PrintSettings print_settings = get_print_settings();
+
+  int x = 0;
+  while(x < print_settings.width) {
+    goto_position(x, 0);
+    RotateMotor(OUT_C, 100, direction * 90);
+    print_line(x, print_settings.height - 1);
+
+    RotateMotor(OUT_C, 100, direction * 90);
+    direction = direction * -1;
+
+    x= x + 1;
+  }
+
+  goto_position(0, 0);
+  int y = 0;
+  while(y < print_settings.height)
+  {
+    goto_position(0, y);
+    RotateMotor(OUT_C, 100, direction * 90);
+    print_line(print_settings.width - 1, y);
+
+    RotateMotor(OUT_C, 100, direction * 90);
+    direction = direction * -1;
+
+    y= y + 1;
+  }
+
+}
+
+sub plot_grid() {
+ PrintSettings print_settings = get_print_settings();
+
+ short x = 0;
+ repeat(print_settings.width) {
+  short y = 0;
+  repeat(print_settings.height - 1) {
+   print_point(x, y);
+   y += 1;
+  }
+  x += 1;
+ }
+
+}
+
+sub plot_rectangle() {
+  goto_position(0, 0);
+  RotateMotor(OUT_C, 100, direction * 90);
+  print_line(0, 12);
+  print_line(26, 12);
+  print_line(26, 0);
+  print_line(0, 0);
+  RotateMotor(OUT_C, 100, direction * 90);
+  direction = direction * -1;
+}
+
+#endif

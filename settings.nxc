@@ -1,0 +1,61 @@
+#ifndef SETTINGS_NXC
+#define SETTINGS_NXC
+
+struct StructureSettings {
+  int r;  // short arm length (attached to the rotative axis)
+  int a; // long arm length
+
+  int s;  // pen distance
+
+  int xa; // left short arm x
+  int xb; // right short arm x
+
+  int gear_ratio;
+
+  int amplitude_angle;
+};
+
+
+struct PrintSettings {
+  Point origin;
+  int width;
+  int height;
+  int points_per_lego_unit;
+
+  int line_resolution; //nb points between two pixels
+
+  int speed;
+};
+
+PrintSettings get_print_settings() {
+ PrintSettings print_settings;
+ Point origin;
+ origin.x = 4;
+ origin.x = -origin.x;
+ origin.y = 13;
+ print_settings.origin = origin;
+
+ print_settings.width = 27;
+ print_settings.height = 13;
+ print_settings.points_per_lego_unit = 4;
+ print_settings.line_resolution = 10;
+ print_settings.speed = 40;
+ return print_settings;
+}
+
+StructureSettings get_structure_settings() {
+  StructureSettings structure_settings;
+  structure_settings.r = 3;  // short arm length (attached to the rotative axis)
+  structure_settings.a = 12;  // long arm length
+  structure_settings.s = 1;  // pen distance
+
+  structure_settings.xa = -5; //left short arm x
+  structure_settings.xb = 5; //right short arm x
+
+  structure_settings.gear_ratio = 3;
+
+  structure_settings.amplitude_angle = 135;
+  return structure_settings;
+}
+
+#endif

@@ -1,0 +1,87 @@
+#ifndef MOVE_NXC
+#define MOVE_NXC
+
+bool program_over = false;
+
+short ALPHA;
+short BETA;
+
+float X;
+float Y;
+
+short command_a;
+bool command_a_to_process = false;
+task move_a() {
+  Wait(1000);
+  PrintSettings print_settings = get_print_settings();
+
+  while(!program_over) {
+    if(command_a_to_process == true) {
+      RotateMotorEx(OUT_A, print_settings.speed, command_a, 0, false, true);
+      command_a_to_process = false;
+      Wait(20);
+    }
+  }
+}
+
+short command_b;
+bool command_b_to_process = false;
+task move_b() {
+  PrintSettings print_settings = get_print_settings();
+
+  while(!program_over) {
+    if(command_b_to_process == true) {
+      RotateMotorEx(OUT_B, print_settings.speed, -command_b, 0, false, true);
+      command_b_to_process = false;
+      Wait(20);
+    }
+  }
+}
+
+void move_motors(short rotation_a, short rotation_b) {
+
+  command_a = rotation_a;
+  command_b = rotation_b;
+  command_a_to_process = true;
+  command_b_to_process = true;
+
+  while(command_a_to_process == true || command_b_to_process == true) {
+    Wait(10);
+  }
+  return;
+}
+
+void goto_position(float x, float y)
+{
+  Point p = convert_to_actual_coordinates(x, y);
+
+  StructureSettings structure_settings = get_structure_settings();
+
+  bool result_set = false;
+  //get alpha beta
+  AnglePair angle_pair = get_alpha_beta(p, structure_settings, result_set);
+  if (!result_set)
+  {
+    return;
+  }
+  short target_alpha = round(structure_settings.gear_ratio * angle_pair.alpha);
+  short target_beta = round(structure_settings.gear_ratio * angle_pair.beta);
+
+  short rotation_a = compute_rotation(ALPHA, target_alpha);
+  short rotation_b = compute_rotation(BETA, target_beta);
+
+  move_motors(rotation_a, rotation_b);
+
+  ALPHA = ALPHA + rotation_a;
+  BETA = BETA + rotation_b;
+
+  X = x;
+  Y = y;
+
+}
+
+#endif
+
+
+
+

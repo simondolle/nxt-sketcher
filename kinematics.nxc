@@ -1,0 +1,172 @@
+#ifndef KINEMATICS_NXC
+#define KINEMATICS_NXC
+
+#include "math.nxc"
+#include "settings.nxc"
+
+float radians_to_degrees = 180/PI;
+float degrees_to_radians = PI/180;
+
+inline short normalize_angle(short angle) {
+ while (angle > 180) {
+    angle = angle - 360;
+ }
+ while (angle < -180) {
+    angle = angle + 360;
+ }
+ return angle;
+}
+
+inline short compute_rotation(short position, short target) {
+ short rotation = (target - position);
+ return rotation;
+}
+
+Point convert_to_actual_coordinates(float x, float y) {
+  PrintSettings print_settings= get_print_settings();
+
+  //convert to actual position
+  x = x/print_settings.points_per_lego_unit;
+  y = y/print_settings.points_per_lego_unit;
+  y = -y;
+
+  x = x + print_settings.origin.x;
+  y = y + print_settings.origin.y;
+
+  Point p;
+  p.x = x;
+  p.y = y;
+  return p;
+}
+
+
+PointPair compute_circle_intersection(Point p0, Point p1, float r0, float r1, bool & result_set) {
+    float d = compute_distance(p0, p1);
+
+    if (d  < abs(r0 - r1) || r0 + r1 < d) {
+      result_set = false;
+      return NULL;
+    }
+
+    float a = (r0 * r0 - r1 * r1 + d * d)/(2 * d);
+    float h = sqrt(r0 * r0 - a * a);
+
+    float x2 = p0.x + a * (p1.x - p0.x)/d;
+    float y2 = p0.y + a * (p1.y - p0.y)/d;
+
+    float x3 = x2 + h * (p1.y - p0.y)/ d;
+    float y3 = y2 - h * (p1.x - p0.x)/ d;
+
+    float x3_prime = x2 - h * (p1.y - p0.y)/ d;
+    float y3_prime = y2 + h * (p1.x - p0.x)/ d;
+
+    Point p3;
+    p3.x = x3;
+    p3.y = y3;
+
+    Point p3_prime;
+    p3_prime.x = x3_prime;
+    p3_prime.y = y3_prime;
+
+    PointPair result;
+    result.p0 = p3;
+    result.p1 = p3_prime;
+    result_set = true;
+    return result;
+}
+
+AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & result_set) {
+    float r_pen = sqrt(structure_settings.a * structure_settings.a + structure_settings.s * structure_settings.s);
+
+    Point a;
+    a.x = structure_settings.xa;
+    a.y = 0;
+
+    PointPair intersection1 = compute_circle_intersection(a, p, structure_settings.r, r_pen, result_set);
+    if (result_set == false) {
+        ClearScreen();
+        TextOut(8, LCD_LINE4, "Can't compute 1st intersection");
+        Wait(1000);
+        return NULL;
+    }
+    Point p1 = intersection1.p0;
+    Point p1_prime = intersection1.p1;
+
+    float alpha = atan2(structure_settings.xa - p1.x, p1.y) * radians_to_degrees;
+    float alpha_prime = atan2(structure_settings.xa - p1_prime.x, p1_prime.y) * radians_to_degrees;
+
+    float alpha_result;
+    Point p1_actual;
+    if (p1.x < p1_prime.x) {
+        alpha_result = alpha;
+        p1_actual.x = p1.x;
+        p1_actual.y = p1.y;
+    } else {
+        alpha_result = alpha_prime;
+        p1_actual.x = p1_prime.x;
+        p1_actual.y = p1_prime.y;
+    }
+
+    PointPair intersection_cross = compute_circle_intersection(p1_actual, p, structure_settings.a, structure_settings.s, result_set);
+    if (result_set == false) {
+        ClearScreen();
+        TextOut(8, LCD_LINE4, "Can't compute 2nd intersection");
+        Wait(1000);
+        return NULL;
+    }
+
+    Point p_cross = intersection_cross.p0;
+    Point p_cross_prime = intersection_cross.p1;
+
+    Point p_cross_actual;
+    if ((p_cross.x - p1_actual.x) * (p.y - p_cross.y) - (p_cross.y - p1_actual.y) * (p.x - p_cross.x) > 0) {
+        p_cross_actual.x = p_cross.x;
+        p_cross_actual.y = p_cross.y;
+    } else {
+        p_cross_actual.x = p_cross_prime.x;
+        p_cross_actual.y = p_cross_prime.y;
+    }
+
+    Point b;
+    b.x = structure_settings.xb;
+    b.y = 0;
+
+    PointPair intersection2 = compute_circle_intersection(b, p_cross_actual, structure_settings.r, structure_settings.a, result_set);
+    if (result_set == false) {
+        ClearScreen();
+        TextOut(8, LCD_LINE4, "Can't compute 3rd intersection");
+        Wait(1000);
+        return NULL;
+    }
+
+    Point p2 = intersection2.p0;
+    Point p2_prime = intersection2.p1;
+
+    float beta = atan2(structure_settings.xb - p2.x, p2.y) * radians_to_degrees;
+    float beta_prime = atan2(structure_settings.xb - p2_prime.x, p2_prime.y) * radians_to_degrees;
+
+    float beta_result;
+    if (p2.x > p2_prime.x) {
+        beta_result = beta;
+    } else {
+        beta_result = beta_prime;
+    }
+    AnglePair result;
+    result.alpha = alpha_result;
+    result.beta = beta_result;
+
+    int amplitude_angle = structure_settings.amplitude_angle;
+    if (alpha_result < -amplitude_angle || amplitude_angle < alpha_result) {
+        result_set = false;
+        return NULL;
+    }
+
+    if (beta_result < -amplitude_angle || amplitude_angle < beta_result) {
+        result_set = false;
+        return NULL;
+    }
+    result_set = true;
+    return result;
+}
+
+#endif

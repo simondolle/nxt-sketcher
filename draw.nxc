@@ -1,0 +1,49 @@
+#ifndef DRAW_NXC
+#define DRAW_NXC
+
+#include "kinematics.nxc"
+
+float direction = 1;
+
+sub print_point(short x, short y) {
+  goto_position(x, y);
+  RotateMotor(OUT_C, 100, direction * 180);
+  direction = direction * -1;
+}
+
+sub print_line(short target_x, short target_y) {
+  Point current_p;
+  current_p.x = X;
+  current_p.y = Y;
+
+  Point target_p;
+  target_p.x = target_x;
+  target_p.y = target_y;
+  float distance = compute_distance(current_p, target_p);
+
+  PrintSettings print_settings = get_print_settings();
+  float f_nb_steps = distance * print_settings.line_resolution;
+
+  float current_x = current_p.x;
+  float current_y = current_p.y;
+  float distance_x = target_x - current_p.x;
+  float distance_y = target_y - current_p.y;
+
+  float step_x = distance_x/f_nb_steps;
+  float step_y = distance_y/f_nb_steps;
+
+  int n = 0;
+  int nb_steps = round(f_nb_steps);
+  while(n < nb_steps) {
+    current_x = current_x + step_x;
+    current_y = current_y + step_y;
+
+    goto_position(current_x, current_y);
+    n = n + 1;
+  }
+  goto_position(target_x, target_y);
+  X = target_x;
+  Y = target_y;
+}
+
+#endif

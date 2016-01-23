@@ -1,0 +1,43 @@
+#ifndef CALIBRATION_NXC
+#define CALIBRATION_NXC
+
+inline bool is_stalled(byte output)
+{
+ long t0 = CurrentTick();
+ long previousCount = MotorTachoCount(output);
+ while(CurrentTick() < t0 + 100) {
+  Wait(10);
+  long count = MotorTachoCount(output);
+  short stallThreshold = 2;
+  if (abs(count - previousCount) >= stallThreshold)
+  {
+   return false;
+  }
+  previousCount = count;
+ }
+ return true;
+}
+
+inline void calibrate_motor(byte output) {
+ PrintSettings print_settings = get_print_settings();
+
+ OnRev(output, print_settings.speed);
+ until (is_stalled(output));
+ Off(output);
+ long initialCount = MotorRotationCount(output);
+ Wait(100);
+ OnFwd(output, print_settings.speed);
+ until (is_stalled(output));
+ Off(output);
+ long finalCount = MotorRotationCount(output);
+ Wait(100);
+ RotateMotorEx(output, -print_settings.speed, (finalCount - initialCount) / 2, 0, false, true);
+ Wait(100);
+}
+
+inline void calibrate_stalled() {
+  calibrate_motor(OUT_A);
+  calibrate_motor(OUT_B);
+}
+
+#endif

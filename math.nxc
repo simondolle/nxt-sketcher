@@ -1,0 +1,89 @@
+#ifndef MATH_NXC
+#define MATH_NXC
+
+struct Point {
+  float x;
+  float y;
+};
+
+struct PointPair {
+  Point p0;
+  Point p1;
+};
+
+struct AnglePair {
+  float alpha;
+  float beta;
+};
+
+
+float max(float x, float y) {
+  if (x >= y) {
+    return x;
+  }
+  return y;
+}
+
+float min(float x, float y) {
+  if (x <= y) {
+    return x;
+  }
+  return y;
+}
+
+float atan2(float y, float x) {
+  float t3 = abs(x);
+  float t1 = abs(y);
+  float t0 = max(t3, t1);
+  t1 = min(t3, t1);
+  t3 = 1.0 / t0;
+  t3 = t1 * t3;
+
+  float t4 = t3 * t3;
+  t0 =         - 0.013480470;
+  t0 = t0 * t4 + 0.057477314;
+  t0 = t0 * t4 - 0.121239071;
+  t0 = t0 * t4 + 0.195635925;
+  t0 = t0 * t4 - 0.332994597;
+  t0 = t0 * t4 + 0.999995630;
+  t3 = t0 * t3;
+
+  if (abs(y) > abs(x))
+  {
+    t3 = 1.570796327 - t3;
+  }
+
+  if (x < 0) {
+    t3 = 3.141592654 - t3;
+  }
+
+  if (y < 0) {
+    t3 = -t3;
+  }
+
+  return t3;
+}
+
+float compute_distance(Point p1, Point p2) {
+  return sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+}
+
+int round(float f) {
+  int int_part = f;
+  float f_int_part = int_part;
+  if (f >= 0) {
+    if ((f - int_part) >= 0.5) {
+      return int_part + 1;
+    } else {
+      return int_part;
+    }
+  } else {
+    if ((int_part - f) >= 0.5) {
+      return int_part - 1;
+    } else {
+      return int_part;
+    }
+  }
+}
+
+#endif
