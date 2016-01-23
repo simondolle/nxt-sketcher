@@ -22,6 +22,19 @@ inline short compute_rotation(short position, short target) {
  return rotation;
 }
 
+Point change_referential(float x, float y) {
+
+  PrintSettings print_settings = get_print_settings();
+  float cos_a = print_settings.cos_a;
+  float sin_a = print_settings.sin_a;
+
+  Point p;
+  p.x = x * cos_a  + y * sin_a;
+  p.y = -x * sin_a  + y * cos_a;
+
+  return p;
+}
+
 Point convert_to_actual_coordinates(float x, float y) {
   PrintSettings print_settings= get_print_settings();
 
@@ -30,8 +43,10 @@ Point convert_to_actual_coordinates(float x, float y) {
   y = y/print_settings.points_per_lego_unit;
   y = -y;
 
-  x = x + print_settings.origin.x;
-  y = y + print_settings.origin.y;
+  Point p_new_ref = change_referential(x, y);
+
+  x = p_new_ref.x + print_settings.origin.x;
+  y = p_new_ref.y + print_settings.origin.y;
 
   Point p;
   p.x = x;

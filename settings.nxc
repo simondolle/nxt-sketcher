@@ -25,9 +25,12 @@ struct PrintSettings {
   int line_resolution; //nb points between two pixels
 
   int speed;
+
+  float cos_a; //referential rotation angle
+  float sin_a;
 };
 
-PrintSettings get_print_settings() {
+PrintSettings get_print_settings_straight() {
  PrintSettings print_settings;
  Point origin;
  origin.x = 4;
@@ -40,7 +43,36 @@ PrintSettings get_print_settings() {
  print_settings.points_per_lego_unit = 4;
  print_settings.line_resolution = 10;
  print_settings.speed = 40;
+
+ print_settings.cos_a = 1;
+ print_settings.sin_a = 0;
+
  return print_settings;
+}
+
+
+PrintSettings get_print_settings_45() {
+ PrintSettings print_settings;
+ Point origin;
+ origin.x = 3.885;
+ origin.x = -origin.x;
+ origin.y = 11.317;
+ print_settings.origin = origin;
+
+ print_settings.width = 18;
+ print_settings.height = 18;
+ print_settings.points_per_lego_unit = 4;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ;
+ print_settings.line_resolution = 10;
+ print_settings.speed = 40;
+
+ print_settings.cos_a = sqrt(2)/2;
+ print_settings.sin_a = -sqrt(2)/2;
+
+ return print_settings;
+}
+
+PrintSettings get_print_settings() {
+  return get_print_settings_45();
 }
 
 StructureSettings get_structure_settings() {
