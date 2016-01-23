@@ -2,13 +2,12 @@
 #define DRAW_NXC
 
 #include "kinematics.nxc"
-
-float direction = 1;
+#include "pen.nxc"
 
 sub print_point(short x, short y) {
   goto_position(x, y);
-  RotateMotor(OUT_C, 100, direction * 180);
-  direction = direction * -1;
+  pen_down();
+  pen_up();
 }
 
 sub print_line(short target_x, short target_y) {

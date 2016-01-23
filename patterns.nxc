@@ -2,6 +2,7 @@
 #define PATTERNS_NXC
 
 #include "draw.nxc"
+#include "pen.nxc"
 
 sub plot_corners() {
   print_point(0, 0);
@@ -39,7 +40,7 @@ sub plot_heart() {
 
 void plot_heart_lines() {
   goto_position(2, 0);
-  RotateMotor(OUT_C, 100, direction * 90);
+  pen_down();
   print_line(2, 0);
   print_line(2, 1);
   print_line(1, 1);
@@ -85,13 +86,12 @@ void plot_heart_lines() {
   print_line(5, 1);
   print_line(5, 0);
   print_line(2, 0);
-  RotateMotor(OUT_C, 100, direction * 90);
-  direction = direction * -1;
+  pen_up();
 }
 
 void plot_invader_lines() {
   goto_position(2, 1);
-  RotateMotor(OUT_C, 100, direction * 90);
+  pen_down();
   print_line(2, 0);
   print_line(3, 0);
   print_line(3, 2);
@@ -135,28 +135,25 @@ void plot_invader_lines() {
   print_line(4, 1);
   print_line(3, 1);
 
-  RotateMotor(OUT_C, 100, direction * 90);
-  direction = direction * -1;
-
+  pen_up();
   goto_position(3, 3);
-  RotateMotor(OUT_C, 100, direction * 90);
+  pen_down();
+
   print_line(3, 4);
   print_line(4, 4);
   print_line(4, 3);
   print_line(3, 3);
 
-  RotateMotor(OUT_C, 100, direction * 90);
-  direction = direction * -1;
-
+  pen_up();
   goto_position(7, 3);
-  RotateMotor(OUT_C, 100, direction * 90);
+  pen_down();
+
   goto_position(8, 3);
   goto_position(8, 4);
   goto_position(8, 3);
   goto_position(7, 3);
 
-  RotateMotor(OUT_C, 100, direction * 90);
-  direction = direction * -1;
+  pen_up();
 }
 
 sub plot_invader() {
@@ -217,12 +214,10 @@ void plot_grid_lines() {
   int x = 0;
   while(x < print_settings.width) {
     goto_position(x, 0);
-    RotateMotor(OUT_C, 100, direction * 90);
+    pen_down();
     print_line(x, print_settings.height - 1);
 
-    RotateMotor(OUT_C, 100, direction * 90);
-    direction = direction * -1;
-
+    pen_up();
     x= x + 1;
   }
 
@@ -231,12 +226,10 @@ void plot_grid_lines() {
   while(y < print_settings.height)
   {
     goto_position(0, y);
-    RotateMotor(OUT_C, 100, direction * 90);
+    pen_down();
     print_line(print_settings.width - 1, y);
 
-    RotateMotor(OUT_C, 100, direction * 90);
-    direction = direction * -1;
-
+    pen_up();
     y= y + 1;
   }
 
@@ -259,13 +252,12 @@ sub plot_grid() {
 
 sub plot_rectangle() {
   goto_position(0, 0);
-  RotateMotor(OUT_C, 100, direction * 90);
+  pen_down();
   print_line(0, 12);
   print_line(26, 12);
   print_line(26, 0);
   print_line(0, 0);
-  RotateMotor(OUT_C, 100, direction * 90);
-  direction = direction * -1;
+  pen_up();
 }
 
 #endif
