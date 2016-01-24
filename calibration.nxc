@@ -48,6 +48,8 @@ inline void calibrate_stalled() {
   calibrate_pen();
   calibrate_motor(OUT_A);
   calibrate_motor(OUT_B);
+  ALPHA = 0;
+  BETA = 0;
 }
 
 #endif

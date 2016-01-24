@@ -19,7 +19,6 @@ task move_a() {
     if(command_a_to_process == true) {
       RotateMotorEx(OUT_A, print_settings.speed, command_a, 0, false, true);
       command_a_to_process = false;
-      Wait(20);
     }
   }
 }
@@ -33,7 +32,6 @@ task move_b() {
     if(command_b_to_process == true) {
       RotateMotorEx(OUT_B, print_settings.speed, -command_b, 0, false, true);
       command_b_to_process = false;
-      Wait(20);
     }
   }
 }

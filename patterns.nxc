@@ -90,10 +90,11 @@ void plot_heart_lines() {
 }
 
 void plot_invader_lines() {
-  goto_position(2, 1);
+  goto_position(3, 1);
   pen_down();
-  print_line(2, 0);
   print_line(2, 1);
+  print_line(2, 0);
+  print_line(3, 0);
   print_line(3, 1);
   print_line(3, 2);
   print_line(2, 2);
@@ -138,8 +139,6 @@ void plot_invader_lines() {
   print_line(4, 2);
   print_line(4, 1);
   print_line(3, 1);
-  print_line(3, 0);
-  print_line(2, 0);
 
   pen_up();
   goto_position(3, 4);
@@ -244,9 +243,10 @@ sub plot_grid() {
  PrintSettings print_settings = get_print_settings();
 
  short x = 0;
- repeat(print_settings.width) {
+ while (x < print_settings.width * print_settings.points_per_lego_unit)
+ {
   short y = 0;
-  repeat(print_settings.height - 1) {
+  while( y < print_settings.height * print_settings.points_per_lego_unit) {
    print_point(x, y);
    y += 1;
   }

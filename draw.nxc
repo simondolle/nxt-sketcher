@@ -21,7 +21,7 @@ sub print_line(short target_x, short target_y) {
   float distance = compute_distance(current_p, target_p);
 
   PrintSettings print_settings = get_print_settings();
-  float f_nb_steps = distance * print_settings.line_resolution;
+  float f_nb_steps = distance/print_settings.points_per_lego_unit * print_settings.line_resolution;
 
   float current_x = current_p.x;
   float current_y = current_p.y;
@@ -40,9 +40,8 @@ sub print_line(short target_x, short target_y) {
     goto_position(current_x, current_y);
     n = n + 1;
   }
+
   goto_position(target_x, target_y);
-  X = target_x;
-  Y = target_y;
 }
 
 #endif
