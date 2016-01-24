@@ -1,6 +1,8 @@
 #ifndef CALIBRATION_NXC
 #define CALIBRATION_NXC
 
+#include "pen.nxc"
+
 inline bool is_stalled(byte output)
 {
  long t0 = CurrentTick();
@@ -35,7 +37,15 @@ inline void calibrate_motor(byte output) {
  Wait(100);
 }
 
+void calibrate_pen() {
+  OnRev(OUT_C, PEN_SPEED);
+  until(SensorBoolean(S1));
+  Off(OUT_C);
+  //RotateMotorEx(OUT_C, PEN_SPEED, -10, 0, false, true);
+}
+
 inline void calibrate_stalled() {
+  calibrate_pen();
   calibrate_motor(OUT_A);
   calibrate_motor(OUT_B);
 }

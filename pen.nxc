@@ -1,19 +1,24 @@
 #ifndef PEN_NXC
 #define PEN_NXC
 
-int pen_position = -90;
+#define PEN_UP 1
+#define PEN_DOWN 0
+
+int pen_position = PEN_UP;
+
+int PEN_SPEED = 50;
 
 void pen_up() {
-  if (pen_position == 0) {
-    RotateMotor(OUT_C, 100, -90);
-    pen_position = -90;
+  if (pen_position == PEN_DOWN) {
+    RotateMotor(OUT_C, PEN_SPEED, -90);
+    pen_position = PEN_UP;
   }
 }
 
 void pen_down() {
-  if (pen_position == -90) {
-    RotateMotor(OUT_C, 100, 90);
-    pen_position = 0;
+  if (pen_position == PEN_UP) {
+    RotateMotor(OUT_C, PEN_SPEED, 90);
+    pen_position = PEN_DOWN;
   }
 
 }

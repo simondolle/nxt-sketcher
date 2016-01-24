@@ -8,10 +8,12 @@
 
 task submain()
 {
- //SetSensorColorFull(IN_3);
- //SetSensorTouch(IN_1);
+
+ SetSensorTouch(IN_1);
  //SetSensorTouch(IN_2);
- RotateMotor(OUT_C, 100, 90);
+ //SetSensorColorFull(IN_3);
+ //pen_up();
+ //pen_down();
  calibrate_stalled();
  //-100: 2 angles positifs, A = B (A tourne en positif)
  //-75 : 2 angles positifs, A = 2 * B

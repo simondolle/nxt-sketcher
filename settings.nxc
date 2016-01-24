@@ -72,7 +72,8 @@ PrintSettings get_print_settings_45() {
 }
 
 PrintSettings get_print_settings() {
-  return get_print_settings_45();
+  PrintSettings result = get_print_settings_45();
+  return result;
 }
 
 StructureSettings get_structure_settings() {
