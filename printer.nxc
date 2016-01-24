@@ -15,6 +15,7 @@ task submain()
  //pen_up();
  //pen_down();
  calibrate_stalled();
+ //OnFwd(OUT_A, 40);
  //-100: 2 angles positifs, A = B (A tourne en positif)
  //-75 : 2 angles positifs, A = 2 * B
  //-50 : 2 angles positifs, B ne bouge pas

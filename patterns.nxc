@@ -256,11 +256,13 @@ sub plot_grid() {
 }
 
 sub plot_rectangle() {
+  PrintSettings print_settings = get_print_settings();
+
   goto_position(0, 0);
   pen_down();
-  print_line(0, 12);
-  print_line(26, 12);
-  print_line(26, 0);
+  print_line(0, print_settings.height - 1);
+  print_line(print_settings.width - 1, print_settings.height - 1);
+  print_line(print_settings.width - 1, 0);
   print_line(0, 0);
   pen_up();
 }
