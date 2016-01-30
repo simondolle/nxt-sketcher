@@ -1,13 +1,13 @@
 #ifndef MOVE_NXC
 #define MOVE_NXC
 
-bool program_over = false;
-
 short ALPHA;
 short BETA;
 
 float X;
 float Y;
+
+int PID = PID_1;
 
 short command_a;
 bool command_a_to_process = false;
@@ -15,9 +15,9 @@ task move_a() {
   Wait(1000);
   PrintSettings print_settings = get_print_settings();
 
-  while(!program_over) {
+  while(true) {
     if(command_a_to_process == true) {
-      RotateMotorEx(OUT_A, print_settings.speed, command_a, 0, false, true);
+      RotateMotorExPID(OUT_A, print_settings.speed, command_a, 0, false, true, PID, PID, PID);
       command_a_to_process = false;
     }
   }
@@ -27,10 +27,9 @@ short command_b;
 bool command_b_to_process = false;
 task move_b() {
   PrintSettings print_settings = get_print_settings();
-
-  while(!program_over) {
+  while(true) {
     if(command_b_to_process == true) {
-      RotateMotorEx(OUT_B, print_settings.speed, -command_b, 0, false, true);
+      RotateMotorExPID(OUT_B, print_settings.speed, -command_b, 0, false, true, PID, PID, PID);
       command_b_to_process = false;
     }
   }

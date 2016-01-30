@@ -24,7 +24,7 @@ task submain()
  //plot_grid_lines();
  //plot_invader();
 
- program_over = true;
+ StopAllTasks();
 }
 
 task main() {
