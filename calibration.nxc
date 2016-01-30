@@ -2,6 +2,7 @@
 #define CALIBRATION_NXC
 
 #include "pen.nxc"
+#include "move.nxc"
 
 inline bool is_stalled(byte output)
 {
