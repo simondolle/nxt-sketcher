@@ -28,6 +28,7 @@ task submain()
 
  //plot_rectangle();
  plot_invader_lines();
+
  //plot_corners();
  //plot_grid_lines();
  //plot_heart_lines();
