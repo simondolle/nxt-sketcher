@@ -45,19 +45,23 @@ sub print_line(short target_x, short target_y) {
   //Wait(1000);
 }
 
-
-void plot_pattern(int xs[], int ys[]) {
+void plot_pattern_offset(int xs[], int ys[], int x_offset, int y_offset) {
   pen_up();
-  goto_position(xs[0], ys[0]);
+  goto_position(xs[0] + x_offset, ys[0] + y_offset);
   pen_down();
   int i=1;
   repeat(ArrayLen(xs) - 1) {
-    print_line(xs[i], ys[i]);
+    print_line(xs[i] + x_offset, ys[i] + y_offset);
     i += 1;
   }
   //close the pattern
-  print_line(xs[0], ys[0]);
+  print_line(xs[0] + x_offset, ys[0] + y_offset);
   pen_up();
+}
+
+
+void plot_pattern(int xs[], int ys[]) {
+  plot_pattern_offset(xs, ys, 0, 0);
 }
 
 void plot_pattern_reverse(int xs[], int ys[]) {
