@@ -7,7 +7,6 @@ radians_to_degrees = 180 / math.pi
 
 def get_xy(alpha, beta, structure_settings):
 
-
     r = structure_settings.r  # short arm length (attached to the rotative axis)
     a = structure_settings.a  # long arm length
     s = structure_settings.s  # pen distance
@@ -32,13 +31,9 @@ def get_xy(alpha, beta, structure_settings):
     cos_theta = max(cos_theta, -1.0)
     theta = math.acos(cos_theta)
 
-
     #gamma is the angle formed by an horizontal axis and de
     tan_gamma = (ye-yd)/float(xe-xd)
     gamma = math.atan(tan_gamma)
-    #print gamma * radians_to_degrees, gamma2 * radians_to_degrees
-
-
 
     #lambda is the angle formed by an horizontal axis and the left long arm
     lam = theta + gamma
@@ -392,31 +387,41 @@ def export_pixel_to_angle(pixel_to_angle):
     return result_a, result_b
 
 
+
+@np.vectorize
+def compute_error(x, y):
+    structure_settings = StructureSetting()
+    x, y = change_referential(x, y, angle)
+    r = get_alpha_beta(x, y, structure_settings)
+    if r is None:
+        return -0.1
+    alpha, beta = r
+
+    alpha = alpha * degrees_to_radians
+    beta = beta * degrees_to_radians
+    distances = []
+    angle_error = 1.0
+    for alpha_shift in [-angle_error * degrees_to_radians, 0, angle_error * degrees_to_radians]:
+        for beta_shift in [-angle_error * degrees_to_radians, 0, angle_error * degrees_to_radians]:
+            x_shift, y_shift = get_xy(alpha + alpha_shift, beta + beta_shift, structure_settings)
+            distance = compute_distance(x, y, x_shift, y_shift)
+
+            distances.append(distance)
+    return max(distances)
+
 points_per_lego_unit = 4
-#grid_to_angle = compute_grid_to_angle(points_per_lego_unit)
-angle = 0
+angle = -45
 grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
 
-#print_area = find_largest_rectange(grid_to_angle)
-#print print_area
 
 print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
 print print_area
-#print_area = (-4.0, 10.0, 2.5, 13.0)
 x0, y0, x1, y1 = print_area
 
 pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
 
-
-x_grids = []
-y_grids = []
 xs_print_area = []
 ys_print_area = []
-
-for (x_grid, y_grid), (alpha, beta, d) in grid_to_angle.items():
-    if print_area[0] <= x_grid and x_grid <= print_area[2] and  print_area[1] <= y_grid and y_grid <= print_area[3]:
-        x_grids.append(x_grid)
-        y_grids.append(y_grid)
 
 xs_print_area = []
 ys_print_area = []
@@ -429,31 +434,15 @@ for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
     xs_print_area.append(x_prime)
     ys_print_area.append(y_prime)
 
-print pixel_to_angle[(0, 0)]
-print pixel_to_angle[(0, 12)]
-print pixel_to_angle[(26, 12)];
-print pixel_to_angle[(26, 0)];
+structure_settings = StructureSetting()
+xi = np.linspace(min(xs_print_area), max(xs_print_area), 100)
+yi = np.linspace(min(ys_print_area), max(ys_print_area), 100)
+X, Y = np.meshgrid(xi, yi)
+errors = compute_error(X, Y)
 
-plt.scatter(x_grids, y_grids, c="r")
-plt.scatter(xs_print_area, ys_print_area, c="b")
+CS = plt.contourf(X, Y, errors, 15, cmap=plt.cm.rainbow, vmax=abs(errors).max(),
+                  vmin=0)
+plt.scatter(xs_print_area, ys_print_area, marker='o', c='b', s=5, zorder=10)
+plt.colorbar(CS)
 plt.axis('equal')
 plt.show()
-export_pixel_to_angle(pixel_to_angle)
-
-
-#print get_alpha_beta(0, 4.5, StructureSetting())
-#print get_xy(60*degrees_to_radians, -60 * degrees_to_radians, StructureSetting())
-"""
-print get_xy(102, 33)
-print get_xy(91, 28)
-print get_xy(81, 76)
-print get_xy(71, 20)
-print get_xy(273, 56)
-print get_xy(279, 25)
-"""
-
-#plt.scatter(x_grids, y_grids, c="r")
-#plt.scatter(xs_print_area, ys_print_area, c="b")
-#plt.scatter(pixel_to_angle[(0, 0)][0], pixel_to_angle[(0, 0)][1], c="b")
-#plt.axis('equal')
-#plt.show()
