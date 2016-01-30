@@ -10,32 +10,20 @@ task submain()
 {
 
  SetSensorTouch(IN_1);
- //SetSensorTouch(IN_2);
- //SetSensorColorFull(IN_3);
- //pen_up();
- //pen_down();
+
  calibrate_stalled();
- //OnFwd(OUT_A, 40);
- //-100: 2 angles positifs, A = B (A tourne en positif)
- //-75 : 2 angles positifs, A = 2 * B
- //-50 : 2 angles positifs, B ne bouge pas
- //-25 : A positif, B négatif, A = 2 * B
- //0 : A positif, B négatif, A = B
- //25: A positif, B négatif, B = 2 * A
- //50: A ne bouge pas, B négatif
- //75: A négatif, B négatif, B = 2 * A
- //100: A négatif, B négatif, B = A
 
  //plot_rectangle();
  plot_invader_lines();
-
+ //plot_ghost_lines();
+ //plot_star_lines();
+ //plot_note_lines();
  //plot_corners();
  //plot_grid_lines();
  //plot_heart_lines();
  //plot_grid_lines();
  //plot_invader();
 
- //float f=  atan2(1, 0);
  program_over = true;
 }
 
