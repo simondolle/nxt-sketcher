@@ -24,17 +24,17 @@ inline bool is_stalled(byte output)
 inline void calibrate_motor(byte output) {
  PrintSettings print_settings = get_print_settings();
 
- OnRev(output, print_settings.speed);
+ OnRev(output, print_settings.calibration_speed);
  until (is_stalled(output));
  Off(output);
  long initialCount = MotorRotationCount(output);
  Wait(100);
- OnFwd(output, print_settings.speed);
+ OnFwd(output, print_settings.calibration_speed);
  until (is_stalled(output));
  Off(output);
  long finalCount = MotorRotationCount(output);
  Wait(100);
- RotateMotorEx(output, -print_settings.speed, (finalCount - initialCount) / 2, 0, false, true);
+ RotateMotorEx(output, -print_settings.calibration_speed, (finalCount - initialCount) / 2, 0, false, true);
  Wait(100);
 }
 
