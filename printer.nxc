@@ -14,7 +14,7 @@ task submain()
  calibrate_stalled();
 
  //plot_rectangle();
- plot_invader_lines();
+ //plot_invader_lines();
  //plot_ghost_lines();
  //plot_star_lines();
  //plot_note_lines();
@@ -23,7 +23,7 @@ task submain()
  //plot_heart_lines();
  //plot_grid_lines();
  //plot_invader();
-
+ plot_heart_curve();
  StopAllTasks();
 }
 
