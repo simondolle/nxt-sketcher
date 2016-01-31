@@ -42,7 +42,7 @@ PrintSettings get_print_settings_straight() {
  print_settings.width = 6.5;
  print_settings.height = 3;
  print_settings.points_per_lego_unit = 3;
- print_settings.line_resolution = 3;
+ print_settings.line_resolution = 6;
  print_settings.speed = 40;
  print_settings.calibration_speed = 40;
 

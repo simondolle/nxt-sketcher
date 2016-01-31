@@ -7,7 +7,7 @@ short BETA;
 float X;
 float Y;
 
-int PID = PID_1;
+int PID = PID_2;
 
 short command_a;
 bool command_a_to_process = false;
