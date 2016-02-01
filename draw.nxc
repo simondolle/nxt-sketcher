@@ -153,23 +153,23 @@ void smooth_curve_to_relative(float x2, float y2, float x, float y) {
  smooth_curve_to(x2 + x0, y2 + y0, x + x0, y + y0);
 }
 
-void horizontalLineTo(float x) {
+void horizontal_line_to(float x) {
   print_line(x, Y);
 }
 
-void horizontalLineToRelative(float x) {
+void horizontal_line_to_relative(float x) {
   print_line(x + X, Y);
 }
 
-void verticalLineTo(float y) {
+void vertical_line_to(float y) {
   print_line(X, y);
 }
 
-void verticalLineToRelative(float y) {
+void vertical_line_to_relative(float y) {
   print_line(X, y + Y);
 }
 
-void closePath() {
+void close_path() {
   print_line(PATH_START_X, PATH_START_Y);
   PATH_START_X = UNSET;
   PATH_START_Y = UNSET;

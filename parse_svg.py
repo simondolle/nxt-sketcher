@@ -141,7 +141,7 @@ class HorizontalLineTo(MoveTo):
         return "H%s"%self.x
 
     def to_nxc(self):
-        return "horizontalLineTo(%s);"%self.x
+        return "horizontal_line_to(%s);"%self.x
 
 
 class HorizontalLineToRelative(MoveTo):
@@ -159,7 +159,7 @@ class HorizontalLineToRelative(MoveTo):
         return "h%s"%self.x
 
     def to_nxc(self):
-        return "horizontalLineToRelative(%s);"%self.x
+        return "horizontal_line_to_relative(%s);"%self.x
 
 
 class VerticalLineTo(MoveTo):
@@ -177,7 +177,7 @@ class VerticalLineTo(MoveTo):
         return "V%s"%self.y
 
     def to_nxc(self):
-        return "verticalLineTo(%s);"%self.y
+        return "vertical_line_to(%s);"%self.y
 
 
 class VerticalLineToRelative(MoveTo):
@@ -195,7 +195,7 @@ class VerticalLineToRelative(MoveTo):
         return "v%s"%self.y
 
     def to_nxc(self):
-        return "verticalLineToRelative(%s);"%self.y
+        return "vertical_line_to_relative(%s);"%self.y
 
 class ClosePath(MoveTo):
     def __init__(self):
@@ -214,7 +214,7 @@ class ClosePath(MoveTo):
         return "z"
 
     def to_nxc(self):
-        return "closePath();"
+        return "close_path();"
 
 
 class CurveTo(object):

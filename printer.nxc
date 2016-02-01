@@ -5,6 +5,7 @@
 #include "draw.nxc"
 #include "patterns.nxc"
 #include "pen.nxc"
+#include "svg_parser.nxc"
 
 task submain()
 {

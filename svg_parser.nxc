@@ -1,0 +1,99 @@
+#include "draw.nxc"
+
+string get_token(string& path, int start_position) {
+  int token_start = start_position;
+  int token_end = start_position;
+  while(isspace(StrIndex(path, token_start))) {
+    token_start+=1;
+  }
+  token_end = token_start;
+  int len = StrLen(path);
+  while(token_end + 1 < len && !isalpha(StrIndex(path, token_end + 1))) {
+    token_end += 1;
+  }
+  return SubStr(path, token_start, token_end - token_start + 1);
+}
+
+char get_command(string token) {
+  return StrIndex(token, 0);
+}
+
+int get_params(string token, float& result[]) {
+  int result_index = 0;
+
+  int i = 0;
+  int j = 0;
+  int len = StrLen(token);
+  while(i < len) {
+
+
+      while((j + 1 < len) && (strcmp(SubStr(token, j + 1, 1), "-") == 0) && (strcmp(SubStr(token, j + 1, 1), ",") == 0)) {
+        j += 1;
+      }
+      string number = SubStr(token, i, j - i + 1);
+      float f = StrToNum(number);
+      result[result_index] = f;
+      result_index += 1;
+      if(strcmp(SubStr(token, j + 1, 1), ",") == 0) {
+        i = j+2;
+      }
+      else {
+        i = j+1;
+      }
+      j = i;
+  }
+  return result_index;
+}
+
+void parse_path(string path) {
+  int i = 0;
+  int len = StrLen(path);
+  while(i < len) {
+    string token = get_token(path, i);
+    i += StrLen(token);
+    float params[] = {0, 0, 0, 0};
+    char command = get_command(token);
+    int param_size = get_params(token, params);
+    switch(command) {
+        case 'M':
+          goto_point(params[0], params[1]);
+          break;
+        case 'L':
+          print_line(params[0], params[1]);
+          break;
+        case 'l':
+          print_line_relative(params[0], params[1]);
+          break;
+        case 'H':
+          horizontal_line_to(params[0]);
+          break;
+        case 'h':
+          horizontal_line_to_relative(params[0]);
+          break;
+        case 'V':
+          vertical_line_to(params[0]);
+          break;
+        case 'v':
+          vertical_line_to_relative(params[0]);
+          break;
+        case 'z':
+          close_path();
+          break;
+        case 'C':
+          curve_to(params[0], params[1], params[2], params[3], params[4], params[5]);
+          break;
+        case 'c':
+          curve_to_relative(params[0], params[1], params[2], params[3], params[4], params[5]);
+         break;
+        case 'S':
+          smooth_curve_to(params[0], params[1], params[2], params[3]);
+          break;
+        case 's':
+          smooth_curve_to_relative(params[0], params[1], params[2], params[3]);
+          break;
+        default:
+          ClearScreen();
+          TextOut(8, LCD_LINE4, "Unknown command");
+    }
+  }
+}
