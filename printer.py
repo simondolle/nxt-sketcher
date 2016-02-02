@@ -1,6 +1,8 @@
+import argparse
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 degrees_to_radians = math.pi / 180
 radians_to_degrees = 180 / math.pi
@@ -420,12 +422,11 @@ def display_reachable_area(points_per_lego_unit, angle):
 
     print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
     x0, y0, x1, y1 = print_area
-    print print_area
+
     xt0, yt0 = change_referential(x0, y0, angle)
     xt1, yt1 = change_referential(x0, y1, angle)
     xt2, yt2 = change_referential(x1, y1, angle)
     xt3, yt3 = change_referential(x1, y0, angle)
-
 
     plt.scatter(reachable_xs, reachable_ys, marker='o', c='b', s=5, zorder=10)
     plt.plot([xt0, xt1, xt2, xt3, xt0], [yt0, yt1, yt2, yt3, yt0])
@@ -433,42 +434,55 @@ def display_reachable_area(points_per_lego_unit, angle):
     plt.show()
 
 
-points_per_lego_unit = 4
-angle = -45
+def display_error_grid(points_per_lego_unit, angle):
+    grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
 
-display_reachable_area(points_per_lego_unit, angle)
+    print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
+    print print_area
+    x0, y0, x1, y1 = print_area
 
-grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
+    pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
 
-print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
-print print_area
-x0, y0, x1, y1 = print_area
+    xs_print_area = []
+    ys_print_area = []
 
-pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
+    xs_print_area = []
+    ys_print_area = []
+    for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
 
-xs_print_area = []
-ys_print_area = []
-
-xs_print_area = []
-ys_print_area = []
-for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
+        structure_settings = StructureSetting()
+        structure_settings.s = 1
+        x, y = get_xy(1./structure_settings.gear_ratio * alpha * degrees_to_radians, 1./structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
+        x_prime, y_prime = change_referential(x, y, -angle)
+        xs_print_area.append(x_prime)
+        ys_print_area.append(y_prime)
 
     structure_settings = StructureSetting()
-    structure_settings.s = 1
-    x, y = get_xy(1./structure_settings.gear_ratio * alpha * degrees_to_radians, 1./structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
-    x_prime, y_prime = change_referential(x, y, -angle)
-    xs_print_area.append(x_prime)
-    ys_print_area.append(y_prime)
+    xi = np.linspace(min(xs_print_area), max(xs_print_area), 100)
+    yi = np.linspace(min(ys_print_area), max(ys_print_area), 100)
+    X, Y = np.meshgrid(xi, yi)
+    errors = compute_error(X, Y)
 
-structure_settings = StructureSetting()
-xi = np.linspace(min(xs_print_area), max(xs_print_area), 100)
-yi = np.linspace(min(ys_print_area), max(ys_print_area), 100)
-X, Y = np.meshgrid(xi, yi)
-errors = compute_error(X, Y)
+    CS = plt.contourf(X, Y, errors, 15, cmap=plt.cm.rainbow, vmax=abs(errors).max(),
+                      vmin=0)
+    plt.scatter(xs_print_area, ys_print_area, marker='o', c='b', s=5, zorder=10)
+    plt.colorbar(CS)
+    plt.axis('equal')
+    plt.show()
 
-CS = plt.contourf(X, Y, errors, 15, cmap=plt.cm.rainbow, vmax=abs(errors).max(),
-                  vmin=0)
-plt.scatter(xs_print_area, ys_print_area, marker='o', c='b', s=5, zorder=10)
-plt.colorbar(CS)
-plt.axis('equal')
-plt.show()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--reachable', action='store_true')
+    parser.add_argument('--error', action='store_true')
+    parser.add_argument('-p', metavar='N', type=int, default=4, help='points per lego unit')
+    parser.add_argument('-a', metavar='N', type=int, default=-45, help='angle')
+
+    points_per_lego_unit = 4
+    angle = -45
+    args = parser.parse_args()
+
+    if args.reachable is True:
+        display_reachable_area(args.p, args.a)
+
+    if args.error is True:
+        display_error_grid(args.p, args.a)
