@@ -409,10 +409,36 @@ def compute_error(x, y):
             distances.append(distance)
     return max(distances)
 
+def display_reachable_area(points_per_lego_unit, angle):
+    reachable_xs = []
+    reachable_ys = []
+    grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
+    for (x, y), (alpha, beta, _) in grid_to_angle.items():
+        x, y = change_referential(x, y, angle)
+        reachable_xs.append(x)
+        reachable_ys.append(y)
+
+    print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
+    x0, y0, x1, y1 = print_area
+    print print_area
+    xt0, yt0 = change_referential(x0, y0, angle)
+    xt1, yt1 = change_referential(x0, y1, angle)
+    xt2, yt2 = change_referential(x1, y1, angle)
+    xt3, yt3 = change_referential(x1, y0, angle)
+
+
+    plt.scatter(reachable_xs, reachable_ys, marker='o', c='b', s=5, zorder=10)
+    plt.plot([xt0, xt1, xt2, xt3, xt0], [yt0, yt1, yt2, yt3, yt0])
+    plt.axis('equal')
+    plt.show()
+
+
 points_per_lego_unit = 4
 angle = -45
-grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
 
+display_reachable_area(points_per_lego_unit, angle)
+
+grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
 
 print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
 print print_area
