@@ -73,38 +73,6 @@ def compute_circle_intersection(x0, y0, x1, y1, r0, r1):
     y3_prime = y2 + h * (x1 - x0)/ d
     return (x3, y3), (x3_prime, y3_prime)
 
-def get_atan2(y, x):
-
-  t3 = math.fabs(x)
-  t1 = math.fabs(y)
-  t0 = max(t3, t1)
-  t1 = min(t3, t1)
-  t3 = float(1) / t0
-  t3 = t1 * t3
-
-  t4 = t3 * t3;
-  t0 =         - 0.013480470
-  t0 = t0 * t4 + 0.057477314
-  t0 = t0 * t4 - 0.121239071
-  t0 = t0 * t4 + 0.195635925
-  t0 = t0 * t4 - 0.332994597
-  t0 = t0 * t4 + 0.999995630
-  t3 = t0 * t3;
-
-  if math.fabs(y) > math.fabs(x):
-    t3 = float(1.570796327) - t3
-
-  if x < 0:
-    t3 = float(3.141592654) - t3
-
-  if y < 0:
-    t3 = -t3
-
-  print math.fabs(math.atan2(y, x) - t3 )
-
-  return t3;
-
-
 
 def get_alpha_beta(x, y, structure_settings):
     r_pen = math.sqrt(math.pow(structure_settings.a, 2) + math.pow(structure_settings.s, 2))
@@ -164,41 +132,8 @@ def change_referential(x, y, angle):
     angle = angle * degrees_to_radians
     return (x * math.cos(angle)  + y * math.sin(angle), -x * math.sin(angle) + y * math.cos(angle))
 
-def get_closest_grid_point(x, y, points_per_lego_unit = 2):
-    x_grid = round(x * points_per_lego_unit) / float(points_per_lego_unit)
-    y_grid = round(y * points_per_lego_unit) / float(points_per_lego_unit)
-    return x_grid, y_grid
-
 def compute_distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x2-x1, 2) + math.pow(y2-y1, 2))
-
-def spirograph(nb_loops, beta_coefficient):
-    xs=[]
-    ys=[]
-    for alpha_degrees in range(nb_loops * 360):
-        alpha = alpha_degrees * degrees_to_radians
-        beta = beta_coefficient * alpha
-        x, y = get_xy(alpha, beta)
-        xs.append(x)
-        ys.append(y)
-    return xs, ys
-
-def display_print_area():
-    xs=[]
-    ys=[]
-    angle_step = 5
-    for alpha_degrees in range(0, 360, angle_step):
-        for beta_degrees in range(0, 360, angle_step):
-            alpha = alpha_degrees * degrees_to_radians
-
-            beta = beta_degrees * degrees_to_radians
-            x, y = get_xy(alpha, beta)
-            xs.append(x)
-            ys.append(y)
-    plt.scatter(xs, ys, c="r")
-    plt.axis('equal')
-    plt.show()
-    return xs, ys
 
 def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego_unit = 4, angle = -30):
     grid_to_angle = {}
@@ -212,81 +147,6 @@ def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego
         grid_to_angle[(x, y)] = (round(structure_settings.gear_ratio * angles[0]), round(structure_settings.gear_ratio * angles[1]), 0)
     return grid_to_angle
 
-def find_largest_print_area(grid_coordinates, points_per_lego_unit):
-    xs = set([x for x, y in grid_coordinates.keys()])
-    ys = set([y for x, y in grid_coordinates.keys()])
-
-    xs = sorted(xs, reverse = True)
-    ys = sorted(ys)
-
-    min_x = min(xs)
-    max_x = max(xs)
-
-    min_y = min(ys)
-    max_y = max(ys)
-
-    step = 1/float(points_per_lego_unit)
-    result = {}
-    for y in ys:
-        for x in xs:
-            if (x, y) not in grid_coordinates:
-                result[(x, y)] = 0
-            else:
-                if x == min_x or x == max_x or y == min_y or y == max_y:
-                    result[(x, y)] = 1
-                else:
-                    value = min(result[(x + step, y)], result[(x, y - step)], result[(x + step, y - step)]) + 1
-                    result[(x, y)] = value
-    max_dim = max(result.values())
-
-    top_left_coordinates = []
-    for (x, y), dim in result.items():
-        if dim == max_dim:
-            top_left_coordinates.append((x, y))
-
-
-def is_rectangle(x0, y0, x1, y1, grid_coordinates, xs, ys):
-    for x in xs:
-        if x < x0 or x1 < x:
-            continue
-        for y in ys:
-            if y < y0 or y1 < y:
-                continue
-            if (x, y) not in grid_coordinates:
-                return False
-    return True
-
-
-def find_largest_rectange(grid_coordinates):
-    xs = set([x for x, y in grid_coordinates.keys()])
-    ys = set([y for x, y in grid_coordinates.keys()])
-
-    xs = sorted(list(xs))
-    ys = sorted(list(ys))
-
-    min_x = min(xs)
-    max_x = max(xs)
-
-    min_y = min(ys)
-    max_y = max(ys)
-    #print max_x, max_y
-    rectangles = []
-    max_area = None
-    result = None
-    for x_origin in xs:
-        for y_origin in ys:
-            for x in xs:
-                if x < x_origin:
-                    continue
-                for y in ys:
-                    if y < y_origin:
-                        continue
-                    if is_rectangle(x_origin, y_origin, x, y, grid_coordinates, xs, ys):
-                        area = (x-x_origin) * (y-y_origin)
-                        if max_area is None or max_area < area:
-                            max_area = area
-                            result = (x_origin, y_origin, x, y)
-    return result
 
 class Point:
     def __init__(self, x, y):
@@ -438,13 +298,8 @@ def display_error_grid(points_per_lego_unit, angle):
     grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
 
     print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
-    print print_area
-    x0, y0, x1, y1 = print_area
 
     pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
-
-    xs_print_area = []
-    ys_print_area = []
 
     xs_print_area = []
     ys_print_area = []
