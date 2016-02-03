@@ -211,49 +211,9 @@ def find_largest_rectange_quadratic(grid_coordinates, points_per_lego_unit):
                 best_ur = ur
     return (best_ll.x, best_ll.y, best_ur.x, best_ur.y)
 
-def build_pixel_to_angle(print_area, grid_to_angle):
-
-    xs = set([x for x, y in grid_to_angle.keys()])
-    ys = set([y for x, y in grid_to_angle.keys()])
-    xs = sorted(list(xs))
-    ys = sorted(list(ys))
-    x0, y0, x1, y1 = print_area
-    xs = [x for x in xs if x0 <= x and x <= x1]
-    ys = [y for y in ys if y0 <= y and y <= y1]
-    pixel_to_angle = {}
-    for i, x in enumerate(xs):
-        for j, y in enumerate(ys):
-            pixel_to_angle[i, len(ys) - 1 - j] = grid_to_angle[x, y] #(0, 0) is top left
-    return pixel_to_angle
-
-def export_pixel_to_angle(pixel_to_angle):
-    xs = set([x for x, y in pixel_to_angle.keys()])
-    ys = set([y for x, y in pixel_to_angle.keys()])
-    xs = sorted(list(xs))
-    ys = sorted(list(ys))
-
-    #xs = xs[0:13]
-    width = len(xs)
-    height = len(ys)
-    result_a = []
-    result_b = []
-    for y in ys:
-        for x in xs:
-            result_a.append(pixel_to_angle[(x, y)][0])
-            result_b.append(pixel_to_angle[(x, y)][1])
-
-    print "#define WIDTH %d" % width
-    print "#define HEIGHT %d" % height
-    print "short pos_to_alpha[] = {" + ",".join([str(int(a)) for a in result_a]) + "};"
-    print "short pos_to_beta[] = {" + ",".join([str(int(b)) for b in result_b]) + "};"
-    return result_a, result_b
-
-
-
-@np.vectorize
 def compute_error(x, y):
     structure_settings = StructureSetting()
-    x, y = change_referential(x, y, angle)
+    #x, y = change_referential(x, y, 0)
     r = get_alpha_beta(x, y, structure_settings)
     if r is None:
         return -0.1
@@ -271,7 +231,7 @@ def compute_error(x, y):
             distances.append(distance)
     return max(distances)
 
-def display_reachable_area(points_per_lego_unit, angle):
+def display_reachable_area(points_per_lego_unit, angle, plot_errors):
     reachable_xs = []
     reachable_ys = []
     grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
@@ -288,42 +248,29 @@ def display_reachable_area(points_per_lego_unit, angle):
     xt2, yt2 = change_referential(x1, y1, angle)
     xt3, yt3 = change_referential(x1, y0, angle)
 
-    plt.scatter(reachable_xs, reachable_ys, marker='o', c='b', s=5, zorder=10)
+    margin = 1
+
+    min_xs = min(reachable_xs) - margin
+    max_xs = max(reachable_xs) + margin
+
+    min_ys = min(reachable_ys) - margin
+    max_ys = max(reachable_ys) + margin
+
+    if plot_errors:
+        xi = np.linspace(min_xs, max_xs, 100)
+        yi = np.linspace(min_ys, max_ys, 100)
+        X, Y = np.meshgrid(xi, yi)
+        errors = np.vectorize(compute_error)(X, Y)
+
+        CS = plt.contourf(X, Y, errors, 15, cmap=plt.cm.rainbow, vmax=abs(errors).max(), vmin=0)
+        plt.colorbar(CS)
+
+    plt.scatter(reachable_xs, reachable_ys, marker='o', c='b', s=5)
     plt.plot([xt0, xt1, xt2, xt3, xt0], [yt0, yt1, yt2, yt3, yt0])
+
     plt.axis('equal')
     plt.show()
 
-
-def display_error_grid(points_per_lego_unit, angle):
-    grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
-
-    print_area = find_largest_rectange_quadratic(grid_to_angle, points_per_lego_unit)
-
-    pixel_to_angle = build_pixel_to_angle(print_area, grid_to_angle)
-
-    xs_print_area = []
-    ys_print_area = []
-    for (x_grid, y_grid), (alpha, beta, d) in pixel_to_angle.items():
-
-        structure_settings = StructureSetting()
-        structure_settings.s = 1
-        x, y = get_xy(1./structure_settings.gear_ratio * alpha * degrees_to_radians, 1./structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
-        x_prime, y_prime = change_referential(x, y, -angle)
-        xs_print_area.append(x_prime)
-        ys_print_area.append(y_prime)
-
-    structure_settings = StructureSetting()
-    xi = np.linspace(min(xs_print_area), max(xs_print_area), 100)
-    yi = np.linspace(min(ys_print_area), max(ys_print_area), 100)
-    X, Y = np.meshgrid(xi, yi)
-    errors = compute_error(X, Y)
-
-    CS = plt.contourf(X, Y, errors, 15, cmap=plt.cm.rainbow, vmax=abs(errors).max(),
-                      vmin=0)
-    plt.scatter(xs_print_area, ys_print_area, marker='o', c='b', s=5, zorder=10)
-    plt.colorbar(CS)
-    plt.axis('equal')
-    plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -333,11 +280,7 @@ if __name__ == "__main__":
     parser.add_argument('-a', metavar='N', type=int, default=-45, help='angle')
 
     points_per_lego_unit = 4
-    angle = -45
     args = parser.parse_args()
 
     if args.reachable is True:
-        display_reachable_area(args.p, args.a)
-
-    if args.error is True:
-        display_error_grid(args.p, args.a)
+        display_reachable_area(args.p, args.a, args.error)
