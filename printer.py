@@ -137,8 +137,14 @@ def compute_distance(x1, y1, x2, y2):
 
 def compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego_unit = 4, angle = -30):
     grid_to_angle = {}
-    for x in np.arange(-10, 10 + 1, 1/float(points_per_lego_unit)):
-      for y in np.arange(0, 15, 1/float(points_per_lego_unit) ):
+    min_x = structure_settings.xa - structure_settings.a - structure_settings.r
+    max_x = structure_settings.xb + structure_settings.a + structure_settings.r
+
+    min_y = 0
+    max_y = structure_settings.a + structure_settings.r
+
+    for x in np.arange(min_x, max_x, 1/float(points_per_lego_unit)):
+      for y in np.arange(min_y, max_y, 1/float(points_per_lego_unit) ):
         x_prime, y_prime = change_referential(x, y, angle)
 
         angles = get_alpha_beta(x_prime, y_prime, structure_settings)
