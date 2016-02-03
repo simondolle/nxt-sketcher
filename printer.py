@@ -219,7 +219,6 @@ def find_largest_rectange_quadratic(grid_coordinates, points_per_lego_unit):
 
 def compute_error(x, y):
     structure_settings = StructureSetting()
-    #x, y = change_referential(x, y, 0)
     r = get_alpha_beta(x, y, structure_settings)
     if r is None:
         return -0.1
@@ -237,11 +236,13 @@ def compute_error(x, y):
             distances.append(distance)
     return max(distances)
 
-def display_reachable_area(points_per_lego_unit, angle, plot_errors):
+def display_reachable_area(points_per_lego_unit, angle, structure_settings, plot_errors, plot_actual_points):
     reachable_xs = []
     reachable_ys = []
-    grid_to_angle = compute_grid_to_angle_inverse_kinematics(StructureSetting(), points_per_lego_unit, angle)
+    grid_to_angle = compute_grid_to_angle_inverse_kinematics(structure_settings, points_per_lego_unit, angle)
     for (x, y), (alpha, beta, _) in grid_to_angle.items():
+        if plot_actual_points:
+            x, y = get_xy(1./structure_settings.gear_ratio * alpha * degrees_to_radians, 1./structure_settings.gear_ratio * beta * degrees_to_radians, structure_settings)
         x, y = change_referential(x, y, angle)
         reachable_xs.append(x)
         reachable_ys.append(y)
@@ -282,6 +283,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('--reachable', action='store_true')
     parser.add_argument('--error', action='store_true')
+    parser.add_argument('--plot_actual_points', action='store_true', help='plot actual point position')
     parser.add_argument('-p', metavar='N', type=int, default=4, help='points per lego unit')
     parser.add_argument('-a', metavar='N', type=int, default=-45, help='angle')
 
@@ -289,4 +291,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.reachable is True:
-        display_reachable_area(args.p, args.a, args.error)
+        display_reachable_area(args.p, args.a, StructureSetting(), args.error, args.plot_actual_points)
