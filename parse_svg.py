@@ -30,25 +30,29 @@ def parse_path(path):
         subtokens.append("".join(g))
     for command, params in get_tokens(subtokens):
         params = parse_params(params)
+        print command, params
         d = {
-            "M": MoveTo,
-            "L": LineTo,
-            "l": LineToRelative,
-            "H": HorizontalLineTo,
-            "h": HorizontalLineToRelative,
-            "V": VerticalLineTo,
-            "z": ClosePath,
-            "v": VerticalLineToRelative,
-            "C": CurveTo,
-            "c": CurveToRelative,
-            "S": SmoothCurveTo,
-            "s": SmoothCurveToRelative,
+            "M": (MoveTo, 2),
+            "m": (MoveToRelative, 2),
+            "L": (LineTo, 2),
+            "l": (LineToRelative, 2),
+            "H": (HorizontalLineTo, 1),
+            "h": (HorizontalLineToRelative, 1),
+            "V": (VerticalLineTo, 1),
+            "z": (ClosePath, 0),
+            "v": (VerticalLineToRelative, 1),
+            "C": (CurveTo, 6),
+            "c": (CurveToRelative, 6),
+            "S": (SmoothCurveTo, 4),
+            "s": (SmoothCurveToRelative, 4)
         }
-        result.append(d[command](*params))
-    #tokens=re.split("[a-zA-Z]", path)
+        constructor, nb_arguments = d[command]
+        for i in range(0, len(params), nb_arguments):
+          result.append(constructor(*params[i:i+nb_arguments]))
     return result
-    #print tokens
 
+def convert_floats(l):
+    return ",".join(["{:.2f}".format(x) for x in l])
 
 class MoveTo(object):
     def __init__(self, x, y):
