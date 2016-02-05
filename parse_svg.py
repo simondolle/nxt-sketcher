@@ -14,7 +14,7 @@ XS = []
 YS = []
 
 def parse_params(params):
-    number="[-+]?\d*\.\d+|\d+"
+    number=r"[-+]?\d*\.\d+|[-+]?\d+"
     tokens=re.findall(number, params)
     return [float(f) for f in tokens]
 
@@ -87,6 +87,29 @@ class MoveTo(object):
     def transform(self, transformer):
         x, y = transformer.transform(self.x, self.y)
         return MoveTo(x, y)
+
+class MoveToRelative(MoveTo):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def draw(self):
+        self.draw_line(self.x + CURRENT_X, self.y + CURRENT_Y)
+        global PATH_START_X
+        global PATH_START_Y
+        PATH_START_X = self.x
+        PATH_START_Y = self.y
+
+    def transform(self, transformer):
+        x, y = transformer.transform_no_shift(self.x, self.y)
+        return MoveToRelative(x, y)
+
+    def __str__(self):
+        return "m%s"%convert_floats([self.x, self.y])
+
+    def to_nxc(self):
+        return "pen_up();\ngoto_point_relative(%s);\npen_down();"%", ".join([str(self.x), str(self.y)])
+
 
 class LineTo(MoveTo):
     def __init__(self, x, y):

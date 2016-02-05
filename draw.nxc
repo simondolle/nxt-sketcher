@@ -19,6 +19,8 @@ sub print_point(short x, short y) {
 }
 
 sub print_line(float target_x, float target_y) {
+  pen_down();
+
   Point current_p;
   current_p.x = X;
   current_p.y = Y;
@@ -95,6 +97,12 @@ void goto_point(float x, float y) {
   goto_position(x, y);
   PATH_START_X = x;
   PATH_START_Y = y;
+}
+
+void goto_point_relative(float x, float y) {
+  goto_position(x + X, y + Y);
+  PATH_START_X = x + X;
+  PATH_START_Y = y + Y;
 }
 
 

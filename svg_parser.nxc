@@ -64,6 +64,9 @@ void parse_path(string path) {
         case 'M':
           goto_point(params[0], params[1]);
           break;
+        case 'm':
+          goto_point_relative(params[0], params[1]);
+          break;
         case 'L':
           print_line(params[0], params[1]);
           break;
