@@ -83,7 +83,7 @@ class MoveTo(object):
         LAST_CONTROL_POINT_Y = None
 
     def __str__(self):
-        return "M%s"%",".join([str(self.x), str(self.y)])
+        return "M%s"%convert_floats([self.x, self.y])
 
     def to_nxc(self):
         return "pen_up();\ngoto_point(%s);\npen_down();"%", ".join([str(self.x), str(self.y)])
@@ -128,7 +128,7 @@ class LineTo(MoveTo):
         return LineTo(x, y)
 
     def __str__(self):
-        return "L%s"%", ".join([str(self.x), str(self.y)])
+        return "L%s"%convert_floats([self.x, self.y])
 
     def to_nxc(self):
         return "print_line(%s);"%", ".join([str(self.x), str(self.y)])
@@ -147,7 +147,7 @@ class LineToRelative(MoveTo):
         return LineToRelative(x, y)
 
     def __str__(self):
-        return "l%s"%", ".join([str(self.x), str(self.y)])
+        return "l%s"%convert_floats([self.x, self.y])
 
     def to_nxc(self):
         return "print_line_relative(%s);"%", ".join([str(self.x), str(self.y)])
@@ -165,7 +165,7 @@ class HorizontalLineTo(MoveTo):
         return HorizontalLineTo(x)
 
     def __str__(self):
-        return "H%s"%self.x
+        return "H%s"%convert_floats([self.x])
 
     def to_nxc(self):
         return "horizontal_line_to(%s);"%self.x
@@ -183,7 +183,7 @@ class HorizontalLineToRelative(MoveTo):
         return HorizontalLineToRelative(x)
 
     def __str__(self):
-        return "h%s"%self.x
+        return "h%s"%convert_floats([self.x])
 
     def to_nxc(self):
         return "horizontal_line_to_relative(%s);"%self.x
@@ -201,7 +201,7 @@ class VerticalLineTo(MoveTo):
         return VerticalLineTo(y)
 
     def __str__(self):
-        return "V%s"%self.y
+        return "V%s"%convert_floats([self.y])
 
     def to_nxc(self):
         return "vertical_line_to(%s);"%self.y
@@ -219,7 +219,7 @@ class VerticalLineToRelative(MoveTo):
         return VerticalLineToRelative(y)
 
     def __str__(self):
-        return "v%s"%self.y
+        return "v%s"%convert_floats([self.y])
 
     def to_nxc(self):
         return "vertical_line_to_relative(%s);"%self.y
@@ -291,10 +291,10 @@ class CurveTo(object):
         return CurveTo(x1, y1, x2, y2, x, y)
 
     def __str__(self):
-        return "C%s"%",".join([str(self.x1), str(self.y1), str(self.x2), str(self.y2), str(self.x), str(self.y)])
+        return "C%s"%convert_floats([self.x1, self.y1, self.x2, self.y2, self.x, self.y])
 
     def to_nxc(self):
-        return "curve_to(%s);"%", ".join([str(self.x1), str(self.y1), str(self.x2), str(self.y2), str(self.x), str(self.y)])
+        return "curve_to(%s);"%convert_floats([self.x1, self.y1, self.x2, self.y2, self.x, self.y])
 
 class CurveToRelative(CurveTo):
     def __init__(self, x1, y1, x2, y2, x, y):
@@ -312,7 +312,7 @@ class CurveToRelative(CurveTo):
         return CurveToRelative(x1, y1, x2, y2, x, y)
 
     def __str__(self):
-        return "c%s"%",".join([str(self.x1), str(self.y1), str(self.x2), str(self.y2), str(self.x), str(self.y)])
+        return "c%s"%convert_floats([self.x1, self.y1, self.x2, self.y2, self.x, self.y])
 
     def to_nxc(self):
         return "curve_to_relative(%s);"%", ".join([str(self.x1), str(self.y1), str(self.x2), str(self.y2), str(self.x), str(self.y)])
@@ -340,7 +340,7 @@ class SmoothCurveTo(CurveTo):
         return SmoothCurveTo(x2, y2, x, y)
 
     def __str__(self):
-        return "S%s"%",".join([str(self.x2), str(self.y2), str(self.x), str(self.y)])
+        return "S%s"%convert_floats([self.x2, self.y2, self.x, self.y])
 
     def to_nxc(self):
         return "smooth_curve_to(%s);"%", ".join([str(self.x2), str(self.y2), str(self.x), str(self.y)])
@@ -363,7 +363,7 @@ class SmoothCurveToRelative(SmoothCurveTo):
         return SmoothCurveToRelative(x2, y2, x, y)
 
     def __str__(self):
-        return "s%s"%",".join([str(self.x2), str(self.y2), str(self.x), str(self.y)])
+        return "s%s"%convert_floats([self.x2, self.y2, self.x, self.y])
 
     def to_nxc(self):
         return "smooth_curve_to_relative(%s);"%", ".join([str(self.x2), str(self.y2), str(self.x), str(self.y)])
