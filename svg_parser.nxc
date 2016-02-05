@@ -1,3 +1,6 @@
+#ifndef SVG_PARSER_NXC
+#define SVG_PARSER_NXC
+
 #include "draw.nxc"
 
 string get_token(string& path, int start_position) {
@@ -19,19 +22,20 @@ char get_command(string token) {
 }
 
 int get_params(string token, float& result[]) {
+
   int result_index = 0;
 
-  int i = 0;
-  int j = 0;
+  int i = 1;
+  int j = 1;
   int len = StrLen(token);
   while(i < len) {
-
-
-      while((j + 1 < len) && (strcmp(SubStr(token, j + 1, 1), "-") == 0) && (strcmp(SubStr(token, j + 1, 1), ",") == 0)) {
+      while((j + 1 < len) && (strcmp(SubStr(token, j + 1, 1), "-") != 0) && (strcmp(SubStr(token, j + 1, 1), ",") != 0)) {
         j += 1;
       }
+      ClearScreen();
       string number = SubStr(token, i, j - i + 1);
       float f = StrToNum(number);
+
       result[result_index] = f;
       result_index += 1;
       if(strcmp(SubStr(token, j + 1, 1), ",") == 0) {
@@ -42,8 +46,10 @@ int get_params(string token, float& result[]) {
       }
       j = i;
   }
+
   return result_index;
 }
+
 
 void parse_path(string path) {
   int i = 0;
@@ -51,7 +57,7 @@ void parse_path(string path) {
   while(i < len) {
     string token = get_token(path, i);
     i += StrLen(token);
-    float params[] = {0, 0, 0, 0};
+    float params[] = {0, 0, 0, 0, 0, 0};
     char command = get_command(token);
     int param_size = get_params(token, params);
     switch(command) {
@@ -84,7 +90,7 @@ void parse_path(string path) {
           break;
         case 'c':
           curve_to_relative(params[0], params[1], params[2], params[3], params[4], params[5]);
-         break;
+          break;
         case 'S':
           smooth_curve_to(params[0], params[1], params[2], params[3]);
           break;
@@ -96,4 +102,7 @@ void parse_path(string path) {
           TextOut(8, LCD_LINE4, "Unknown command");
     }
   }
+  pen_up();
 }
+
+#endif

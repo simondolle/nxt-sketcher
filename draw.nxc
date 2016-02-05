@@ -109,6 +109,8 @@ void plot_points(int xs[], int ys[]) {
 }
 
 void curve_to(float x1, float y1, float x2, float y2, float x, float y) {
+  pen_down();
+
   float t_step = 0.1;
   float x0 = X;
   float y0 = Y;
