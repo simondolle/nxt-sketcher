@@ -4,7 +4,7 @@
 #include "kinematics.nxc"
 #include "pen.nxc"
 
-#define UNSET -1000
+
 
 float LAST_CONTROL_POINT_X = -1000;
 float LAST_CONTROL_POINT_Y = -1000;

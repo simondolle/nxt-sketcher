@@ -1,6 +1,8 @@
 #ifndef MOVE_NXC
 #define MOVE_NXC
 
+#define UNSET -100000
+
 short ALPHA;
 short BETA;
 
@@ -8,6 +10,16 @@ float X;
 float Y;
 
 int PID = PID_2;
+
+//Variables used to determine the print area
+float MIN_X = UNSET;
+float MAX_X = UNSET;
+
+float MIN_Y = UNSET;
+float MAX_Y = UNSET;
+
+bool SIMULATION = true;
+
 
 short command_a;
 bool command_a_to_process = false;
@@ -48,9 +60,43 @@ void move_motors(short rotation_a, short rotation_b) {
   return;
 }
 
+void update_min_max_x_y(float x, float y) {
+    if (MIN_X == UNSET) {
+      MIN_X = x;
+    } else {
+      MIN_X = min(MIN_X, x);
+    }
+
+    if (MAX_X == UNSET) {
+      MAX_X = x;
+    } else {
+      MAX_X = max(MAX_X, x);
+    }
+
+    if (MIN_Y == UNSET) {
+      MIN_Y = y;
+    } else {
+      MIN_Y = min(MIN_Y, y);
+    }
+
+    if (MAX_Y == UNSET) {
+      MAX_Y = y;
+    } else {
+      MAX_Y = max(MAX_Y, y);
+    }
+
+}
+
 void goto_position(float x, float y)
 {
   Point p = convert_to_actual_coordinates(x, y);
+
+  if (SIMULATION == true) {
+    update_min_max_x_y(x, y);
+    X = x;
+    Y = y;
+    return;
+  }
 
   StructureSettings structure_settings = get_structure_settings();
 

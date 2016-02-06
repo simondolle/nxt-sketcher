@@ -3,6 +3,25 @@
 
 #include "draw.nxc"
 
+float X_SHIFT = 0;
+float Y_SHIFT = 0;
+
+float SCALE_FACTOR = 1;
+
+Point transform_x_y(float x, float y) {
+  Point p;
+  p.x = SCALE_FACTOR * (x + X_SHIFT);
+  p.y = SCALE_FACTOR * (y + Y_SHIFT);
+  return p;
+}
+
+Point transform_no_shift_x_y(float x, float y) {
+  Point p;
+  p.x = SCALE_FACTOR * x;
+  p.y = SCALE_FACTOR * y;
+  return p;
+}
+
 string get_token(string& path, int start_position) {
   int token_start = start_position;
   int token_end = start_position;
@@ -62,50 +81,128 @@ void parse_path(string path) {
     int param_size = get_params(token, params);
     switch(command) {
         case 'M':
-          goto_point(params[0], params[1]);
+        {
+          Point p = transform_x_y(params[0], params[1]);
+          goto_point(p.x, p.y);
           break;
+        }
         case 'm':
-          goto_point_relative(params[0], params[1]);
+        {
+          Point p = transform_no_shift_x_y(params[0], params[1]);
+          goto_point_relative(p.x, p.y);
           break;
+        }
         case 'L':
-          print_line(params[0], params[1]);
+        {
+          Point p = transform_x_y(params[0], params[1]);
+          print_line(p.x, p.y);
           break;
+        }
         case 'l':
-          print_line_relative(params[0], params[1]);
+        {
+          Point p = transform_no_shift_x_y(params[0], params[1]);
+          print_line_relative(p.x, p.y);
           break;
+        }
         case 'H':
-          horizontal_line_to(params[0]);
+        {
+          Point p = transform_x_y(params[0], params[1]);
+          horizontal_line_to(p.x);
           break;
+        }
         case 'h':
-          horizontal_line_to_relative(params[0]);
+        {
+          Point p = transform_no_shift_x_y(params[0], params[1]);
+          horizontal_line_to_relative(p.x);
           break;
+        }
         case 'V':
-          vertical_line_to(params[0]);
+        {
+          Point p = transform_x_y(params[0], params[1]);
+          vertical_line_to(p.y);
           break;
+        }
         case 'v':
-          vertical_line_to_relative(params[0]);
+        {
+          Point p = transform_no_shift_x_y(params[0], params[1]);
+          vertical_line_to_relative(p.y);
           break;
+        }
         case 'z':
+        {
           close_path();
           break;
+        }
         case 'C':
-          curve_to(params[0], params[1], params[2], params[3], params[4], params[5]);
+        {
+          Point p1 = transform_x_y(params[0], params[1]);
+          Point p2 = transform_x_y(params[2], params[3]);
+          Point p3 = transform_x_y(params[4], params[5]);
+          curve_to(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
           break;
+        }
         case 'c':
-          curve_to_relative(params[0], params[1], params[2], params[3], params[4], params[5]);
+        {
+          Point p1 = transform_no_shift_x_y(params[0], params[1]);
+          Point p2 = transform_no_shift_x_y(params[2], params[3]);
+          Point p3 = transform_no_shift_x_y(params[4], params[5]);
+          curve_to_relative(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
           break;
+        }
         case 'S':
-          smooth_curve_to(params[0], params[1], params[2], params[3]);
+        {
+          Point p2 = transform_x_y(params[0], params[1]);
+          Point p3 = transform_x_y(params[2], params[3]);
+          smooth_curve_to(p2.x, p2.y, p3.x, p3.y);
           break;
+        }
         case 's':
-          smooth_curve_to_relative(params[0], params[1], params[2], params[3]);
+        {
+          Point p2 = transform_no_shift_x_y(params[0], params[1]);
+          Point p3 = transform_no_shift_x_y(params[2], params[3]);
+          smooth_curve_to_relative(p2.x, p2.y, p3.x, p3.y);
           break;
+        }
         default:
+        {
           ClearScreen();
           TextOut(8, LCD_LINE4, "Unknown command");
+        }
     }
   }
   pen_up();
+}
+
+void reset_min_max_x_y() {
+  MIN_X = UNSET;
+  MAX_X = UNSET;
+  MIN_Y = UNSET;
+  MAX_Y = UNSET;
+}
+
+void set_scaling_parameters(string path) {
+  reset_min_max_x_y();
+  SIMULATION = true;
+
+  parse_path(path);
+
+  X_SHIFT = -MIN_X;
+  Y_SHIFT = -MIN_Y;
+
+  PrintSettings print_settings = get_print_settings();
+
+  float scale_x = print_settings.width * print_settings.points_per_lego_unit /(MAX_X - MIN_X);
+  float scale_y = print_settings.height * print_settings.points_per_lego_unit /(MAX_Y - MIN_Y);
+
+  SCALE_FACTOR = min(scale_x, scale_y);
+
+  reset_min_max_x_y();
+  SIMULATION = false;
+}
+
+void draw_path(string path) {
+  set_scaling_parameters(path);
+  parse_path(path);
 }
 
 #endif
