@@ -54,8 +54,9 @@ int get_params(string token, float& result[]) {
       ClearScreen();
       string number = SubStr(token, i, j - i + 1);
       float f = StrToNum(number);
-
-      result[result_index] = f;
+      if(result_index < ArrayLen(result)) {
+        result[result_index] = f;
+      }
       result_index += 1;
       if(strcmp(SubStr(token, j + 1, 1), ",") == 0) {
         i = j+2;
@@ -69,6 +70,10 @@ int get_params(string token, float& result[]) {
   return result_index;
 }
 
+int get_nb_params(string token) {
+  float a[] = {0};
+  return get_params(token, a);
+}
 
 void parse_path(string path) {
   int i = 0;
@@ -76,97 +81,115 @@ void parse_path(string path) {
   while(i < len) {
     string token = get_token(path, i);
     i += StrLen(token);
-    float params[] = {0, 0, 0, 0, 0, 0};
+    int nb_params = get_nb_params(token);
+    float params[];
+    ArrayInit(params, 0, nb_params);
     char command = get_command(token);
-    int param_size = get_params(token, params);
-    switch(command) {
-        case 'M':
-        {
-          Point p = transform_x_y(params[0], params[1]);
-          goto_point(p.x, p.y);
-          break;
-        }
-        case 'm':
-        {
-          Point p = transform_no_shift_x_y(params[0], params[1]);
-          goto_point_relative(p.x, p.y);
-          break;
-        }
-        case 'L':
-        {
-          Point p = transform_x_y(params[0], params[1]);
-          print_line(p.x, p.y);
-          break;
-        }
-        case 'l':
-        {
-          Point p = transform_no_shift_x_y(params[0], params[1]);
-          print_line_relative(p.x, p.y);
-          break;
-        }
-        case 'H':
-        {
-          Point p = transform_x_y(params[0], params[1]);
-          horizontal_line_to(p.x);
-          break;
-        }
-        case 'h':
-        {
-          Point p = transform_no_shift_x_y(params[0], params[1]);
-          horizontal_line_to_relative(p.x);
-          break;
-        }
-        case 'V':
-        {
-          Point p = transform_x_y(params[0], params[1]);
-          vertical_line_to(p.y);
-          break;
-        }
-        case 'v':
-        {
-          Point p = transform_no_shift_x_y(params[0], params[1]);
-          vertical_line_to_relative(p.y);
-          break;
-        }
-        case 'z':
-        {
-          close_path();
-          break;
-        }
-        case 'C':
-        {
-          Point p1 = transform_x_y(params[0], params[1]);
-          Point p2 = transform_x_y(params[2], params[3]);
-          Point p3 = transform_x_y(params[4], params[5]);
-          curve_to(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-          break;
-        }
-        case 'c':
-        {
-          Point p1 = transform_no_shift_x_y(params[0], params[1]);
-          Point p2 = transform_no_shift_x_y(params[2], params[3]);
-          Point p3 = transform_no_shift_x_y(params[4], params[5]);
-          curve_to_relative(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-          break;
-        }
-        case 'S':
-        {
-          Point p2 = transform_x_y(params[0], params[1]);
-          Point p3 = transform_x_y(params[2], params[3]);
-          smooth_curve_to(p2.x, p2.y, p3.x, p3.y);
-          break;
-        }
-        case 's':
-        {
-          Point p2 = transform_no_shift_x_y(params[0], params[1]);
-          Point p3 = transform_no_shift_x_y(params[2], params[3]);
-          smooth_curve_to_relative(p2.x, p2.y, p3.x, p3.y);
-          break;
-        }
-        default:
-        {
-          ClearScreen();
-          TextOut(8, LCD_LINE4, "Unknown command");
+    get_params(token, params);
+
+    int param_index = 0;
+    while(param_index < nb_params) {
+        switch(command) {
+            case 'M':
+            {
+              Point p = transform_x_y(params[param_index], params[param_index + 1]);
+              goto_point(p.x, p.y);
+              param_index += 2;
+              break;
+            }
+            case 'm':
+            {
+              Point p = transform_no_shift_x_y(params[param_index], params[param_index + 1]);
+              goto_point_relative(p.x, p.y);
+              param_index += 2;
+              break;
+            }
+            case 'L':
+            {
+              Point p = transform_x_y(params[param_index], params[param_index + 1]);
+              print_line(p.x, p.y);
+              param_index += 2;
+              break;
+            }
+            case 'l':
+            {
+              Point p = transform_no_shift_x_y(params[param_index], params[param_index + 1]);
+              print_line_relative(p.x, p.y);
+              param_index += 2;
+              break;
+            }
+            case 'H':
+            {
+              Point p = transform_x_y(params[param_index], 0);
+              horizontal_line_to(p.x);
+              param_index += 1;
+              break;
+            }
+            case 'h':
+            {
+              Point p = transform_no_shift_x_y(params[param_index], 0);
+              horizontal_line_to_relative(p.x);
+              param_index += 1;
+              break;
+            }
+            case 'V':
+            {
+              Point p = transform_x_y(0, params[param_index + 0]);
+              vertical_line_to(p.y);
+              param_index += 1;
+              break;
+            }
+            case 'v':
+            {
+              Point p = transform_no_shift_x_y(0, params[param_index]);
+              vertical_line_to_relative(p.y);
+              param_index += 1;
+              break;
+            }
+            case 'z':
+            {
+              close_path();
+              break;
+            }
+            case 'C':
+            {
+              Point p1 = transform_x_y(params[param_index    ], params[param_index + 1]);
+              Point p2 = transform_x_y(params[param_index + 2], params[param_index + 3]);
+              Point p3 = transform_x_y(params[param_index + 4], params[param_index + 5]);
+              curve_to(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+              param_index += 6;
+              break;
+            }
+            case 'c':
+            {
+              Point p1 = transform_no_shift_x_y(params[param_index    ], params[param_index + 1]);
+              Point p2 = transform_no_shift_x_y(params[param_index + 2], params[param_index + 3]);
+              Point p3 = transform_no_shift_x_y(params[param_index + 4], params[param_index + 5]);
+              curve_to_relative(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+              param_index += 6;
+              break;
+            }
+            case 'S':
+            {
+              Point p2 = transform_x_y(params[param_index   ], params[param_index + 1]);
+              Point p3 = transform_x_y(params[param_index + 2], params[param_index + 3]);
+              smooth_curve_to(p2.x, p2.y, p3.x, p3.y);
+              param_index += 4;
+              break;
+            }
+            case 's':
+            {
+              Point p2 = transform_no_shift_x_y(params[param_index    ], params[param_index + 1]);
+              Point p3 = transform_no_shift_x_y(params[param_index + 2], params[param_index + 3]);
+              smooth_curve_to_relative(p2.x, p2.y, p3.x, p3.y);
+              param_index += 4;
+              break;
+            }
+            default:
+            {
+              ClearScreen();
+              TextOut(8, LCD_LINE4, "Unknown command");
+            }
         }
     }
   }
