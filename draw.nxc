@@ -119,14 +119,33 @@ void plot_points(int xs[], int ys[]) {
 void curve_to(float x1, float y1, float x2, float y2, float x, float y) {
   pen_down();
 
-  float t_step = 0.1;
+  float t_step = 0.01;
+  if (SIMULATION) {
+    t_step = 0.1;
+  }
+
   float x0 = X;
   float y0 = Y;
+
+  PrintSettings print_settings = get_print_settings();
+  float distance_threshold = 0.9 * print_settings.points_per_lego_unit / print_settings.line_resolution;
+
+
   float t = 0;
   while(t < 1.0) {
     float target_x = (1-t)*(1-t)*(1-t) * x0 + 3*(1-t)*(1-t)* t * x1 + 3*(1-t)* t * t * x2 + t*t*t*x;
     float target_y = (1-t)*(1-t)*(1-t) * y0 + 3*(1-t)*(1-t)* t * y1 + 3*(1-t)* t * t * y2 + t*t*t*y;
-    goto_position(target_x, target_y);
+    Point current_p;
+    current_p.x = X;
+    current_p.y = Y;
+
+    Point target_p;
+    target_p.x = target_x;
+    target_p.y = target_y;
+    float distance = compute_distance(current_p, target_p);
+    if (distance > distance_threshold) {
+      goto_position(target_x, target_y);
+    }
     t += t_step;
   }
   goto_position(x, y);
