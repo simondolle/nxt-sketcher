@@ -15,6 +15,7 @@ void pen_up() {
     return;
   }
   if (pen_position == PEN_DOWN) {
+    wait_system_to_be_ready_for_move();
     RotateMotor(OUT_C, PEN_SPEED, -90);
     pen_position = PEN_UP;
   }
@@ -25,6 +26,7 @@ void pen_down() {
     return;
   }
   if (pen_position == PEN_UP) {
+    wait_system_to_be_ready_for_move();
     RotateMotor(OUT_C, PEN_SPEED, 90);
     pen_position = PEN_DOWN;
   }

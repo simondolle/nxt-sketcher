@@ -47,16 +47,21 @@ task move_b() {
   }
 }
 
+void wait_system_to_be_ready_for_move() {
+  while(command_a_to_process || command_b_to_process ) {
+    Wait(10);
+  }
+}
+
 void move_motors(short rotation_a, short rotation_b) {
+
+  wait_system_to_be_ready_for_move();
 
   command_a = rotation_a;
   command_b = rotation_b;
   command_a_to_process = true;
   command_b_to_process = true;
 
-  while(command_a_to_process == true || command_b_to_process == true) {
-    Wait(10);
-  }
   return;
 }
 
