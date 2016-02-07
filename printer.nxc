@@ -9,10 +9,7 @@
 
 task submain()
 {
-
- SetSensorTouch(IN_1);
-
- calibrate_stalled();
+ init();
 
  //plot_rectangle();
  //plot_invader_lines();
@@ -26,7 +23,7 @@ task submain()
  //plot_invader();
  //plot_heart_curve();
  plot_mona_lisa();
- StopAllTasks();
+ shutdown();
 }
 
 task main() {

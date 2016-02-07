@@ -42,15 +42,41 @@ void calibrate_pen() {
   OnRev(OUT_C, PEN_SPEED);
   until(SensorBoolean(S1));
   Off(OUT_C);
-  //RotateMotorEx(OUT_C, PEN_SPEED, -10, 0, false, true);
 }
 
-inline void calibrate_stalled() {
+void calibrate() {
   calibrate_pen();
   calibrate_motor(OUT_A);
   calibrate_motor(OUT_B);
   ALPHA = 0;
   BETA = 0;
+}
+
+string CALIBRATION_FILE = "calibrated";
+
+bool calibration_file_exists() {
+  ListFilesType args;
+  args.Pattern = CALIBRATION_FILE;
+  SysListFiles(args);
+  return (args.Result == NO_ERR && ArrayLen(args.FileList) > 0);
+}
+
+void init() {
+ SetSensorTouch(IN_1);
+  if (calibration_file_exists()) {
+    DeleteFile(CALIBRATION_FILE);
+  } else {
+    calibrate();
+  }
+}
+
+void shutdown() {
+  move_motors(-ALPHA, -BETA);
+  pen_up();
+  byte handle;
+  CreateFile("calibrated", 1, handle);
+  wait_system_to_be_ready_for_move();
+  StopAllTasks();
 }
 
 #endif
