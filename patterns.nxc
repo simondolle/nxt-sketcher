@@ -170,6 +170,15 @@ sub plot_rectangle() {
   plot_pattern(xs, ys);
 }
 
+string get_file_content(string filename) {
+    int fsize;
+    byte handle;
+    OpenFileRead("noun_17449_cc.xml", fsize, handle);
+    string result;
+    ReadLnString(handle, result);
+    return result;
+}
+
 void plot_mona_lisa() {
     //parse_path("M0,0V12H8.4v-8.4z");
     //parse_path("M10.1381520881,0.0C7.76736191759,0.0,6.96799368235,2.1041947322,6.96799368235,2.1041947322S6.16960096623,0.0,3.79783527663,0.0C1.42774190551,0.0,0.0,2.25958099131,0.0,4.12198634273c0.0,3.1211037302,6.96799368235,7.87801365727,6.96799368235,7.87801365727s6.96799368235,-4.75579504808,6.96799368235,-7.87745621777C13.9359873647,2.25958099131,12.5089422586,0.0,10.1381520881,0.0");
@@ -179,21 +188,11 @@ void plot_mona_lisa() {
     //draw_path("M72.748,0C55.736,0,50,15.099,50,15.099S44.271,0,27.252,0C10.245,0,0,16.214,0,29.578c0,22.396,50,56.53,50,56.53s50-34.126,50-56.526C100,16.214,89.76,0,72.748,0z");
     //draw_path("M69.866,5.276C64.043,15.431,56.246,23.62,50.218,33.57c5.761,0,11.53,0,17.291,0c0.888,1.832-1.847,4.731-3.144,6.288      C52.812,53.69,37.21,69.315,25.854,83.871C28.337,73.253,35.701,60.717,40,49.289c-5.501,0-11.003,0-16.505,0      C28.856,34.474,35.081,20.523,40,5.276C49.958,5.276,59.908,5.276,69.866,5.276z");
     //draw_path("M0,0C-5,0-5,0-5,5-5,10-5,10,0,10,5,10,5,10,5,5,5,0,5,0,0,0z");
-    int fsize;
-    byte handle;
-    OpenFileRead("noun_17449_cc.xml", fsize, handle);
-    string svg;
+}
 
-    ReadLnString(handle, svg);
-    //ClearScreen();
-    //TextOut(8, LCD_LINE4, svg);
-    //Wait(1000);
-
-    //ClearScreen();
-    //NumOut(8, LCD_LINE4, StrLen(svg));
-    //Wait(1000);
-
-
+void plot_svg(string filename) {
+    string svg = get_file_content(filename);
     draw_svg(svg);
 }
+
 #endif
