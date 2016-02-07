@@ -22,8 +22,8 @@ task submain()
  //plot_grid_lines();
  //plot_invader();
  //plot_heart_curve();
- //plot_mona_lisa();
- plot_svg("noun_17449_cc.xml");
+ plot_path();
+ //plot_svg("drawing.svg");
 
  shutdown();
 }

@@ -51,7 +51,7 @@ int get_params(string token, float& result[]) {
       while((j + 1 < len) && (strcmp(SubStr(token, j + 1, 1), "-") != 0) && (strcmp(SubStr(token, j + 1, 1), ",") != 0)) {
         j += 1;
       }
-      ClearScreen();
+      //ClearScreen();
       string number = SubStr(token, i, j - i + 1);
       float f = StrToNum(number);
       if(result_index < ArrayLen(result)) {
@@ -76,6 +76,11 @@ int get_nb_params(string token) {
 }
 
 void parse_path(string path) {
+  //ClearScreen();
+  //TextOut(8, LCD_LINE4, "-------");
+  //TextOut(8, LCD_LINE4, path);
+  //Wait(1000);
+
   int i = 0;
   int len = StrLen(path);
   while(i < len) {
@@ -324,7 +329,12 @@ bool is_path_start(int i, string& svg, int& start_index, int& end_index, bool de
       return false;
   }
 
-  while(StrIndex(svg, index) == c) {
+  index += 1;
+  if (index >= len) {
+      return false;
+  }
+
+  while(StrIndex(svg, index) != c) {
     index += 1;
     if (index >= len) {
       return false;
@@ -341,30 +351,36 @@ bool is_path_start(int i, string& svg, int& start_index, int& end_index, bool de
   return true;
 }
 
-void parse_svg(string svg) {
+void parse_svg(string& svg) {
  int i = 0;
  bool path_found = false;
  while(i < StrLen(svg)) {
    int start_position;
    int end_position;
    bool debug = false;
-   if (i == 358) {
-     debug = true;
-     ClearScreen();
-     TextOut(8, LCD_LINE4, "Debug");
-     Wait(1000);
-   }
+
+   //ClearScreen();
+   //NumOut(8, LCD_LINE4, i);
+   //Wait(10);
+
+   //if (i == 1186 || i == 1187 || i == 1188) {
+   //  debug = true;
+   //  ClearScreen();
+   //  TextOut(8, LCD_LINE4, "Debug");
+   //  Wait(1000);
+   //}
+
 
    bool is_start = is_path_start(i, svg, start_position, end_position, debug);
    if (is_start) {
-     ClearScreen();
-     TextOut(8, LCD_LINE4, "Path found");
-     Wait(1000);
+     //ClearScreen();
+     //TextOut(8, LCD_LINE4, "Path found");
+     //Wait(1000);
 
-     ClearScreen();
-     NumOut(8, LCD_LINE4, start_position);
-     NumOut(32, LCD_LINE4, end_position);
-     Wait(1000);
+     //ClearScreen();
+     //NumOut(8, LCD_LINE4, start_position);
+     //NumOut(32, LCD_LINE4, end_position);
+     //Wait(1000);
 
      path_found = true;
      string path = SubStr(svg, start_position, end_position - start_position + 1);
@@ -404,7 +420,9 @@ void set_scaling_parameters(string& svg) {
 }
 
 
-void draw_svg(string svg) {
+void draw_svg(string& svg) {
+  //ClearScreen();
+  //TextOut(8, LCD_LINE4, "-----");
   set_scaling_parameters(svg);
   parse_svg(svg);
 }
