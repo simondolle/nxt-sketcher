@@ -3,11 +3,12 @@
 
 #define UNSET -100000
 
-short ALPHA;
-short BETA;
+//current position
+short ALPHA; //angle of the left arm (0 corresponds to vertical arm)
+short BETA; //angle of the right arm (0 corresponds to vertical arm)
 
-float X;
-float Y;
+float X; //x = 0 corresponds to the middle of the segment between the two gear axis
+float Y; //y = 0 corresponds to the ordinate of the two gear axis
 
 int PID = PID_2;
 
@@ -18,6 +19,10 @@ float MAX_X = UNSET;
 float MIN_Y = UNSET;
 float MAX_Y = UNSET;
 
+//simulation mode is used to compute the coordinates of points
+//to be plotted without actually plotting them.
+//It is used to compute the size of the pattern and
+//scale it so that it fits the print area.
 bool SIMULATION = true;
 
 
@@ -54,9 +59,9 @@ void wait_system_to_be_ready_for_move() {
 }
 
 void move_motors(short rotation_a, short rotation_b) {
-
   wait_system_to_be_ready_for_move();
 
+  //pass parameters to the tasks in charge of rotating the motors.
   command_a = rotation_a;
   command_b = rotation_b;
   command_a_to_process = true;
@@ -89,7 +94,6 @@ void update_min_max_x_y(float x, float y) {
     } else {
       MAX_Y = max(MAX_Y, y);
     }
-
 }
 
 void goto_position(float x, float y)

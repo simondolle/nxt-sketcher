@@ -35,6 +35,8 @@ Point change_referential(float x, float y) {
   return p;
 }
 
+//Convert coordinates in print area to actual coordinates
+//in a straight x-y referential.
 Point convert_to_actual_coordinates(float x, float y) {
   PrintSettings print_settings= get_print_settings();
 
@@ -90,13 +92,17 @@ PointPair compute_circle_intersection(Point p0, Point p1, float r0, float r1, bo
     return result;
 }
 
+//get the motor angles corresponding to a x-y position
+//computation is largely inspired from https://github.com/cavenel/ev3-print3rbot/
 AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & result_set) {
     float r_pen = sqrt(structure_settings.a * structure_settings.a + structure_settings.s * structure_settings.s);
 
+    //point where the left arm is attached
     Point a;
     a.x = structure_settings.xa;
     a.y = 0;
 
+    //compute the position of the left arm articulation
     PointPair intersection1 = compute_circle_intersection(a, p, structure_settings.r, r_pen, result_set);
     if (result_set == false) {
         ClearScreen();
@@ -122,6 +128,7 @@ AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & r
         p1_actual.y = p1_prime.y;
     }
 
+    //compute position of the articulation between the two arms.
     PointPair intersection_cross = compute_circle_intersection(p1_actual, p, structure_settings.a, structure_settings.s, result_set);
     if (result_set == false) {
         ClearScreen();
@@ -142,10 +149,12 @@ AnglePair get_alpha_beta(Point p, StructureSettings structure_settings, bool & r
         p_cross_actual.y = p_cross_prime.y;
     }
 
+    //point where the left arm is attached
     Point b;
     b.x = structure_settings.xb;
     b.y = 0;
 
+    //compute the position of the right arm articulation
     PointPair intersection2 = compute_circle_intersection(b, p_cross_actual, structure_settings.r, structure_settings.a, result_set);
     if (result_set == false) {
         ClearScreen();

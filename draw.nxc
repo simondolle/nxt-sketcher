@@ -4,11 +4,14 @@
 #include "kinematics.nxc"
 #include "pen.nxc"
 
-
-
+//store the coordinates of last control point
+//to be able to handle the "smooth curveto" instructions
 float LAST_CONTROL_POINT_X = -1000;
 float LAST_CONTROL_POINT_Y = -1000;
 
+
+//store the coordinates of path start
+//to be able to handle the closepath instruction
 float PATH_START_X = UNSET;
 float PATH_START_Y = UNSET;
 

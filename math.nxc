@@ -31,6 +31,10 @@ float min(float x, float y) {
   return y;
 }
 
+//atan2 is not present in the standard firmware
+//this is a method to approximate it.
+//(accuracy is much better than what we actually need)
+//algorithm comes from http://http.developer.nvidia.com/Cg/atan2.html
 float atan2(float y, float x) {
   float t3 = abs(x);
   float t1 = abs(y);
