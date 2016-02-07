@@ -203,11 +203,191 @@ void reset_min_max_x_y() {
   MAX_Y = UNSET;
 }
 
-void set_scaling_parameters(string path) {
+
+bool is_path_start(int i, string& svg, int& start_index, int& end_index, bool debug) {
+  int index = i;
+  int len = StrLen(svg);
+
+
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, SubStr(svg, i, 1));
+    Wait(1000);
+  }
+
+  if (index >= len || StrIndex(svg, index) != ' ') {
+    if (debug) {
+      ClearScreen();
+      TextOut(8, LCD_LINE4, "Space not found");
+      Wait(1000);
+    }
+
+    return false;
+  }
+  index += 1;
+  if (index >= len) {
+    return false;
+  }
+
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, "Space found");
+    Wait(1000);
+  }
+
+  while(StrIndex(svg, index) == ' ') {
+    index += 1;
+    if (index >= len) {
+      return false;
+    }
+  }
+
+  if(StrIndex(svg, index) != 'd') {
+    return false;
+  }
+
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, "d found");
+    Wait(1000);
+  }
+
+  index += 1;
+  if (index >= len) {
+      return false;
+  }
+  while(StrIndex(svg, index) == ' ') {
+    index += 1;
+    if (index >= len) {
+      return false;
+    }
+  }
+
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, "spaces found");
+    Wait(1000);
+  }
+
+  if(StrIndex(svg, index) != '=') {
+    return false;
+  }
+
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, "= found");
+    Wait(1000);
+  }
+
+  index += 1;
+  if (index >= len) {
+      return false;
+  }
+  while(StrIndex(svg, index) == ' ') {
+    index += 1;
+    if (index >= len) {
+      return false;
+    }
+  }
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, "spaces found");
+    Wait(1000);
+  }
+
+
+  if(StrIndex(svg, index) != ''' && StrIndex(svg, index) != '"') {
+    if (debug) {
+      ClearScreen();
+      TextOut(8, LCD_LINE4, SubStr(svg, index, 1));
+      TextOut(8, LCD_LINE3, "-----------");
+      Wait(1000);
+
+      ClearScreen();
+      TextOut(8, LCD_LINE4, "delimiter not found");
+      Wait(1000);
+    }
+
+    return false;
+  }
+  char c = StrIndex(svg, index);
+
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, "Delimiter found");
+    Wait(1000);
+  }
+
+  index += 1;
+  start_index = index;
+  if (index >= len) {
+      return false;
+  }
+
+  while(StrIndex(svg, index) == c) {
+    index += 1;
+    if (index >= len) {
+      return false;
+    }
+  }
+
+  if (debug) {
+    ClearScreen();
+    TextOut(8, LCD_LINE4, "Matching delimiter found");
+    Wait(1000);
+  }
+
+  end_index = index - 1;
+  return true;
+}
+
+void parse_svg(string svg) {
+ int i = 0;
+ bool path_found = false;
+ while(i < StrLen(svg)) {
+   int start_position;
+   int end_position;
+   bool debug = false;
+   if (i == 358) {
+     debug = true;
+     ClearScreen();
+     TextOut(8, LCD_LINE4, "Debug");
+     Wait(1000);
+   }
+
+   bool is_start = is_path_start(i, svg, start_position, end_position, debug);
+   if (is_start) {
+     ClearScreen();
+     TextOut(8, LCD_LINE4, "Path found");
+     Wait(1000);
+
+     ClearScreen();
+     NumOut(8, LCD_LINE4, start_position);
+     NumOut(32, LCD_LINE4, end_position);
+     Wait(1000);
+
+     path_found = true;
+     string path = SubStr(svg, start_position, end_position - start_position + 1);
+     parse_path(path);
+     i = end_position + 1;
+   } else {
+     i += 1;
+   }
+ }
+
+ if (!path_found) {
+   ClearScreen();
+   TextOut(8, LCD_LINE4, "Path not found");
+   Wait(1000);
+ }
+
+}
+
+void set_scaling_parameters(string& svg) {
   reset_min_max_x_y();
   SIMULATION = true;
 
-  parse_path(path);
+  parse_svg(svg);
 
   X_SHIFT = -MIN_X;
   Y_SHIFT = -MIN_Y;
@@ -223,9 +403,10 @@ void set_scaling_parameters(string path) {
   SIMULATION = false;
 }
 
-void draw_path(string path) {
-  set_scaling_parameters(path);
-  parse_path(path);
+
+void draw_svg(string svg) {
+  set_scaling_parameters(svg);
+  parse_svg(svg);
 }
 
 #endif
