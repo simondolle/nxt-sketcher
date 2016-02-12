@@ -118,6 +118,7 @@ void parse_path(string path) {
             case 'M':
             {
               Point p = transform_x_y(params[param_index], params[param_index + 1]);
+              pen_up();
               goto_point(p.x, p.y);
               param_index += 2;
               break;
@@ -125,6 +126,7 @@ void parse_path(string path) {
             case 'm':
             {
               Point p = transform_no_shift_x_y(params[param_index], params[param_index + 1]);
+              pen_up();
               goto_point_relative(p.x, p.y);
               param_index += 2;
               break;
