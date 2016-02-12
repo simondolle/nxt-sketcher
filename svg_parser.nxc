@@ -1,6 +1,17 @@
 #ifndef SVG_PARSER_NXC
 #define SVG_PARSER_NXC
 
+#define INITIAL_STATE 0
+#define FIRST_SPACE_FOUND 1
+#define D_FOUND 2
+#define SECOND_SPACE_FOUND 3
+#define EQUAL_FOUND 4
+#define THIRD_SPACE_FOUND 5
+#define QUOTE_FOUND 6
+
+#define SIMPLE_QUOTE 39
+#define DOUBLE_QUOTE 34
+
 #include "draw.nxc"
 
 float X_SHIFT = 0;
@@ -51,9 +62,22 @@ int get_params(string token, float& result[]) {
       while((j + 1 < len) && (strcmp(SubStr(token, j + 1, 1), "-") != 0) && (strcmp(SubStr(token, j + 1, 1), ",") != 0)) {
         j += 1;
       }
-      //ClearScreen();
       string number = SubStr(token, i, j - i + 1);
       float f = StrToNum(number);
+      //detect conversion errors
+      if (f == 0) {
+        int k = 0;
+        bool all_spaces = true;
+        while(k < j - i + 1) {
+          if (strcmp(SubStr(token, i + k, 1), " ") != 0) {
+            all_spaces = false;
+          }
+          k += 1;
+        }
+        if (all_spaces) {
+          return 0;
+        }
+      }
       if(result_index < ArrayLen(result)) {
         result[result_index] = f;
       }
@@ -76,11 +100,6 @@ int get_nb_params(string token) {
 }
 
 void parse_path(string path) {
-  //ClearScreen();
-  //TextOut(8, LCD_LINE4, "-------");
-  //TextOut(8, LCD_LINE4, path);
-  //Wait(1000);
-
   int i = 0;
   int len = StrLen(path);
   while(i < len) {
@@ -90,6 +109,7 @@ void parse_path(string path) {
     float params[];
     ArrayInit(params, 0, nb_params);
     char command = get_command(token);
+
     get_params(token, params);
 
     int param_index = 0;
@@ -359,29 +379,8 @@ void parse_svg(string& svg) {
    int end_position;
    bool debug = false;
 
-   //ClearScreen();
-   //NumOut(8, LCD_LINE4, i);
-   //Wait(10);
-
-   //if (i == 1186 || i == 1187 || i == 1188) {
-   //  debug = true;
-   //  ClearScreen();
-   //  TextOut(8, LCD_LINE4, "Debug");
-   //  Wait(1000);
-   //}
-
-
    bool is_start = is_path_start(i, svg, start_position, end_position, debug);
    if (is_start) {
-     //ClearScreen();
-     //TextOut(8, LCD_LINE4, "Path found");
-     //Wait(1000);
-
-     //ClearScreen();
-     //NumOut(8, LCD_LINE4, start_position);
-     //NumOut(32, LCD_LINE4, end_position);
-     //Wait(1000);
-
      path_found = true;
      string path = SubStr(svg, start_position, end_position - start_position + 1);
      parse_path(path);
@@ -390,20 +389,128 @@ void parse_svg(string& svg) {
      i += 1;
    }
  }
-
- if (!path_found) {
-   ClearScreen();
-   TextOut(8, LCD_LINE4, "Path not found");
-   Wait(1000);
- }
-
 }
+
+
+void parse_svg_file(byte& handle) {
+ int state = INITIAL_STATE;
+ int i = 0;
+ while(true) {
+   i += 1;
+   char s;
+   string current_path;
+   unsigned int return_code = Read(handle, s);
+   switch (return_code)
+   {
+     case LDR_SUCCESS:
+        switch (state)
+        {
+          case INITIAL_STATE:
+            if (s == ' ') {
+              state = FIRST_SPACE_FOUND;
+            }
+            break;
+          case FIRST_SPACE_FOUND:
+            if (s == 'd') {
+              state = D_FOUND;
+            } else {
+                if (s != ' ') {
+                  state = INITIAL_STATE;
+                }
+            }
+            break;
+          case D_FOUND:
+            if (s == '=') {
+              state = EQUAL_FOUND;
+            } else {
+              if (s == ' ') {
+                state = SECOND_SPACE_FOUND;
+              } else {
+                state = INITIAL_STATE;
+              }
+            }
+            break;
+          case SECOND_SPACE_FOUND:
+            if (s == '=') {
+              state = EQUAL_FOUND;
+            } else {
+                if (s != ' ') {
+                  state = INITIAL_STATE;
+                }
+            }
+            break;
+          case EQUAL_FOUND:
+            if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+              state = QUOTE_FOUND;
+              current_path = "";
+            } else {
+              if (s == ' ') {
+                state = THIRD_SPACE_FOUND;
+              } else {
+                state = INITIAL_STATE;
+              }
+            }
+            break;
+          case THIRD_SPACE_FOUND:
+            if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+              state = QUOTE_FOUND;
+              current_path = "";
+            } else {
+                if (s != ' ') {
+                  state = INITIAL_STATE;
+                }
+            }
+            break;
+           case QUOTE_FOUND:
+             if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+              parse_path(current_path);
+              state = INITIAL_STATE;
+              current_path = "";
+             } else {
+               string h = "a";
+               h[0] = s;
+               current_path += h;
+             }
+             break;
+        }
+        break;
+     case LDR_ENDOFFILE:
+        // No more data to read.
+        return;
+     default:
+        // Unanticipated exception.
+        TextOut(0, LCD_LINE1, "read failed     ");
+        shutdown();
+   }
+ }
+}
+
 
 void set_scaling_parameters(string& svg) {
   reset_min_max_x_y();
   SIMULATION = true;
 
   parse_svg(svg);
+
+  X_SHIFT = -MIN_X;
+  Y_SHIFT = -MIN_Y;
+
+  PrintSettings print_settings = get_print_settings();
+
+  float scale_x = print_settings.width * print_settings.points_per_lego_unit /(MAX_X - MIN_X);
+  float scale_y = print_settings.height * print_settings.points_per_lego_unit /(MAX_Y - MIN_Y);
+
+  SCALE_FACTOR = min(scale_x, scale_y);
+
+  reset_min_max_x_y();
+  SIMULATION = false;
+}
+
+void set_scaling_parameters_file(byte& handle) {
+  reset_min_max_x_y();
+  SIMULATION = true;
+
+  parse_svg_file(handle);
 
   X_SHIFT = -MIN_X;
   Y_SHIFT = -MIN_Y;
@@ -426,5 +533,16 @@ void draw_svg(string& svg) {
   set_scaling_parameters(svg);
   parse_svg(svg);
 }
+
+void draw_svg_file(string filename) {
+  int fsize;
+  byte handle;
+  OpenFileRead(filename, fsize, handle);
+  set_scaling_parameters_file(handle);
+  OpenFileRead(filename, fsize, handle);
+  parse_svg_file(handle);
+}
+
+
 
 #endif

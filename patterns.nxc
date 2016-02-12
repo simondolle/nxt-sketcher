@@ -195,14 +195,7 @@ void plot_path() {
 }
 
 void plot_svg(string filename) {
-    ClearScreen();
-    TextOut(8, LCD_LINE4, "Open file");
-    Wait(1000);
-    string svg;
-    get_file_content(filename, svg);
-    ClearScreen();
-    TextOut(8, LCD_LINE4, "Draw");
-    draw_svg(svg);
+    draw_svg_file(filename);
 }
 
 #endif
