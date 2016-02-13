@@ -73,12 +73,15 @@ void init() {
   }
 }
 
-void shutdown() {
+void goto_start_position() {
   move_motors(-ALPHA, -BETA);
   pen_up();
   byte handle;
   CreateFile("calibrated", 1, handle);
-  wait_system_to_be_ready_for_move();
+}
+
+void shutdown() {
+  goto_start_position();
   StopAllTasks();
 }
 

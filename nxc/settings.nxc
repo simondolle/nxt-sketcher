@@ -75,7 +75,7 @@ PrintSettings get_print_settings_45() {
 }
 
 PrintSettings get_print_settings() {
-  PrintSettings result = get_print_settings_45();
+  PrintSettings result = get_print_settings_straight();
   return result;
 }
 

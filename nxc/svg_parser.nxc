@@ -353,6 +353,7 @@ void draw_svg_file(string filename) {
   OpenFileRead(filename, fsize, handle);
   display_centered_text("Printing.");
   parse_svg_file(handle);
+  goto_start_position();
 }
 
 
