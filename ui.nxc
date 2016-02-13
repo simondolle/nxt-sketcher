@@ -1,0 +1,85 @@
+#ifndef UI_NXC
+#define UI_NXC
+
+#include "text_utils.nxc"
+
+int normalize(int i, int modulo) {
+  while(i < 0) {
+    i += modulo;
+  }
+  while(i >= modulo) {
+    i -= modulo;
+  }
+  return i;
+}
+
+string remove_extension(string filename) {
+  return SubStr(filename, 0, StrLen(filename) - 4);
+}
+
+void draw_arrows() {
+  const int arrow_width = 5;
+  const int arrow_y = 15;
+  const int arrow_tail = 2;
+  int i = 0;
+  while(i < arrow_width) {
+    LineOut(i, arrow_y - i, i, arrow_y + i);
+    i+=1;
+  }
+  LineOut(arrow_width, arrow_y, arrow_width + arrow_tail - 1, arrow_y);
+
+  int j = 0;
+  while(j < arrow_width) {
+    LineOut(DISPLAY_WIDTH - 1 - j, arrow_y - j, DISPLAY_WIDTH - 1 - j, arrow_y + j);
+    j+=1;
+  }
+  LineOut(DISPLAY_WIDTH - 1 - arrow_width, arrow_y, DISPLAY_WIDTH - arrow_width - arrow_tail, arrow_y);
+}
+
+void run_ui()
+{
+  ListFilesType args;
+  args.Pattern = "*.svg";
+  SysListFiles(args);
+  if (args.Result == NO_ERR && ArrayLen(args.FileList) > 0)
+  {
+    int nbFiles = ArrayLen(args.FileList);
+    draw_arrows();
+    int i = 0;
+    while(true) {
+      if (ButtonPressed(BTNCENTER, true)) {
+        ClearScreen();
+        display_centered_text("Printing");
+        init();
+        draw_svg_file(args.FileList[i]);
+
+
+        ButtonPressed (BTNLEFT, true);
+        ButtonPressed (BTNRIGHT, true);
+        ButtonPressed (BTNCENTER, true);
+        draw_arrows();
+      }
+      if (ButtonPressed(BTNEXIT, true)) {
+        shutdown();
+      }
+
+      int left_pressures = ButtonCount(BTNLEFT, true);
+	  int right_pressures = ButtonCount(BTNRIGHT, true);
+
+      i = normalize(i + right_pressures - left_pressures, nbFiles);
+
+      TextOut(0, LCD_LINE4, "                              ");
+      string text = remove_extension(args.FileList[i]);
+      display_centered_text(text);
+
+      Wait(100);
+    }
+
+
+  } else {
+    TextOut(0, LCD_LINE6, "Could not find any svg file.");
+  }
+}
+
+
+#endif

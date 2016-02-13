@@ -1,0 +1,16 @@
+#ifndef TEXT_UTILS_NXC
+#define TEXT_UTILS_NXC
+
+#include "math.nxc"
+
+int get_offset(string text) {
+  int string_width = 6 * StrLen(text);
+  return max(0, (DISPLAY_WIDTH - string_width)/2);
+}
+
+void display_centered_text(string text) {
+  TextOut(0, LCD_LINE4, "                              ");
+  TextOut(get_offset(text), LCD_LINE4, text);
+}
+
+#endif

@@ -12,6 +12,7 @@
 #define SIMPLE_QUOTE 39
 #define DOUBLE_QUOTE 34
 
+#include "text_utils.nxc"
 #include "draw.nxc"
 
 float X_SHIFT = 0;
@@ -344,11 +345,13 @@ void set_scaling_parameters_file(byte& handle) {
 }
 
 void draw_svg_file(string filename) {
+  display_centered_text("Analyzing file.");
   int fsize;
   byte handle;
   OpenFileRead(filename, fsize, handle);
   set_scaling_parameters_file(handle);
   OpenFileRead(filename, fsize, handle);
+  display_centered_text("Printing.");
   parse_svg_file(handle);
 }
 

@@ -1,8 +1,10 @@
 #ifndef CALIBRATION_NXC
 #define CALIBRATION_NXC
 
+#include "text_utils.nxc"
 #include "pen.nxc"
 #include "move.nxc"
+
 
 inline bool is_stalled(byte output)
 {
@@ -45,6 +47,7 @@ void calibrate_pen() {
 }
 
 void calibrate() {
+  display_centered_text("Calibrating.");
   calibrate_pen();
   calibrate_motor(OUT_A);
   calibrate_motor(OUT_B);

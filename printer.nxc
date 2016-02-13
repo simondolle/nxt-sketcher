@@ -6,10 +6,13 @@
 #include "patterns.nxc"
 #include "pen.nxc"
 #include "svg_parser.nxc"
+#include "ui.nxc"
 
 task submain()
 {
- init();
+ run_ui();
+
+
 
  //plot_rectangle();
  //plot_invader_lines();
@@ -23,9 +26,9 @@ task submain()
  //plot_invader();
  //plot_heart_curve();
  //plot_path();
- plot_svg("drawing.svg");
+ //plot_svg("drawing.svg");
 
- shutdown();
+ //shutdown();
 }
 
 task main() {
