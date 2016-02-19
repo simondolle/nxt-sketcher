@@ -1,3 +1,3 @@
 # NXT-Sketcher
 
-![Alt text](cover.png?raw=true)
+![Alt text](building_instruction_files/cover.png?raw=true)
