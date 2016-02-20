@@ -6,62 +6,6 @@
 #include "calibration.nxc"
 #include "svg_parser.nxc"
 
-sub plot_corners() {
-  PrintSettings print_settings = get_print_settings();
-
-  print_point(0, 0);
-  print_point(0, print_settings.height - 1);
-  print_point(print_settings.width - 1, print_settings.height - 1);
-  print_point(print_settings.width - 1, 0);
-}
-
-sub plot_heart() {
-  int xs[] = {3, 2, 1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 7, 6, 5, 4};
-  int ys[] = {0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 1, 2, 1};
-  plot_points(xs, ys);
-}
-
-void plot_heart_lines() {
-  int xs[] = {2, 2, 1, 1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5,  5,  6,  6,  7,  7,  8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 12, 12, 11, 11, 8, 8, 7, 7, 6, 6, 5, 5};
-  int ys[] = {0, 1, 1, 2, 2, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 10, 10, 9, 9, 8,  8,  7,  7,  6,  6,  5,  5,  2,  2,  1,  1,  0, 0, 1, 1, 2, 2, 1, 1, 0};
-  plot_pattern(xs, ys);
-}
-
-void plot_heart_curve() {
-  goto_position(6.33634505505, 0.0);
-  pen_down();
-  curve_to(4.85460119849, 0.0, 4.35499605147, 1.31512170762, 4.35499605147, 1.31512170762);
-  smooth_curve_to(3.85600060389, 0.0, 2.37364704789, 0.0);
-  curve_to(0.892338690946, 0.0, 0.0, 1.41223811957, 0.0, 2.57624146421);
-  curve_to_relative(0.0, 1.95068983137, 4.35499605147, 4.92375853579, 4.35499605147, 4.92375853579);
-  smooth_curve_to_relative(4.35499605147, -2.97237190505, 4.35499605147, -4.92341013611);
-  curve_to(8.70999210294, 1.41223811957, 7.8180889116, 0.0, 6.33634505505, 0.0);
-  pen_up();
-}
-
-void plot_invader_lines() {
-  int body_xs[] = {3, 2, 2, 3, 3, 3, 2, 2, 1, 1, 0, 0, 1, 1, 2, 2, 3, 3, 5, 5, 3, 3, 8, 8, 6, 6, 8, 8, 9, 9, 9, 10, 10, 11, 11, 10, 10, 9, 9, 8, 8, 9, 9, 7, 7, 4, 4};
-  int body_ys[] = {1, 1, 0, 0, 1, 2, 2, 3, 3, 4, 4, 7, 7, 5, 5, 7, 7, 8, 8, 7, 7, 6, 6, 7, 7, 8, 8, 7, 7, 7, 5,  5,  7,  7,  4,  4,  3, 3, 2, 2, 0, 0, 1, 1, 2, 2, 1};
-
-  plot_pattern(body_xs, body_ys);
-
-  int left_eye_xs[] = {4, 4, 3, 3};
-  int left_eye_ys[] = {4, 3, 3, 4};
-
-  plot_pattern(left_eye_xs, left_eye_ys);
-
-  int rigth_eye_xs[] = {8, 8, 7, 7};
-  int right_eye_ys[] = {4, 3, 3, 4};
-
-  plot_pattern(rigth_eye_xs, right_eye_ys);
-}
-
-sub plot_invader() {
-  int xs[] = {0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 9, 9};
-  int ys[] = {4, 5, 6, 3, 4, 0, 3, 4, 5, 6, 7, 1, 2, 4, 5, 7, 3, 4, 5, 6, 3, 4, 5, 6, 1, 2, 4, 5, 7, 0, 3, 4, 5, 6, 7, 4, 5, 6, 3, 4};
-  plot_points(xs, ys);
-}
-
 void plot_ghost_lines() {
   int body_xs[] = {5, 5, 3, 3, 2, 2, 1, 1, 0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  7,  7,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 12, 12, 11, 11, 10, 10, 8, 8};
   int body_ys[] = {0, 1, 1, 2, 2, 3, 3, 6, 6, 14, 14, 13, 13, 12, 12, 13, 13, 14, 14, 12, 12, 14, 14, 13, 13, 12, 12, 13, 13, 14, 14,  6,  6,  3,  3,  2,  2,  1, 1, 0};
@@ -84,23 +28,6 @@ void plot_ghost_lines() {
   plot_pattern(right_eye_pupil_xs, right_eye_pupil_ys);
 }
 
-void plot_star_lines() {
-  int body_xs[] = {6, 6, 5, 5, 4, 4, 0, 0, 1, 1, 2, 2, 3,  3,  2,  2,  1,  1,  3,  3,  4,  4,  6,  6,  8,  8, 10, 10, 11, 11, 13, 13, 12, 12, 11, 11, 12, 12, 13, 13, 14, 14, 10, 10, 9, 9, 8, 8};
-  int body_ys[] = {0, 2, 2, 4, 4, 5, 5, 7, 7, 8, 8, 9, 9, 11, 11, 14, 14, 16, 16, 15, 15, 14, 14, 13, 13, 14, 14, 15, 15, 16, 16, 14, 14, 11, 11,  9,  9,  8,  8,  7,  7,  5,  5,  4, 4, 2, 2, 0};
-
-  plot_pattern(body_xs, body_ys);
-
-  int left_eye_xs[] = {5, 5, 6, 6};
-  int left_eye_ys[] = {6, 8, 8, 6};
-
-  plot_pattern(left_eye_xs, left_eye_ys);
-
-  int rigth_eye_xs[] = {8, 8, 9, 9};
-  int right_eye_ys[] = {6, 8, 8, 6};
-
-  plot_pattern(rigth_eye_xs, right_eye_ys);
-}
-
 void plot_note_lines() {
   int xs[] = {3, 3, 1, 1, 0, 0, 1, 1, 3, 3, 4, 4, 5, 5, 6, 6, 5, 5};
   int ys[] = {0, 4, 4, 5, 5, 7, 7, 8, 8, 7, 7, 2, 2, 3, 3, 1, 1, 0};
@@ -108,67 +35,6 @@ void plot_note_lines() {
   string path = "M3,0v4h-2v1h-1v2h1v1h2v-1h1v-5h1v1h1v-2h-1v-1z";
   plot_pattern(xs, ys);
 
-}
-
-void plot_grid_lines() {
-
-  PrintSettings print_settings = get_print_settings();
-  int width = print_settings.width * print_settings.points_per_lego_unit;
-  int height = print_settings.height * print_settings.points_per_lego_unit;
-  int x = 0;
-  while(x <= width) {
-    goto_position(x, 0);
-    pen_down();
-    print_line(x, height);
-
-    pen_up();
-    x= x + 1;
-  }
-
-  goto_position(0, 0);
-  int y = 0;
-  while(y <= height)
-  {
-    goto_position(0, y);
-    pen_down();
-    print_line(width, y);
-
-    pen_up();
-    y= y + 1;
-  }
-  pen_up();
-}
-
-sub plot_grid() {
- PrintSettings print_settings = get_print_settings();
-
- short x = 0;
- while (x < print_settings.width * print_settings.points_per_lego_unit)
- {
-  short y = 0;
-  while( y < print_settings.height * print_settings.points_per_lego_unit) {
-   print_point(x, y);
-   y += 1;
-  }
-  x += 1;
- }
-
-}
-
-sub plot_rectangle() {
-  PrintSettings print_settings = get_print_settings();
-
-  int xs[];
-  ArrayInit(xs, 0, 4);
-  int ys[];
-  ArrayInit(ys, 0, 4);
-
-  xs[2] = print_settings.width - 1;
-  xs[3] = print_settings.width - 1;
-
-  ys[1] = print_settings.height - 1;
-  ys[2] = print_settings.height - 1;
-  plot_pattern(xs, ys);
 }
 
 #endif
