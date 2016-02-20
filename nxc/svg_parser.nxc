@@ -80,24 +80,17 @@ int get_params(byte& handle, float& result[], char& last_read_char) {
              accumulator = "";
              i += 1;
            }
-           string h = "a";
-           h[0] = s;
-           accumulator += h;
+           accumulator += char_to_string(s);
            state = PROCESSING_NUMBER;
          }
 
-
          if (isdigit(s)) {
-           string h = "a";
-           h[0] = s;
-           accumulator += h;
+           accumulator += char_to_string(s);
            state = PROCESSING_NUMBER;
          }
 
          if (s == '.' && state == PROCESSING_NUMBER) {
-           string h = "a";
-           h[0] = s;
-           accumulator += h;
+           accumulator += char_to_string(s);
          }
 
          if (isalpha(s) || s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {

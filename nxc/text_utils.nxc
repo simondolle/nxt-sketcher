@@ -13,4 +13,10 @@ void display_centered_text(string text) {
   TextOut(get_offset(text), LCD_LINE4, text);
 }
 
+string char_to_string(char c) {
+  string result = " ";
+  result[0] = c;
+  return result;
+}
+
 #endif
