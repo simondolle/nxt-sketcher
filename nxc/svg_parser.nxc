@@ -34,193 +34,320 @@ Point transform_no_shift_x_y(float x, float y) {
   return p;
 }
 
-string get_token(string& path, int start_position) {
-  int token_start = start_position;
-  int token_end = start_position;
-  while(isspace(StrIndex(path, token_start))) {
-    token_start+=1;
-  }
-  token_end = token_start;
-  int len = StrLen(path);
-  while(token_end + 1 < len && !isalpha(StrIndex(path, token_end + 1))) {
-    token_end += 1;
-  }
-  return SubStr(path, token_start, token_end - token_start + 1);
+#define IDLE 0
+#define PROCESSING_NUMBER 1
+
+int get_params(byte& handle, float& result[], char& last_read_char) {
+   int state = IDLE;
+   int nb_requested_params = ArrayLen(result);
+   int i = 0;
+   string accumulator = "";
+   while(i < nb_requested_params) {
+     char s;
+     unsigned int return_code;
+     if (last_read_char == NULL) {
+       unsigned int return_code = Read(handle, s);
+     } else {
+       s = last_read_char;
+       last_read_char = NULL;
+       return_code = LDR_SUCCESS;
+     }
+
+     switch (return_code)
+     {
+       case LDR_SUCCESS:
+       {
+         if (s == ',') {
+           float f = StrToNum(accumulator);
+           result[i] = f;
+           accumulator = "";
+           i += 1;
+           state=IDLE;
+         }
+
+         if (s == ' ' && state == PROCESSING_NUMBER) {
+           float f = StrToNum(accumulator);
+           result[i] = f;
+           accumulator = "";
+           i += 1;
+           state=IDLE;
+         }
+
+         if (s == '-') {
+           if (state == PROCESSING_NUMBER) {
+             float f = StrToNum(accumulator);
+             result[i] = f;
+             accumulator = "";
+             i += 1;
+           }
+           string h = "a";
+           h[0] = s;
+           accumulator += h;
+           state = PROCESSING_NUMBER;
+         }
+
+
+         if (isdigit(s)) {
+           string h = "a";
+           h[0] = s;
+           accumulator += h;
+           state = PROCESSING_NUMBER;
+         }
+
+         if (s == '.' && state == PROCESSING_NUMBER) {
+           string h = "a";
+           h[0] = s;
+           accumulator += h;
+         }
+
+         if (isalpha(s) || s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+           if (state == PROCESSING_NUMBER) {
+             float f = StrToNum(accumulator);
+             result[i] = f;
+             i += 1;
+           }
+           last_read_char = s;
+           return i;
+         }
+         break;
+       }
+       case LDR_ENDOFFILE: {
+         // No more data to read.
+         return i;
+       }
+       default: {
+         display_centered_text("Read failed");
+         Wait(1000);
+         shutdown();
+       }
+     }
+   }
+
+  return i;
 }
 
-char get_command(string token) {
-  return StrIndex(token, 0);
-}
-
-int get_params(string token, float& result[]) {
-
-  int result_index = 0;
-
-  int i = 1;
-  int j = 1;
-  int len = StrLen(token);
-  while(i < len) {
-      while((j + 1 < len) && (strcmp(SubStr(token, j + 1, 1), "-") != 0) && (strcmp(SubStr(token, j + 1, 1), ",") != 0)) {
-        j += 1;
-      }
-      string number = SubStr(token, i, j - i + 1);
-      float f = StrToNum(number);
-      //detect conversion errors
-      if (f == 0) {
-        int k = 0;
-        bool all_spaces = true;
-        while(k < j - i + 1) {
-          if (strcmp(SubStr(token, i + k, 1), " ") != 0) {
-            all_spaces = false;
-          }
-          k += 1;
-        }
-        if (all_spaces) {
-          return 0;
-        }
-      }
-      if(result_index < ArrayLen(result)) {
-        result[result_index] = f;
-      }
-      result_index += 1;
-      if(strcmp(SubStr(token, j + 1, 1), ",") == 0) {
-        i = j+2;
-      }
-      else {
-        i = j+1;
-      }
-      j = i;
-  }
-
-  return result_index;
-}
-
-int get_nb_params(string token) {
-  float a[] = {0};
-  return get_params(token, a);
-}
-
-void parse_path(string path) {
-  int i = 0;
-  int len = StrLen(path);
-  while(i < len) {
-    string token = get_token(path, i);
-    i += StrLen(token);
-    int nb_params = get_nb_params(token);
-    float params[];
-    ArrayInit(params, 0, nb_params);
-    char command = get_command(token);
-
-    get_params(token, params);
-
-    int param_index = 0;
-    while(param_index < nb_params) {
-        switch(command) {
-            case 'M':
-            {
-              Point p = transform_x_y(params[param_index], params[param_index + 1]);
-              pen_up();
-              goto_point(p.x, p.y);
-              param_index += 2;
-              break;
-            }
-            case 'm':
-            {
-              Point p = transform_no_shift_x_y(params[param_index], params[param_index + 1]);
-              pen_up();
-              goto_point_relative(p.x, p.y);
-              param_index += 2;
-              break;
-            }
-            case 'L':
-            {
-              Point p = transform_x_y(params[param_index], params[param_index + 1]);
-              print_line(p.x, p.y);
-              param_index += 2;
-              break;
-            }
-            case 'l':
-            {
-              Point p = transform_no_shift_x_y(params[param_index], params[param_index + 1]);
-              print_line_relative(p.x, p.y);
-              param_index += 2;
-              break;
-            }
-            case 'H':
-            {
-              Point p = transform_x_y(params[param_index], 0);
-              horizontal_line_to(p.x);
-              param_index += 1;
-              break;
-            }
-            case 'h':
-            {
-              Point p = transform_no_shift_x_y(params[param_index], 0);
-              horizontal_line_to_relative(p.x);
-              param_index += 1;
-              break;
-            }
-            case 'V':
-            {
-              Point p = transform_x_y(0, params[param_index + 0]);
-              vertical_line_to(p.y);
-              param_index += 1;
-              break;
-            }
-            case 'v':
-            {
-              Point p = transform_no_shift_x_y(0, params[param_index]);
-              vertical_line_to_relative(p.y);
-              param_index += 1;
-              break;
-            }
-            case 'z':
-            {
-              close_path();
-              break;
-            }
-            case 'C':
-            {
-              Point p1 = transform_x_y(params[param_index    ], params[param_index + 1]);
-              Point p2 = transform_x_y(params[param_index + 2], params[param_index + 3]);
-              Point p3 = transform_x_y(params[param_index + 4], params[param_index + 5]);
-              curve_to(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-              param_index += 6;
-              break;
-            }
-            case 'c':
-            {
-              Point p1 = transform_no_shift_x_y(params[param_index    ], params[param_index + 1]);
-              Point p2 = transform_no_shift_x_y(params[param_index + 2], params[param_index + 3]);
-              Point p3 = transform_no_shift_x_y(params[param_index + 4], params[param_index + 5]);
-              curve_to_relative(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-              param_index += 6;
-              break;
-            }
-            case 'S':
-            {
-              Point p2 = transform_x_y(params[param_index   ], params[param_index + 1]);
-              Point p3 = transform_x_y(params[param_index + 2], params[param_index + 3]);
-              smooth_curve_to(p2.x, p2.y, p3.x, p3.y);
-              param_index += 4;
-              break;
-            }
-            case 's':
-            {
-              Point p2 = transform_no_shift_x_y(params[param_index    ], params[param_index + 1]);
-              Point p3 = transform_no_shift_x_y(params[param_index + 2], params[param_index + 3]);
-              smooth_curve_to_relative(p2.x, p2.y, p3.x, p3.y);
-              param_index += 4;
-              break;
-            }
-            default:
-            {
-              ClearScreen();
-              TextOut(8, LCD_LINE4, "Unknown command");
-            }
-        }
+int get_nb_params_from_command(char command) {
+  int result = 0;
+  switch(command) {
+    case 'M':
+    {
+      result = 2;
+      break;
+    }
+    case 'm':
+    {
+      result = 2;
+      break;
+    }
+    case 'L':
+    {
+      result = 2;
+      break;
+    }
+    case 'l':
+    {
+      result = 2;
+      break;
+    }
+    case 'H':
+    {
+      result = 1;
+      break;
+    }
+    case 'h':
+    {
+      result = 1;
+      break;
+    }
+    case 'V':
+    {
+      result = 1;
+      break;
+    }
+    case 'v':
+    {
+      result = 1;
+      break;
+    }
+    case 'z':
+    {
+      result = 0;
+      break;
+    }
+    case 'C':
+    {
+      result = 6;
+      break;
+    }
+    case 'c':
+    {
+      result = 6;
+      break;
+    }
+    case 'S':
+    {
+      result = 4;
+      break;
+    }
+    case 's':
+    {
+      result = 4;
+      break;
+    }
+    default:
+    {
+      display_centered_text("Unknown command.");
+      Wait(1000);
     }
   }
+  return result;
+}
+
+void execute_command(char command, float& params[]) {
+  switch(command) {
+    case 'M':
+    {
+      Point p = transform_x_y(params[0], params[1]);
+      pen_up();
+      goto_point(p.x, p.y);
+      break;
+    }
+    case 'm':
+    {
+      Point p = transform_no_shift_x_y(params[0], params[1]);
+      pen_up();
+      goto_point_relative(p.x, p.y);
+      break;
+    }
+    case 'L':
+    {
+      Point p = transform_x_y(params[0], params[1]);
+      print_line(p.x, p.y);
+      break;
+    }
+    case 'l':
+    {
+      Point p = transform_no_shift_x_y(params[0], params[1]);
+      print_line_relative(p.x, p.y);
+      break;
+    }
+    case 'H':
+    {
+      Point p = transform_x_y(params[0], 0);
+      horizontal_line_to(p.x);
+      break;
+    }
+    case 'h':
+    {
+      Point p = transform_no_shift_x_y(params[0], 0);
+      horizontal_line_to_relative(p.x);
+      break;
+    }
+    case 'V':
+    {
+      Point p = transform_x_y(0, params[0]);
+      vertical_line_to(p.y);
+      break;
+    }
+    case 'v':
+    {
+      Point p = transform_no_shift_x_y(0, params[0]);
+      vertical_line_to_relative(p.y);
+      break;
+    }
+    case 'z':
+    {
+      close_path();
+      break;
+    }
+    case 'C':
+    {
+      Point p1 = transform_x_y(params[0], params[1]);
+      Point p2 = transform_x_y(params[2], params[3]);
+      Point p3 = transform_x_y(params[4], params[5]);
+      curve_to(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+      break;
+    }
+    case 'c':
+    {
+      Point p1 = transform_no_shift_x_y(params[0], params[1]);
+      Point p2 = transform_no_shift_x_y(params[2], params[3]);
+      Point p3 = transform_no_shift_x_y(params[4], params[5]);
+      curve_to_relative(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+      break;
+    }
+    case 'S':
+    {
+      Point p2 = transform_x_y(params[0], params[1]);
+      Point p3 = transform_x_y(params[2], params[3]);
+      smooth_curve_to(p2.x, p2.y, p3.x, p3.y);
+      break;
+    }
+    case 's':
+    {
+      Point p2 = transform_no_shift_x_y(params[0], params[1]);
+      Point p3 = transform_no_shift_x_y(params[2], params[3]);
+      smooth_curve_to_relative(p2.x, p2.y, p3.x, p3.y);
+      break;
+    }
+    default:
+    {
+      display_centered_text("Unknown command.");
+      Wait(1000);
+    }
+  }
+}
+
+void parse_path(byte& handle) {
+  char command = NULL;
+  char last_read_char = NULL;
+  while(true) {
+    char s;
+    unsigned int return_code;
+    if (last_read_char == NULL) {
+      unsigned int return_code = Read(handle, s);
+    } else {
+      s = last_read_char;
+      last_read_char = NULL;
+      return_code = LDR_SUCCESS;
+    }
+
+    switch (return_code)
+    {
+      case LDR_SUCCESS:
+      {
+        if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+          return;
+        }
+
+        if (isalpha(s)) {
+           command = s;
+           //get parameters
+           int nb_params = get_nb_params_from_command(command);
+           float params[];
+           ArrayInit(params, 0, nb_params);
+           get_params(handle, params, last_read_char);
+           execute_command(command, params);
+        }
+        if (s == '-' || isdigit(s)) {
+           int nb_params = get_nb_params_from_command(command);
+           float params[];
+           ArrayInit(params, 0, nb_params);
+           get_params(handle, params, last_read_char);
+           execute_command(command, params);
+        }
+        break;
+      }
+      case LDR_ENDOFFILE:
+        // No more data to read.
+        return;
+      default:
+        display_centered_text("Read failed.");
+        Wait(1000);
+        shutdown();
+    }
+  }
+
   pen_up();
 }
 
@@ -231,7 +358,7 @@ void reset_min_max_x_y() {
   MAX_Y = UNSET;
 }
 
-void parse_svg_file(byte& handle) {
+void parse_svg(byte& handle) {
  int state = INITIAL_STATE;
  int i = 0;
  while(true) {
@@ -280,7 +407,8 @@ void parse_svg_file(byte& handle) {
             break;
           case EQUAL_FOUND:
             if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
-              state = QUOTE_FOUND;
+              parse_path(handle);
+              state = INITIAL_STATE;
               current_path = "";
             } else {
               if (s == ' ') {
@@ -292,7 +420,8 @@ void parse_svg_file(byte& handle) {
             break;
           case THIRD_SPACE_FOUND:
             if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
-              state = QUOTE_FOUND;
+              parse_path(handle);
+              state = INITIAL_STATE;
               current_path = "";
             } else {
                 if (s != ' ') {
@@ -300,17 +429,6 @@ void parse_svg_file(byte& handle) {
                 }
             }
             break;
-           case QUOTE_FOUND:
-             if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
-              parse_path(current_path);
-              state = INITIAL_STATE;
-              current_path = "";
-             } else {
-               string h = "a";
-               h[0] = s;
-               current_path += h;
-             }
-             break;
         }
         break;
      case LDR_ENDOFFILE:
@@ -318,17 +436,18 @@ void parse_svg_file(byte& handle) {
         return;
      default:
         // Unanticipated exception.
-        TextOut(0, LCD_LINE1, "read failed     ");
+        display_centered_text("Read failed.");
+        Wait(1000);
         shutdown();
    }
  }
 }
 
-void set_scaling_parameters_file(byte& handle) {
+void set_scaling_parameters(byte& handle) {
   reset_min_max_x_y();
   SIMULATION = true;
 
-  parse_svg_file(handle);
+  parse_svg(handle);
 
   X_SHIFT = -MIN_X;
   Y_SHIFT = -MIN_Y;
@@ -344,15 +463,15 @@ void set_scaling_parameters_file(byte& handle) {
   SIMULATION = false;
 }
 
-void draw_svg_file(string filename) {
+void draw_svg(string filename) {
   display_centered_text("Analyzing file.");
   int fsize;
   byte handle;
   OpenFileRead(filename, fsize, handle);
-  set_scaling_parameters_file(handle);
+  set_scaling_parameters(handle);
   OpenFileRead(filename, fsize, handle);
   display_centered_text("Printing.");
-  parse_svg_file(handle);
+  parse_svg(handle);
   goto_start_position();
 }
 

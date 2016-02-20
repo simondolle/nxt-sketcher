@@ -51,7 +51,7 @@ void run_ui()
         ClearScreen();
         display_centered_text("Printing");
         init();
-        draw_svg_file(args.FileList[i]);
+        draw_svg(args.FileList[i]);
 
 
         ButtonPressed (BTNLEFT, true);

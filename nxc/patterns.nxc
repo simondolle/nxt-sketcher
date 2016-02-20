@@ -171,8 +171,4 @@ sub plot_rectangle() {
   plot_pattern(xs, ys);
 }
 
-void plot_svg(string filename) {
-    draw_svg_file(filename);
-}
-
 #endif
