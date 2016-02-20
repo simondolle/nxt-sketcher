@@ -12,6 +12,9 @@
 #define SIMPLE_QUOTE 39
 #define DOUBLE_QUOTE 34
 
+#define LOOKING_FOR_NUMBER 0
+#define PROCESSING_NUMBER 1
+
 #include "text_utils.nxc"
 #include "draw.nxc"
 
@@ -34,11 +37,8 @@ Point transform_no_shift_x_y(float x, float y) {
   return p;
 }
 
-#define IDLE 0
-#define PROCESSING_NUMBER 1
-
 int get_params(byte& handle, float& result[], char& last_read_char) {
-   int state = IDLE;
+   int state = LOOKING_FOR_NUMBER;
    int nb_requested_params = ArrayLen(result);
    int i = 0;
    string accumulator = "";
@@ -62,7 +62,7 @@ int get_params(byte& handle, float& result[], char& last_read_char) {
            result[i] = f;
            accumulator = "";
            i += 1;
-           state=IDLE;
+           state=LOOKING_FOR_NUMBER;
          }
 
          if (s == ' ' && state == PROCESSING_NUMBER) {
@@ -70,7 +70,7 @@ int get_params(byte& handle, float& result[], char& last_read_char) {
            result[i] = f;
            accumulator = "";
            i += 1;
-           state=IDLE;
+           state=LOOKING_FOR_NUMBER;
          }
 
          if (s == '-') {
