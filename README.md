@@ -12,7 +12,7 @@ The robot is able to draw almost any svg file.
 
 # Installation
 
-- Download the latest release here and unzip it.
+- Download the [latest release](releases/download/v0.1/nxt-sketcher.zip) and unzip it.
 - Build the NXT-Sketcher:
   - Follow the building instructions to build your model.
   - Put the NXT-Sketcher on a paper sheet.
