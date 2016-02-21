@@ -23,10 +23,14 @@ The robot is able to draw almost any svg file.
   - Open your Mindstorms NXT software.
   - Connect the NXT-Sketcher to your computer (through the USB cable for instance)
   - Create a new project.
-  - Open the NXT window. ![NXT-window](images/NXT-window.png?raw=true)
+  - Open the NXT window.
 
-  - Go to the Memory tab. ![NXT-window](images/Memory-tab.png?raw=true)
+    ![NXT-window](images/NXT-window.png?raw=true)
+
+  - Go to the Memory tab.
   
+    ![NXT-window](images/Memory-tab.png?raw=true)
+
   - Click on Download.
   - Select the nxt-sketcher.rxe file.
   - Following the same procedure download the .svg file you want to draw.
