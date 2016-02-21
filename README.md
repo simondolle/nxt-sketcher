@@ -63,3 +63,16 @@ But almost any kind of pen will work.
 
 The [Ev3 Print3rbot](http://www.ev3dev.org/projects/2015/05/06/EV3-Print3rbot/) was a great source of inspiration for the desig of the NXT-Sketcher.
 And I am very admirative of his design.
+
+The sample images are downloaded from the [The Noun project](https://thenounproject.com/) and distributed under a Creative Commons license.
+- [Mona Lisa](https://thenounproject.com/search/?q=mona+lisa&i=281407): created by Jake Dunham
+- [Invader](https://thenounproject.com/term/space-invader/87949/): created by Melvin Salas
+- [Cat](https://thenounproject.com/term/cat/70130/): created by Francielly Costantin Senra
+- [Darth Vader](https://thenounproject.com/term/darth-vader/65913/): created by Rohith M S
+- [Music Note](https://thenounproject.com/term/music-note/55429/): created by Parker Foote
+- [Ghost](https://thenounproject.com/term/ghost/275911/): created by Oliviu Stoian
+- [Skull](https://thenounproject.com/term/death/195701/): created by Aha-Soft
+
+# Author
+
+Simon Dollé <simon.dolle@gmail.com>
