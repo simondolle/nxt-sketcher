@@ -1,6 +1,6 @@
 # NXT-Sketcher
 
-![Alt text](building_instructions_files/cover.png?raw=true)
+![NXT-Sketcher 3D view](building_instructions_files/cover.png?raw=true)
 
 NXT-Sketcher is a Lego NXT robot that draws stuff.
 
@@ -18,13 +18,13 @@ The robot is able to draw almost any svg file.
   - Put the NXT-Sketcher on a paper sheet.
   - Insert a pen in the hole at the intersection of the two arms.
   - Adjust pen height, so that the pen touch the paper when the arm at the rear of the robot is down.
-- Download the software to the brick. 
+- Download the software to the brick.
   - Start your NXT brick.
   - Open your Mindstorms NXT software.
   - Connect the NXT-Sketcher to your computer (through the USB cable for instance)
   - Create a new project.
-  - Open the NXT window.
-  - Go to the Memory tab.
+  - Open the NXT window. ![NXT-window](image/NXT-window.png?raw=true)
+  - Go to the Memory tab. ![NXT-window](image/Memory-tab.png?raw=true)
   - Click on Download.
   - Select the nxt-sketcher.rxe file.
   - Following the same procedure download the .svg file you want to draw.
