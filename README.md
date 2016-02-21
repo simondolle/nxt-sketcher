@@ -12,27 +12,29 @@ The robot is able to draw almost any svg file.
 
 # Installation
 
-- Download the latest release here.
-- Unzip.
-- Follow the building instructions to build your model.
-- Put the NXT-Sketch on a paper sheet.
-- Insert a pen in the hole at the intersection of the two arms.
-- Adjust pen height, so that the pen touch the paper when the arm at the rear of the robot is down.
-- Start your NXT brick.
-- Open your Mindstorms NXT software.
-- Connect the NXT-Sketcher to your computer (through the USB cable for instance)
-- Create a new project.
-- Open the NXT window.
-- Go to the Memory tab.
-- Click on Download.
-- Select the nxt-sketcher.rxe file.
-- Following the same procedure download the .svg file you want to draw.
-  Some .svg files are provided as samples with the release.
-  (On the file selection interface you might have to select "View all" to see the .svg files)
-- You can now disconnect the computer.
-- On the NXT brick, run the nxt-sketcher program.
-- Select the file you want to draw with the arrow.
-- Press the orange button to launch the drawing.
+- Download the latest release here and unzip it.
+- Build the NXT-Sketcher:
+  - Follow the building instructions to build your model.
+  - Put the NXT-Sketcher on a paper sheet.
+  - Insert a pen in the hole at the intersection of the two arms.
+  - Adjust pen height, so that the pen touch the paper when the arm at the rear of the robot is down.
+- Download the software to the brick. 
+  - Start your NXT brick.
+  - Open your Mindstorms NXT software.
+  - Connect the NXT-Sketcher to your computer (through the USB cable for instance)
+  - Create a new project.
+  - Open the NXT window.
+  - Go to the Memory tab.
+  - Click on Download.
+  - Select the nxt-sketcher.rxe file.
+  - Following the same procedure download the .svg file you want to draw.
+    Some .svg files are provided as samples with the release.
+    (On the file selection interface you might have to select "View all" to see the .svg files)
+  - You can now disconnect the computer.
+- Run the NXT-Sketcher
+  - On the NXT brick, run the nxt-sketcher program.
+  - Select the file you want to draw with the arrow.
+  - Press the orange button to launch the drawing.
 - That's it.
 
 # Resources
