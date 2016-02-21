@@ -28,7 +28,7 @@ The robot is able to draw almost any svg file.
     ![NXT-window](images/NXT-window.png?raw=true)
 
   - Go to the Memory tab.
-  
+
     ![NXT-window](images/Memory-tab.png?raw=true)
 
   - Click on Download.
