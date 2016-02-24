@@ -344,6 +344,12 @@ void parse_path(byte& handle) {
   pen_up();
 }
 
+void reset_scaling_parameters() {
+  X_SHIFT = 0;
+  Y_SHIFT = 0;
+  SCALE_FACTOR = 1;
+}
+
 void reset_min_max_x_y() {
   MIN_X = UNSET;
   MAX_X = UNSET;
@@ -438,6 +444,7 @@ void parse_svg(byte& handle) {
 
 void set_scaling_parameters(byte& handle) {
   reset_min_max_x_y();
+  reset_scaling_parameters();
   SIMULATION = true;
 
   parse_svg(handle);

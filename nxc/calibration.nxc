@@ -75,6 +75,8 @@ void init() {
 
 void goto_start_position() {
   move_motors(-ALPHA, -BETA);
+  ALPHA = 0;
+  BETA = 0;
   pen_up();
   byte handle;
   CreateFile("calibrated", 1, handle);

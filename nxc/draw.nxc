@@ -205,6 +205,9 @@ void close_path() {
   print_line(PATH_START_X, PATH_START_Y);
   PATH_START_X = UNSET;
   PATH_START_Y = UNSET;
+  LAST_CONTROL_POINT_X = -1000;
+  LAST_CONTROL_POINT_Y = -1000;
+
   pen_up();
 }
 
