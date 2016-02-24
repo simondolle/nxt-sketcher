@@ -326,7 +326,7 @@ void parse_path(byte& handle) {
            int nb_params = get_nb_params_from_command(command);
            float params[];
            ArrayInit(params, 0, nb_params);
-           get_params(handle, params, last_read_char);
+           get_params(handle, params, s);
            execute_command(command, params);
         }
         break;
