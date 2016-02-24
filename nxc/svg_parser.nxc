@@ -465,6 +465,7 @@ void draw_svg(string filename) {
   OpenFileRead(filename, fsize, handle);
   display_centered_text("Printing.");
   parse_svg(handle);
+  pen_up();
   goto_start_position();
 }
 
