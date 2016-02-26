@@ -76,4 +76,4 @@ The sample images are downloaded from the [The Noun project](https://thenounproj
 
 # Author
 
-Simon Dollé <simon.dolle@gmail.com>
+Simon Dollé: <simon.dolle@gmail.com>
