@@ -38,46 +38,54 @@ void draw_arrows() {
 
 void run_ui()
 {
-  ListFilesType args;
-  args.Pattern = "*.svg";
-  SysListFiles(args);
-  if (args.Result == NO_ERR && ArrayLen(args.FileList) > 0)
-  {
-    int nbFiles = ArrayLen(args.FileList);
-    draw_arrows();
-    int i = 0;
-    while(true) {
-      if (ButtonPressed(BTNCENTER, true)) {
-        ClearScreen();
-        display_centered_text("Printing");
-        init();
-        draw_svg(args.FileList[i]);
-
-
-        ButtonPressed (BTNLEFT, true);
-        ButtonPressed (BTNRIGHT, true);
-        ButtonPressed (BTNCENTER, true);
-        draw_arrows();
+  int i = 0;
+  string filename = "";
+  draw_arrows();
+  while(true) {
+    ListFilesType args;
+    args.Pattern = "*.svg";
+    SysListFiles(args);
+    if (args.Result == NO_ERR && ArrayLen(args.FileList) > 0)
+    {
+      int nbFiles = ArrayLen(args.FileList);
+      int j = 0;
+      while(j < nbFiles) {
+        if(remove_extension(args.FileList[j]) == filename) {
+          i = j;
+        }
+        j += 1;
       }
-      if (ButtonPressed(BTNEXIT, true)) {
-        shutdown();
+      int iterations = 0;
+      while(iterations < 30) {
+        if (ButtonPressed(BTNCENTER, true)) {
+          ClearScreen();
+          display_centered_text("Printing");
+          init();
+          draw_svg(args.FileList[i]);
+
+
+          ButtonPressed (BTNLEFT, true);
+          ButtonPressed (BTNRIGHT, true);
+          ButtonPressed (BTNCENTER, true);
+          draw_arrows();
+        }
+        if (ButtonPressed(BTNEXIT, true)) {
+          shutdown();
+        }
+
+        int left_pressures = ButtonCount(BTNLEFT, true);
+  	    int right_pressures = ButtonCount(BTNRIGHT, true);
+
+        i = normalize(i + right_pressures - left_pressures, nbFiles);
+        filename = remove_extension(args.FileList[i]);
+        display_centered_text(filename);
+        Wait(100);
+        iterations += 1;
       }
-
-      int left_pressures = ButtonCount(BTNLEFT, true);
-	  int right_pressures = ButtonCount(BTNRIGHT, true);
-
-      i = normalize(i + right_pressures - left_pressures, nbFiles);
-
-      TextOut(0, LCD_LINE4, "                              ");
-      string text = remove_extension(args.FileList[i]);
-      display_centered_text(text);
-
-      Wait(100);
+    } else {
+      display_centered_text("No svg file");
+      Wait(1000);
     }
-
-
-  } else {
-    TextOut(0, LCD_LINE6, "Could not find any svg file.");
   }
 }
 
