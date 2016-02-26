@@ -184,6 +184,72 @@ void smooth_curve_to_relative(float x2, float y2, float x, float y) {
 
  smooth_curve_to(x2 + x0, y2 + y0, x + x0, y + y0);
 }
+////////////////////
+void quadratic_curve_to(float x1, float y1, float x, float y) {
+  pen_down();
+
+  float t_step = 0.01;
+  if (SIMULATION) {
+    t_step = 0.1;
+  }
+
+  float x0 = X;
+  float y0 = Y;
+
+  PrintSettings print_settings = get_print_settings();
+  float distance_threshold = 0.9 * print_settings.points_per_lego_unit / print_settings.line_resolution;
+
+
+  float t = 0;
+  while(t < 1.0) {
+    float target_x = (1-t)*(1-t) * x0 + 2*(1-t)*t * x1 + t*t*x;
+    float target_y = (1-t)*(1-t) * y0 + 2*(1-t)*t * y1 + t*t*y;
+    Point current_p;
+    current_p.x = X;
+    current_p.y = Y;
+
+    Point target_p;
+    target_p.x = target_x;
+    target_p.y = target_y;
+    float distance = compute_distance(current_p, target_p);
+    if (distance > distance_threshold) {
+      goto_position(target_x, target_y);
+    }
+    t += t_step;
+  }
+  goto_position(x, y);
+  LAST_CONTROL_POINT_X = x1;
+  LAST_CONTROL_POINT_Y = y1;
+}
+
+void quadratic_curve_to_relative(float x1, float y1, float x, float y) {
+ float x0 = X;
+ float y0 = Y;
+ quadratic_curve_to(x1 + x0, y1 + y0, x + x0, y + y0);
+}
+
+void smooth_quadratic_curve_to(float x, float y) {
+ float x0 = X;
+ float y0 = Y;
+
+ float x1 = x0;
+ if (LAST_CONTROL_POINT_X != UNSET) {
+   x1 = x0 + x0 - LAST_CONTROL_POINT_X;
+ }
+
+ float y1 = y0;
+ if (LAST_CONTROL_POINT_Y != UNSET) {
+   y1 = y0 + y0 - LAST_CONTROL_POINT_Y;
+ }
+ quadratic_curve_to(x1, y1, x, y);
+}
+
+void smooth_quadratic_curve_to_relative(float x, float y) {
+ float x0 = X;
+ float y0 = Y;
+
+ smooth_quadratic_curve_to(x + x0, y + y0);
+}
 
 void horizontal_line_to(float x) {
   print_line(x, Y);

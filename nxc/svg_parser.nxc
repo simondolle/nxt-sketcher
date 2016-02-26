@@ -187,6 +187,26 @@ int get_nb_params_from_command(char command) {
       result = 4;
       break;
     }
+    case 'Q':
+    {
+      result = 4;
+      break;
+    }
+    case 'q':
+    {
+      result = 4;
+      break;
+    }
+    case 'T':
+    {
+      result = 2;
+      break;
+    }
+    case 't':
+    {
+      result = 2;
+      break;
+    }
     default:
     {
       display_centered_text("Unknown command.");
@@ -281,6 +301,32 @@ void execute_command(char command, float& params[]) {
       Point p2 = transform_no_shift_x_y(params[0], params[1]);
       Point p3 = transform_no_shift_x_y(params[2], params[3]);
       smooth_curve_to_relative(p2.x, p2.y, p3.x, p3.y);
+      break;
+    }
+    case 'Q':
+    {
+      Point p1 = transform_x_y(params[0], params[1]);
+      Point p2 = transform_x_y(params[2], params[3]);
+      quadratic_curve_to(p1.x, p1.y, p2.x, p2.y);
+      break;
+    }
+    case 'q':
+    {
+      Point p1 = transform_no_shift_x_y(params[0], params[1]);
+      Point p2 = transform_no_shift_x_y(params[2], params[3]);
+      quadratic_curve_to_relative(p1.x, p1.y, p2.x, p2.y);
+      break;
+    }
+    case 'T':
+    {
+      Point p2 = transform_x_y(params[0], params[1]);
+      smooth_quadratic_curve_to(p2.x, p2.y);
+      break;
+    }
+    case 't':
+    {
+      Point p2 = transform_no_shift_x_y(params[0], params[1]);
+      smooth_quadratic_curve_to_relative(p2.x, p2.y);
       break;
     }
     default:
