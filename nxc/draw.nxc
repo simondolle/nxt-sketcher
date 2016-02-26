@@ -66,39 +66,6 @@ void print_line_relative(float x, float y) {
   print_line(x + X, y + Y);
 }
 
-void plot_pattern_offset(int xs[], int ys[], int x_offset, int y_offset) {
-  pen_up();
-  goto_position(xs[0] + x_offset, ys[0] + y_offset);
-  pen_down();
-  int i=1;
-  repeat(ArrayLen(xs) - 1) {
-    print_line(xs[i] + x_offset, ys[i] + y_offset);
-    i += 1;
-  }
-  //close the pattern
-  print_line(xs[0] + x_offset, ys[0] + y_offset);
-  pen_up();
-}
-
-
-void plot_pattern(int xs[], int ys[]) {
-  plot_pattern_offset(xs, ys, 0, 0);
-}
-
-void plot_pattern_reverse(int xs[], int ys[]) {
-  pen_up();
-  goto_position(xs[0], ys[0]);
-  pen_down();
-  int i=0;
-  repeat(ArrayLen(xs) - 1) {
-    print_line(xs[ArrayLen(xs) - 1 - i], ys[ArrayLen(xs) - 1 - i]);
-    i += 1;
-  }
-  //close the pattern
-  print_line(xs[0], ys[0]);
-  pen_up();
-}
-
 void goto_point(float x, float y) {
   goto_position(x, y);
   PATH_START_X = x;
@@ -110,7 +77,6 @@ void goto_point_relative(float x, float y) {
   PATH_START_X = x + X;
   PATH_START_Y = y + Y;
 }
-
 
 void plot_points(int xs[], int ys[]) {
   pen_up();
