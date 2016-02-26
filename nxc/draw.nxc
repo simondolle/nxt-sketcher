@@ -4,6 +4,9 @@
 #include "kinematics.nxc"
 #include "pen.nxc"
 
+#define QUADRATIC 2
+#define CUBIC 3
+
 //store the coordinates of last control point
 //to be able to handle the "smooth curveto" instructions
 float LAST_CONTROL_POINT_X = -1000;
@@ -119,7 +122,34 @@ void plot_points(int xs[], int ys[]) {
   pen_up();
 }
 
-void curve_to(float x1, float y1, float x2, float y2, float x, float y) {
+Point get_last_control_point_reflection() {
+ float x0 = X;
+ float y0 = Y;
+
+ float x1 = x0;
+ if (LAST_CONTROL_POINT_X != UNSET) {
+   x1 = x0 + x0 - LAST_CONTROL_POINT_X;
+ }
+
+ float y1 = y0;
+ if (LAST_CONTROL_POINT_Y != UNSET) {
+   y1 = y0 + y0 - LAST_CONTROL_POINT_Y;
+ }
+ Point p;
+ p.x = x1;
+ p.y = y1;
+ return p;
+}
+
+float get_curve_to_position(float t, float x0, float x1, float x2, float x) {
+  return (1-t)*(1-t)*(1-t) * x0 + 3*(1-t)*(1-t)* t * x1 + 3*(1-t)* t * t * x2 + t*t*t*x;
+}
+
+float get_quadratic_curve_to_position(float t, float x0, float x1, float x) {
+  return (1-t)*(1-t)*x0 + 2*(1-t)*t*x1 + t*t*x;
+}
+
+void bezier_curve_to(int method, float x1, float y1, float x2, float y2, float x, float y) {
   pen_down();
 
   float t_step = 0.01;
@@ -136,8 +166,17 @@ void curve_to(float x1, float y1, float x2, float y2, float x, float y) {
 
   float t = 0;
   while(t < 1.0) {
-    float target_x = (1-t)*(1-t)*(1-t) * x0 + 3*(1-t)*(1-t)* t * x1 + 3*(1-t)* t * t * x2 + t*t*t*x;
-    float target_y = (1-t)*(1-t)*(1-t) * y0 + 3*(1-t)*(1-t)* t * y1 + 3*(1-t)* t * t * y2 + t*t*t*y;
+    float target_x;
+    float target_y;
+    if (method == QUADRATIC) {
+      target_x = get_quadratic_curve_to_position(t, x0, x1, x);
+      target_y = get_quadratic_curve_to_position(t, y0, y1, y);
+    }
+    if (method == CUBIC) {
+      target_x = get_curve_to_position(t, x0, x1, x2, x);
+      target_y = get_curve_to_position(t, y0, y1, y2, y);
+    }
+
     Point current_p;
     current_p.x = X;
     current_p.y = Y;
@@ -152,8 +191,18 @@ void curve_to(float x1, float y1, float x2, float y2, float x, float y) {
     t += t_step;
   }
   goto_position(x, y);
-  LAST_CONTROL_POINT_X = x2;
-  LAST_CONTROL_POINT_Y = y2;
+  if (method == QUADRATIC) {
+    LAST_CONTROL_POINT_X = x1;
+    LAST_CONTROL_POINT_Y = y1;
+  }
+  if (method == CUBIC) {
+    LAST_CONTROL_POINT_X = x2;
+    LAST_CONTROL_POINT_Y = y2;
+  }
+}
+
+void curve_to(float x1, float y1, float x2, float y2, float x, float y) {
+  bezier_curve_to(CUBIC, x1, y1, x2, y2, x, y);
 }
 
 void curve_to_relative(float x1, float y1, float x2, float y2, float x, float y) {
@@ -163,19 +212,8 @@ void curve_to_relative(float x1, float y1, float x2, float y2, float x, float y)
 }
 
 void smooth_curve_to(float x2, float y2, float x, float y) {
- float x0 = X;
- float y0 = Y;
-
- float x1 = x0;
- if (LAST_CONTROL_POINT_X != UNSET) {
-   x1 = x0 + x0 - LAST_CONTROL_POINT_X;
- }
-
- float y1 = y0;
- if (LAST_CONTROL_POINT_Y != UNSET) {
-   y1 = y0 + y0 - LAST_CONTROL_POINT_Y;
- }
- curve_to(x1, y1, x2, y2, x, y);
+ Point p1 = get_last_control_point_reflection();
+ curve_to(p1.x, p1.y, x2, y2, x, y);
 }
 
 void smooth_curve_to_relative(float x2, float y2, float x, float y) {
@@ -184,42 +222,9 @@ void smooth_curve_to_relative(float x2, float y2, float x, float y) {
 
  smooth_curve_to(x2 + x0, y2 + y0, x + x0, y + y0);
 }
-////////////////////
+
 void quadratic_curve_to(float x1, float y1, float x, float y) {
-  pen_down();
-
-  float t_step = 0.01;
-  if (SIMULATION) {
-    t_step = 0.1;
-  }
-
-  float x0 = X;
-  float y0 = Y;
-
-  PrintSettings print_settings = get_print_settings();
-  float distance_threshold = 0.9 * print_settings.points_per_lego_unit / print_settings.line_resolution;
-
-
-  float t = 0;
-  while(t < 1.0) {
-    float target_x = (1-t)*(1-t) * x0 + 2*(1-t)*t * x1 + t*t*x;
-    float target_y = (1-t)*(1-t) * y0 + 2*(1-t)*t * y1 + t*t*y;
-    Point current_p;
-    current_p.x = X;
-    current_p.y = Y;
-
-    Point target_p;
-    target_p.x = target_x;
-    target_p.y = target_y;
-    float distance = compute_distance(current_p, target_p);
-    if (distance > distance_threshold) {
-      goto_position(target_x, target_y);
-    }
-    t += t_step;
-  }
-  goto_position(x, y);
-  LAST_CONTROL_POINT_X = x1;
-  LAST_CONTROL_POINT_Y = y1;
+  bezier_curve_to(QUADRATIC, x1, y1, 0, 0, x, y);
 }
 
 void quadratic_curve_to_relative(float x1, float y1, float x, float y) {
@@ -229,19 +234,8 @@ void quadratic_curve_to_relative(float x1, float y1, float x, float y) {
 }
 
 void smooth_quadratic_curve_to(float x, float y) {
- float x0 = X;
- float y0 = Y;
-
- float x1 = x0;
- if (LAST_CONTROL_POINT_X != UNSET) {
-   x1 = x0 + x0 - LAST_CONTROL_POINT_X;
- }
-
- float y1 = y0;
- if (LAST_CONTROL_POINT_Y != UNSET) {
-   y1 = y0 + y0 - LAST_CONTROL_POINT_Y;
- }
- quadratic_curve_to(x1, y1, x, y);
+ Point p1 = get_last_control_point_reflection();
+ quadratic_curve_to(p1.x, p1.y, x, y);
 }
 
 void smooth_quadratic_curve_to_relative(float x, float y) {
