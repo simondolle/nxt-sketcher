@@ -2,11 +2,11 @@
 
 ![NXT-Sketcher 3D view](building_instructions_files/cover.png?raw=true)
 
-NXT-Sketcher is a Lego NXT robot that draws stuff.
+NXT-Sketcher is a Lego NXT robot that is gifted in drawing.
 
 It can be built from a single standard Lego NXT Mindstorms set.
 
-No additional part, no firmware flashing or software installation is required.
+No additional lego part, no firmware flashing or software installation is required.
 
 The robot is able to draw most of svg files.
 
