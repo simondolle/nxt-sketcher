@@ -218,7 +218,7 @@ int get_nb_params_from_command(char command) {
 
 void execute_command(char command, float& params[]) {
 
-  bool debug = true;
+  bool debug = false;
   if (SIMULATION == false && debug == true) {
     string msg = char_to_string(command);
     msg += " ";
