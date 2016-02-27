@@ -217,6 +217,22 @@ int get_nb_params_from_command(char command) {
 }
 
 void execute_command(char command, float& params[]) {
+
+  bool debug = true;
+  if (SIMULATION == false && debug == true) {
+    string msg = char_to_string(command);
+    msg += " ";
+    int k = 0;
+    while(k < ArrayLen(params)) {
+      msg += NumToStr(params[k]);
+      msg += " ";
+      k += 1;
+    }
+    display_centered_text(msg);
+    Wait(2000);
+  }
+
+
   switch(command) {
     case 'M':
     {
