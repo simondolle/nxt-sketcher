@@ -74,6 +74,27 @@ PrintSettings get_print_settings_45() {
  return print_settings;
 }
 
+PrintSettings get_print_settings_upside_down() {
+ PrintSettings print_settings;
+ Point origin;
+ origin.x = 2.5;
+ //origin.x = -origin.x;
+ origin.y = 10;
+ print_settings.origin = origin;
+
+ print_settings.width = 6.5;
+ print_settings.height = 3;
+ print_settings.points_per_lego_unit = 3;
+ print_settings.line_resolution = 6;
+ print_settings.speed = 40;
+ print_settings.calibration_speed = 40;
+
+ print_settings.cos_a = -1;
+ print_settings.sin_a = 0;
+
+ return print_settings;
+}
+
 PrintSettings get_print_settings() {
   PrintSettings result = get_print_settings_straight();
   return result;
