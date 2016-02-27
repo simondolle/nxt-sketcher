@@ -75,6 +75,13 @@ void init() {
 
 void goto_start_position() {
   move_motors(-ALPHA, -BETA);
+  bool demo_mode=false;
+  if (demo_mode) {
+    Wait(2000);
+    move_motors(3*(90 + 30), 3 * 30);
+    Wait(10000);
+    move_motors(-3*(90 + 30), -3 * 30);
+  }
   ALPHA = 0;
   BETA = 0;
   pen_up();
