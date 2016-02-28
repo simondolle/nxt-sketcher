@@ -12,6 +12,16 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-30699878-2', 'auto');
+      ga('send', 'pageview');
+    </script>
+
 
     <title>Nxt-sketcher</title>
   </head>
@@ -141,10 +151,10 @@ And I am very admirative of his design.</p>
         </section>
 
         <aside id="sidebar">
-          <a href="https://raw.githubusercontent.com/simondolle/nxt-sketcher/master/nxt-sketcher-building-instructions.pdf" class="button">
+          <a href="https://raw.githubusercontent.com/simondolle/nxt-sketcher/master/nxt-sketcher-building-instructions.pdf" class="button" onclick="ga('file', 'download', 'manual');">
             <small>Download</small> Manual
           </a>
-          <a href="https://github.com/simondolle/nxt-sketcher/releases/download/v0.3/nxt-sketcher.zip" class="button">
+          <a href="https://github.com/simondolle/nxt-sketcher/releases/download/v0.3/nxt-sketcher.zip" class="button" onclick="ga('file', 'download', 'release');">
             <small>Download</small> Full Package
           </a>
           <p class="repo-owner"><a href="https://github.com/simondolle/nxt-sketcher">nxt-sketcher</a> is maintained by <a href="https://github.com/simondolle">simondolle</a>.</p>
@@ -154,17 +164,6 @@ And I am very admirative of his design.</p>
         </aside>
       </div>
     </div>
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-30699878-2', 'auto');
-  ga('send', 'pageview');
-
-</script>
 
   </body>
 </html>
