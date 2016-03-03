@@ -60,7 +60,7 @@ void run_ui()
         if (ButtonPressed(BTNCENTER, true)) {
           ClearScreen();
           display_centered_text("Printing");
-          //init();
+          init();
           draw_svg(args.FileList[i]);
 
 

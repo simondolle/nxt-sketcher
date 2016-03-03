@@ -2,11 +2,8 @@
 #define SVG_PARSER_NXC
 
 #define INITIAL_STATE 0
-#define FIRST_SPACE_FOUND 1
 #define D_FOUND 2
-#define SECOND_SPACE_FOUND 3
 #define EQUAL_FOUND 4
-#define THIRD_SPACE_FOUND 5
 #define QUOTE_FOUND 6
 
 #define SIMPLE_QUOTE 39
@@ -218,7 +215,7 @@ int get_nb_params_from_command(char command) {
 
 void execute_command(char command, float& params[]) {
 
-  bool debug = true;
+  bool debug = false;
   if (debug == true) {
     string msg = char_to_string(command);
     msg += " ";
@@ -422,7 +419,7 @@ void reset_min_max_x_y() {
   MAX_Y = UNSET;
 }
 
-string get_next_word(byte& handle, char& last_read_char) {
+string get_next_token(byte& handle, char& last_read_char) {
   string result="";
 
   while(true) {
@@ -442,18 +439,23 @@ string get_next_word(byte& handle, char& last_read_char) {
           last_read_char = NULL;
           return result;
         }
-
         if (isalpha(last_read_char)) {
            result += char_to_string(last_read_char);
            Wait(100);
         }
         else
         {
-           if (StrLen(result) == 0) {
-             result += char_to_string(last_read_char);
-             last_read_char = NULL;
-           }
-           return result;
+          if (isspace(last_read_char) && StrLen(result) == 0) {
+            last_read_char = NULL;
+            break;
+          }
+
+
+          if (StrLen(result) == 0) {
+            result += char_to_string(last_read_char);
+            last_read_char = NULL;
+          }
+          return result;
         }
         break;
       }
@@ -491,11 +493,6 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
         switch (state)
         {
           case INITIAL_STATE:
-            if (last_read_char == ' ') {
-              state = FIRST_SPACE_FOUND;
-            }
-            break;
-          case FIRST_SPACE_FOUND:
             if (last_read_char == 'd') {
               state = D_FOUND;
             } else {
@@ -510,24 +507,9 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
             if (last_read_char == '=') {
               state = EQUAL_FOUND;
             } else {
-              if (last_read_char == ' ') {
-                state = SECOND_SPACE_FOUND;
-              } else {
                 display_centered_text("Invalid syntax 2");
                 Wait(1000);
                 return;
-              }
-            }
-            break;
-          case SECOND_SPACE_FOUND:
-            if (last_read_char == '=') {
-              state = EQUAL_FOUND;
-            } else {
-                if (last_read_char != ' ') {
-                  display_centered_text("Invalid syntax 3");
-                  Wait(1000);
-                  return;
-                }
             }
             break;
           case EQUAL_FOUND:
@@ -535,25 +517,9 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
               parse_path(handle);
               return;
             } else {
-              if (last_read_char == ' ') {
-                state = THIRD_SPACE_FOUND;
-              } else {
-                 display_centered_text("Invalid syntax 4");
-                 Wait(1000);
-                 return;
-              }
-            }
-            break;
-          case THIRD_SPACE_FOUND:
-            if (last_read_char == SIMPLE_QUOTE || last_read_char == DOUBLE_QUOTE) {
-              parse_path(handle);
-              return;
-            } else {
-                if (last_read_char != ' ') {
-                  display_centered_text("Invalid syntax 5");
-                  Wait(1000);
-                  return;
-                }
+               display_centered_text("Invalid syntax 4");
+               Wait(1000);
+               return;
             }
             break;
         }
@@ -574,12 +540,12 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
 void parse_svg(byte& handle) {
   char last_read_char = NULL;
   while(true) {
-    string word = get_next_word(handle, last_read_char);
+    string word = get_next_token(handle, last_read_char);
     if (word == "path") {
       parse_path_instruction(handle, last_read_char);
       display_centered_text("path done");
       while(true) {
-        word = get_next_word(handle, last_read_char);
+        word = get_next_token(handle, last_read_char);
         if (word == "path") {
           break;
         }
