@@ -3,9 +3,11 @@
 
 #define INITIAL_STATE 0
 #define D_FOUND 2
+#define POINTS_FOUND 3
 #define EQUAL_FOUND 4
 #define QUOTE_FOUND 6
 
+#define EOT 3
 #define SIMPLE_QUOTE 39
 #define DOUBLE_QUOTE 34
 
@@ -351,9 +353,6 @@ void execute_command(char command, float& params[]) {
 }
 
 void parse_path(byte& handle) {
-
-  display_centered_text("parse_path");
-  Wait(1000);
   char command = NULL;
   char last_read_char = NULL;
   while(true) {
@@ -406,6 +405,65 @@ void parse_path(byte& handle) {
   pen_up();
 }
 
+
+void parse_polygon_points(byte& handle) {
+  display_centered_text("pars_polygon_points");
+  char command = NULL;
+  char last_read_char = NULL;
+  bool first_command = true;
+  while(true) {
+    char s;
+    unsigned int return_code;
+    if (last_read_char == NULL) {
+      unsigned int return_code = Read(handle, s);
+    } else {
+      s = last_read_char;
+      last_read_char = NULL;
+      return_code = LDR_SUCCESS;
+    }
+
+    switch (return_code)
+    {
+      case LDR_SUCCESS:
+      {
+        if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+          close_path();
+          pen_up();
+          return;
+        }
+
+        if (isalpha(s)) {
+           display_centered_text("Unexpected char");
+           Wait(1000);
+        }
+        if (s == '-' || isdigit(s)) {
+           int nb_params = 2;
+           float params[];
+           ArrayInit(params, 0, nb_params);
+           get_params(handle, params, s);
+           if (first_command) {
+             execute_command('M', params);
+             first_command = false;
+           } else {
+             execute_command('L', params);
+           }
+
+        }
+        break;
+      }
+      case LDR_ENDOFFILE:
+        // No more data to read.
+        return;
+      default:
+        display_centered_text("Read failed.");
+        Wait(1000);
+        shutdown();
+    }
+  }
+  close_path();
+  pen_up();
+}
+
 void reset_scaling_parameters() {
   X_SHIFT = 0;
   Y_SHIFT = 0;
@@ -450,7 +508,6 @@ string get_next_token(byte& handle, char& last_read_char) {
             break;
           }
 
-
           if (StrLen(result) == 0) {
             result += char_to_string(last_read_char);
             last_read_char = NULL;
@@ -463,7 +520,7 @@ string get_next_token(byte& handle, char& last_read_char) {
         // No more data to read.
         display_centered_text("End of file reached.");
         Wait(1000);
-        last_read_char = NULL;
+        last_read_char = EOT;
         return result;
       default:
         display_centered_text("Read failed.");
@@ -476,9 +533,7 @@ string get_next_token(byte& handle, char& last_read_char) {
 
 void parse_path_instruction(byte& handle, char& last_read_char) {
  int state = INITIAL_STATE;
- int i = 0;
  while(true) {
-   i += 1;
    string current_path;
    unsigned int return_code;
    if (last_read_char == NULL) {
@@ -497,8 +552,8 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
               state = D_FOUND;
             } else {
               if (last_read_char != ' ') {
-                display_centered_text("Invalid syntax 1");
-                Wait(1000);
+                //display_centered_text("Invalid syntax 1");
+                //Wait(1000);
                 return;
               }
             }
@@ -507,8 +562,8 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
             if (last_read_char == '=') {
               state = EQUAL_FOUND;
             } else {
-                display_centered_text("Invalid syntax 2");
-                Wait(1000);
+                //display_centered_text("Invalid syntax 2");
+                //Wait(1000);
                 return;
             }
             break;
@@ -517,8 +572,8 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
               parse_path(handle);
               return;
             } else {
-               display_centered_text("Invalid syntax 4");
-               Wait(1000);
+               //display_centered_text("Invalid syntax 4");
+               //Wait(1000);
                return;
             }
             break;
@@ -537,20 +592,99 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
  }
 }
 
+void parse_polygon_instruction(byte& handle, char& last_read_char) {
+ display_centered_text("parse_polygon_instruction");
+ int state = INITIAL_STATE;
+ bool should_break = false;
+ while(true) {
+   string current_path;
+   unsigned int return_code;
+   string token = get_next_token(handle, last_read_char);
+   if (last_read_char == EOT) {
+     should_break = true;
+   }
+
+   switch (state)
+   {
+     case INITIAL_STATE:
+        //display_centered_text("Initial state");
+        //Wait(1000);
+
+       if (token == "points") {
+         state = POINTS_FOUND;
+       } else {
+          //display_centered_text("Returning");
+          //Wait(1000);
+
+         return;
+       }
+       break;
+     case POINTS_FOUND:
+        //display_centered_text("Points found");
+        //Wait(1000);
+
+       if (token == "=") {
+         //display_centered_text("token =");
+         //Wait(1000);
+         state = EQUAL_FOUND;
+       } else {
+         //display_centered_text("Returning");
+         //Wait(1000);
+         return;
+       }
+       break;
+     case EQUAL_FOUND:
+        //display_centered_text("Equal found");
+        //Wait(1000);
+
+       if (token == char_to_string(SIMPLE_QUOTE) || token == char_to_string(DOUBLE_QUOTE)) {
+         parse_polygon_points(handle);
+         return;
+       } else {
+          //display_centered_text("Invalid syntax 4");
+          //Wait(1000);
+          display_centered_text("Returning");
+          Wait(1000);
+          return;
+       }
+       break;
+   }
+   if (should_break) {
+     display_centered_text("Breaking");
+     Wait(1000);
+     break;
+   }
+ }
+}
+
+
 void parse_svg(byte& handle) {
   char last_read_char = NULL;
   while(true) {
     string word = get_next_token(handle, last_read_char);
     if (word == "path") {
       parse_path_instruction(handle, last_read_char);
-      display_centered_text("path done");
       while(true) {
         word = get_next_token(handle, last_read_char);
-        if (word == "path") {
+        if (word == ">") {
           break;
         }
       }
     }
+
+    if (word == "polygon") {
+      parse_polygon_instruction(handle, last_read_char);
+      while(true) {
+        word = get_next_token(handle, last_read_char);
+        if (word == ">") {
+          break;
+        }
+      }
+    }
+
+
+
+
     if (StrLen(word) == 0) {
       break;
     }
