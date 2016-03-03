@@ -218,8 +218,8 @@ int get_nb_params_from_command(char command) {
 
 void execute_command(char command, float& params[]) {
 
-  bool debug = false;
-  if (SIMULATION == false && debug == true) {
+  bool debug = true;
+  if (debug == true) {
     string msg = char_to_string(command);
     msg += " ";
     int k = 0;
@@ -354,6 +354,9 @@ void execute_command(char command, float& params[]) {
 }
 
 void parse_path(byte& handle) {
+
+  display_centered_text("parse_path");
+  Wait(1000);
   char command = NULL;
   char last_read_char = NULL;
   while(true) {
@@ -419,74 +422,150 @@ void reset_min_max_x_y() {
   MAX_Y = UNSET;
 }
 
-void parse_svg(byte& handle) {
+string get_next_word(byte& handle, char& last_read_char, bool debug) {
+  string result="";
+
+  while(true) {
+    unsigned int return_code;
+    if (last_read_char == NULL) {
+      if (debug) {
+        display_centered_text("Reading file");
+        Wait(1000);
+      }
+      unsigned int return_code = Read(handle, last_read_char);
+    } else {
+      return_code = LDR_SUCCESS;
+    }
+
+    switch (return_code)
+    {
+      case LDR_SUCCESS:
+      {
+
+        if (debug) {
+          display_centered_text("Read success");
+          Wait(1000);
+        }
+        if (isalpha(last_read_char)) {
+          if (debug) {
+            display_centered_text("isalpha");
+            Wait(1000);
+          }
+
+           result += char_to_string(last_read_char);
+           Wait(100);
+        }
+        else
+        {
+           if (StrLen(result) == 0) {
+             if (debug) {
+               display_centered_text("StrLen(result) == 0");
+               Wait(1000);
+             }
+
+             result += char_to_string(last_read_char);
+             last_read_char = NULL;
+           }
+           return result;
+        }
+        break;
+      }
+      case LDR_ENDOFFILE:
+        // No more data to read.
+        display_centered_text("End of file reached.");
+        Wait(1000);
+        last_read_char = NULL;
+        return result;
+      default:
+        display_centered_text("Read failed.");
+        Wait(1000);
+        shutdown();
+    }
+    last_read_char = NULL;
+  }
+}
+
+void parse_path_instruction(byte& handle, char& last_read_char) {
  int state = INITIAL_STATE;
  int i = 0;
  while(true) {
    i += 1;
-   char s;
    string current_path;
-   unsigned int return_code = Read(handle, s);
+   unsigned int return_code;
+   if (last_read_char == NULL) {
+      return_code = Read(handle, last_read_char);
+    } else {
+      return_code = LDR_SUCCESS;
+    }
+
    switch (return_code)
    {
      case LDR_SUCCESS:
         switch (state)
         {
           case INITIAL_STATE:
-            if (s == ' ') {
+            if (last_read_char == ' ') {
               state = FIRST_SPACE_FOUND;
             }
             break;
           case FIRST_SPACE_FOUND:
-            if (s == 'd') {
+            if (last_read_char == 'd') {
               state = D_FOUND;
             } else {
-                if (s != ' ') {
-                  state = INITIAL_STATE;
-                }
+              if (last_read_char != ' ') {
+                display_centered_text("Invalid syntax 1");
+                Wait(1000);
+                return;
+              }
             }
             break;
           case D_FOUND:
-            if (s == '=') {
+            if (last_read_char == '=') {
               state = EQUAL_FOUND;
             } else {
-              if (s == ' ') {
+              if (last_read_char == ' ') {
                 state = SECOND_SPACE_FOUND;
               } else {
-                state = INITIAL_STATE;
+                display_centered_text("Invalid syntax 2");
+                Wait(1000);
+                return;
               }
             }
             break;
           case SECOND_SPACE_FOUND:
-            if (s == '=') {
+            if (last_read_char == '=') {
               state = EQUAL_FOUND;
             } else {
-                if (s != ' ') {
-                  state = INITIAL_STATE;
+                if (last_read_char != ' ') {
+                  display_centered_text("Invalid syntax 3");
+                  Wait(1000);
+                  return;
                 }
             }
             break;
           case EQUAL_FOUND:
-            if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+            if (last_read_char == SIMPLE_QUOTE || last_read_char == DOUBLE_QUOTE) {
               parse_path(handle);
-              state = INITIAL_STATE;
-              current_path = "";
+              return;
             } else {
-              if (s == ' ') {
+              if (last_read_char == ' ') {
                 state = THIRD_SPACE_FOUND;
               } else {
-                state = INITIAL_STATE;
+                 display_centered_text("Invalid syntax 4");
+                 Wait(1000);
+                 return;
               }
             }
             break;
           case THIRD_SPACE_FOUND:
-            if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
+            if (last_read_char == SIMPLE_QUOTE || last_read_char == DOUBLE_QUOTE) {
               parse_path(handle);
-              state = INITIAL_STATE;
-              current_path = "";
+              return;
             } else {
-                if (s != ' ') {
-                  state = INITIAL_STATE;
+                if (last_read_char != ' ') {
+                  display_centered_text("Invalid syntax 5");
+                  Wait(1000);
+                  return;
                 }
             }
             break;
@@ -501,7 +580,43 @@ void parse_svg(byte& handle) {
         Wait(1000);
         shutdown();
    }
+   last_read_char = NULL;
  }
+}
+
+void parse_svg(byte& handle) {
+  char last_read_char = NULL;
+  bool display_words = false;
+  while(true) {
+    string word = get_next_word(handle, last_read_char, display_words);
+    if (display_words) {
+      string msg = "'" + word + "'";
+      display_centered_text(msg);
+      Wait(1000);
+      display_centered_text("======");
+      Wait(100);
+      display_centered_text(NumToStr(StrLen(word)));
+      Wait(1000);
+    }
+    if (word == "path") {
+      parse_path_instruction(handle, last_read_char);
+      display_centered_text("path done");
+      while(true) {
+        word = get_next_word(handle, last_read_char, display_words);
+        display_centered_text(word);
+        Wait(1000);
+        if (word == "path") {
+          break;
+        }
+      }
+      display_words = true;
+    }
+    if (StrLen(word) == 0) {
+      display_centered_text("Breaking.");
+      Wait(1000);
+      break;
+    }
+  }
 }
 
 void set_scaling_parameters(byte& handle) {
