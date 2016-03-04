@@ -491,7 +491,6 @@ string get_next_token(byte& handle, char& last_read_char) {
       return_code = LDR_SUCCESS;
     }
 
-
     switch (return_code)
     {
       case LDR_SUCCESS:
@@ -554,8 +553,6 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
               state = D_FOUND;
             } else {
               if (last_read_char != ' ') {
-                //display_centered_text("Invalid syntax 1");
-                //Wait(1000);
                 return;
               }
             }
@@ -564,8 +561,6 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
             if (last_read_char == '=') {
               state = EQUAL_FOUND;
             } else {
-                //display_centered_text("Invalid syntax 2");
-                //Wait(1000);
                 return;
             }
             break;
@@ -574,8 +569,6 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
               parse_path(handle);
               return;
             } else {
-               //display_centered_text("Invalid syntax 4");
-               //Wait(1000);
                return;
             }
             break;
@@ -608,44 +601,24 @@ void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close
    switch (state)
    {
      case INITIAL_STATE:
-        //display_centered_text("Initial state");
-        //Wait(1000);
-
        if (token == "points") {
          state = POINTS_FOUND;
        } else {
-          //display_centered_text("Returning");
-          //Wait(1000);
-
          return;
        }
        break;
      case POINTS_FOUND:
-        //display_centered_text("Points found");
-        //Wait(1000);
-
        if (token == "=") {
-         //display_centered_text("token =");
-         //Wait(1000);
          state = EQUAL_FOUND;
        } else {
-         //display_centered_text("Returning");
-         //Wait(1000);
          return;
        }
        break;
      case EQUAL_FOUND:
-        //display_centered_text("Equal found");
-        //Wait(1000);
-
        if (token == char_to_string(SIMPLE_QUOTE) || token == char_to_string(DOUBLE_QUOTE)) {
          parse_polygon_points(handle, do_close_path);
          return;
        } else {
-          //display_centered_text("Invalid syntax 4");
-          //Wait(1000);
-          display_centered_text("Returning");
-          Wait(1000);
           return;
        }
        break;
@@ -679,36 +652,21 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
    switch (state)
    {
      case INITIAL_STATE:
-        //display_centered_text("Initial state");
-        //Wait(1000);
-
        if (token == "cx" || token == "cy" || token == "r") {
          state = ATTRIBUTE_FOUND;
          current_attribute = token;
        } else {
-          //display_centered_text("Returning");
-          //Wait(1000);
          return;
        }
        break;
      case ATTRIBUTE_FOUND:
-        //display_centered_text("Points found");
-        //Wait(1000);
-
        if (token == "=") {
-         //display_centered_text("token =");
-         //Wait(1000);
          state = EQUAL_FOUND;
        } else {
-         //display_centered_text("Returning");
-         //Wait(1000);
          return;
        }
        break;
      case EQUAL_FOUND:
-        //display_centered_text("Equal found");
-        //Wait(1000);
-
        if (token == char_to_string(SIMPLE_QUOTE) || token == char_to_string(DOUBLE_QUOTE)) {
          float params[];
          ArrayInit(params, 0, 1);
@@ -717,35 +675,19 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
          if (current_attribute == "cx") {
            cx = params[0];
            cx_set = true;
-           string msg = "cx: ";
-           msg += NumToStr(cx);
-           display_centered_text(msg);
-           Wait(1000);
          }
          if (current_attribute == "cy") {
            cy = params[0];
            cy_set = true;
-           string msg = "cy: ";
-           msg += NumToStr(cy);
-           display_centered_text(msg);
-           Wait(1000);
-
          }
          if (current_attribute == "r") {
            r = params[0];
            r_set = true;
-           string msg = "r: ";
-           msg += NumToStr(r);
-           display_centered_text(msg);
-           Wait(1000);
-
          }
          current_attribute = "";
          state = INITIAL_STATE;
 
        } else {
-          //display_centered_text("Invalid syntax 4");
-          //Wait(1000);
           display_centered_text("Returning");
           Wait(1000);
           return;
@@ -753,8 +695,6 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
        break;
    }
    if (should_break) {
-     display_centered_text("Breaking");
-     Wait(1000);
      return;
    }
  }
