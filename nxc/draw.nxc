@@ -237,17 +237,18 @@ void close_path() {
   pen_up();
 }
 
-void circle(float cx, float cy, float r) {
+
+void ellipse(float cx, float cy, float rx, float ry) {
 
   float angle = -PI;
   PrintSettings print_settings = get_print_settings();
   float distance_threshold = 0.9 * print_settings.points_per_lego_unit / print_settings.line_resolution;
 
-  goto_point(cx - r, cy);
+  goto_point(cx - rx, cy);
   pen_down();
   while(angle < PI) {
-    float target_x = cx + r * cos(angle);
-    float target_y = cy  + r * sin(angle);
+    float target_x = cx + rx * cos(angle);
+    float target_y = cy  + ry * sin(angle);
 
     Point current_p;
     current_p.x = X;
@@ -263,6 +264,11 @@ void circle(float cx, float cy, float r) {
     angle += 0.01;
   }
   close_path();
+}
+
+
+void circle(float cx, float cy, float r) {
+  ellipse(cx, cy, r, r);
 }
 
 #endif

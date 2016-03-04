@@ -626,16 +626,25 @@ void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close
 }
 
 void parse_circle_instruction(byte& handle, char& last_read_char) {
+ display_centered_text("circle instructions");
+ Wait(1000);
+
  int state = INITIAL_STATE;
  bool should_break = false;
  string current_attribute;
  bool cx_set = false;
  bool cy_set = false;
  bool r_set = false;
+ bool rx_set = false;
+ bool ry_set = false;
  float cx;
  float cy;
  float r;
- while(!(cx_set && cy_set && r_set)) {
+ float rx;
+ float ry;
+ bool circle_set = false;
+ bool ellipse_set = false;
+ while(!circle_set && !ellipse_set) {
    string current_path;
    unsigned int return_code;
    string token = get_next_token(handle, last_read_char);
@@ -646,7 +655,7 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
    switch (state)
    {
      case INITIAL_STATE:
-       if (token == "cx" || token == "cy" || token == "r") {
+       if (token == "cx" || token == "cy" || token == "r" || token == "rx" || token == "ry") {
          state = ATTRIBUTE_FOUND;
          current_attribute = token;
        }
@@ -665,6 +674,8 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
          get_params(handle, params, last_read_char);
          last_read_char = NULL; //should be a quote
          if (current_attribute == "cx") {
+           display_centered_text("cx");
+           Wait(1000);
            cx = params[0];
            cx_set = true;
          }
@@ -676,6 +687,15 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
            r = params[0];
            r_set = true;
          }
+         if (current_attribute == "rx") {
+           rx = params[0];
+           rx_set = true;
+         }
+         if (current_attribute == "ry") {
+           ry = params[0];
+           ry_set = true;
+         }
+
          current_attribute = "";
          state = INITIAL_STATE;
 
@@ -689,11 +709,22 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
    if (should_break) {
      return;
    }
+
+   circle_set = cx_set && cy_set && r_set;
+   ellipse_set = cx_set && cy_set && rx_set && ry_set;
+ }
+ if (circle_set) {
+   Point p = transform_x_y(cx, cy);
+   Point p_radius = transform_no_shift_x_y(r, r);
+   circle(p.x, p.y, p_radius.x);
  }
 
- Point p = transform_x_y(cx, cy);
- Point p_radius = transform_no_shift_x_y(r, r);
- circle(p.x, p.y, p_radius.x);
+ if (ellipse_set) {
+   Point p = transform_x_y(cx, cy);
+   Point p_radius = transform_no_shift_x_y(rx, ry);
+   ellipse(p.x, p.y, p_radius.x, p_radius.y);
+ }
+
 }
 
 
@@ -723,7 +754,7 @@ void parse_svg(byte& handle) {
       }
     }
 
-    if (word == "circle") {
+    if (word == "circle" || word == "ellipse") {
       parse_circle_instruction(handle, last_read_char);
       while(true) {
         word = get_next_token(handle, last_read_char);
