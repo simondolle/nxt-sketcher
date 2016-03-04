@@ -407,7 +407,6 @@ void parse_path(byte& handle) {
 
 
 void parse_polygon_points(byte& handle) {
-  display_centered_text("pars_polygon_points");
   char command = NULL;
   char last_read_char = NULL;
   bool first_command = true;
@@ -447,7 +446,6 @@ void parse_polygon_points(byte& handle) {
            } else {
              execute_command('L', params);
            }
-
         }
         break;
       }
@@ -681,9 +679,6 @@ void parse_svg(byte& handle) {
         }
       }
     }
-
-
-
 
     if (StrLen(word) == 0) {
       break;
