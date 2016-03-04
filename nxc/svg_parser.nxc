@@ -406,7 +406,7 @@ void parse_path(byte& handle) {
 }
 
 
-void parse_polygon_points(byte& handle) {
+void parse_polygon_points(byte& handle, bool do_close_path) {
   char command = NULL;
   char last_read_char = NULL;
   bool first_command = true;
@@ -426,7 +426,9 @@ void parse_polygon_points(byte& handle) {
       case LDR_SUCCESS:
       {
         if (s == SIMPLE_QUOTE || s == DOUBLE_QUOTE) {
-          close_path();
+          if (do_close_path) {
+            close_path();
+          }
           pen_up();
           return;
         }
@@ -458,7 +460,9 @@ void parse_polygon_points(byte& handle) {
         shutdown();
     }
   }
-  close_path();
+  if (do_close_path) {
+    close_path();
+  }
   pen_up();
 }
 
@@ -590,7 +594,7 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
  }
 }
 
-void parse_polygon_instruction(byte& handle, char& last_read_char) {
+void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close_path) {
  display_centered_text("parse_polygon_instruction");
  int state = INITIAL_STATE;
  bool should_break = false;
@@ -636,7 +640,7 @@ void parse_polygon_instruction(byte& handle, char& last_read_char) {
         //Wait(1000);
 
        if (token == char_to_string(SIMPLE_QUOTE) || token == char_to_string(DOUBLE_QUOTE)) {
-         parse_polygon_points(handle);
+         parse_polygon_points(handle, do_close_path);
          return;
        } else {
           //display_centered_text("Invalid syntax 4");
@@ -670,8 +674,9 @@ void parse_svg(byte& handle) {
       }
     }
 
-    if (word == "polygon") {
-      parse_polygon_instruction(handle, last_read_char);
+    if (word == "polygon" || word == "polyline") {
+      bool do_close_path = (word == "polygon");
+      parse_polygon_instruction(handle, last_read_char, do_close_path);
       while(true) {
         word = get_next_token(handle, last_read_char);
         if (word == ">") {
