@@ -218,7 +218,7 @@ int get_nb_params_from_command(char command) {
 
 void execute_command(char command, float& params[]) {
 
-  bool debug = false;
+  bool debug = true;
   if (debug == true) {
     string msg = char_to_string(command);
     msg += " ";
@@ -551,10 +551,6 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
           case INITIAL_STATE:
             if (last_read_char == 'd') {
               state = D_FOUND;
-            } else {
-              if (last_read_char != ' ') {
-                return;
-              }
             }
             break;
           case D_FOUND:
@@ -603,8 +599,6 @@ void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close
      case INITIAL_STATE:
        if (token == "points") {
          state = POINTS_FOUND;
-       } else {
-         return;
        }
        break;
      case POINTS_FOUND:
@@ -655,8 +649,6 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
        if (token == "cx" || token == "cy" || token == "r") {
          state = ATTRIBUTE_FOUND;
          current_attribute = token;
-       } else {
-         return;
        }
        break;
      case ATTRIBUTE_FOUND:
