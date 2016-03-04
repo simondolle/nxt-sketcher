@@ -6,6 +6,7 @@
 #define POINTS_FOUND 3
 #define EQUAL_FOUND 4
 #define QUOTE_FOUND 6
+#define ATTRIBUTE_FOUND 7
 
 #define EOT 3
 #define SIMPLE_QUOTE 39
@@ -501,7 +502,6 @@ string get_next_token(byte& handle, char& last_read_char) {
         }
         if (isalpha(last_read_char)) {
            result += char_to_string(last_read_char);
-           Wait(100);
         }
         else
         {
@@ -595,7 +595,6 @@ void parse_path_instruction(byte& handle, char& last_read_char) {
 }
 
 void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close_path) {
- display_centered_text("parse_polygon_instruction");
  int state = INITIAL_STATE;
  bool should_break = false;
  while(true) {
@@ -659,6 +658,113 @@ void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close
  }
 }
 
+void parse_circle_instruction(byte& handle, char& last_read_char) {
+ int state = INITIAL_STATE;
+ bool should_break = false;
+ string current_attribute;
+ bool cx_set = false;
+ bool cy_set = false;
+ bool r_set = false;
+ float cx;
+ float cy;
+ float r;
+ while(!(cx_set && cy_set && r_set)) {
+   string current_path;
+   unsigned int return_code;
+   string token = get_next_token(handle, last_read_char);
+   if (last_read_char == EOT) {
+     should_break = true;
+   }
+
+   switch (state)
+   {
+     case INITIAL_STATE:
+        //display_centered_text("Initial state");
+        //Wait(1000);
+
+       if (token == "cx" || token == "cy" || token == "r") {
+         state = ATTRIBUTE_FOUND;
+         current_attribute = token;
+       } else {
+          //display_centered_text("Returning");
+          //Wait(1000);
+         return;
+       }
+       break;
+     case ATTRIBUTE_FOUND:
+        //display_centered_text("Points found");
+        //Wait(1000);
+
+       if (token == "=") {
+         //display_centered_text("token =");
+         //Wait(1000);
+         state = EQUAL_FOUND;
+       } else {
+         //display_centered_text("Returning");
+         //Wait(1000);
+         return;
+       }
+       break;
+     case EQUAL_FOUND:
+        //display_centered_text("Equal found");
+        //Wait(1000);
+
+       if (token == char_to_string(SIMPLE_QUOTE) || token == char_to_string(DOUBLE_QUOTE)) {
+         float params[];
+         ArrayInit(params, 0, 1);
+         get_params(handle, params, last_read_char);
+         last_read_char = NULL; //should be a quote
+         if (current_attribute == "cx") {
+           cx = params[0];
+           cx_set = true;
+           string msg = "cx: ";
+           msg += NumToStr(cx);
+           display_centered_text(msg);
+           Wait(1000);
+         }
+         if (current_attribute == "cy") {
+           cy = params[0];
+           cy_set = true;
+           string msg = "cy: ";
+           msg += NumToStr(cy);
+           display_centered_text(msg);
+           Wait(1000);
+
+         }
+         if (current_attribute == "r") {
+           r = params[0];
+           r_set = true;
+           string msg = "r: ";
+           msg += NumToStr(r);
+           display_centered_text(msg);
+           Wait(1000);
+
+         }
+         current_attribute = "";
+         state = INITIAL_STATE;
+
+       } else {
+          //display_centered_text("Invalid syntax 4");
+          //Wait(1000);
+          display_centered_text("Returning");
+          Wait(1000);
+          return;
+       }
+       break;
+   }
+   if (should_break) {
+     display_centered_text("Breaking");
+     Wait(1000);
+     return;
+   }
+ }
+
+ Point p = transform_x_y(cx, cy);
+ Point p_radius = transform_no_shift_x_y(r, r);
+ circle(p.x, p.y, p_radius.x);
+}
+
+
 
 void parse_svg(byte& handle) {
   char last_read_char = NULL;
@@ -677,6 +783,16 @@ void parse_svg(byte& handle) {
     if (word == "polygon" || word == "polyline") {
       bool do_close_path = (word == "polygon");
       parse_polygon_instruction(handle, last_read_char, do_close_path);
+      while(true) {
+        word = get_next_token(handle, last_read_char);
+        if (word == ">") {
+          break;
+        }
+      }
+    }
+
+    if (word == "circle") {
+      parse_circle_instruction(handle, last_read_char);
       while(true) {
         word = get_next_token(handle, last_read_char);
         if (word == ">") {

@@ -237,4 +237,32 @@ void close_path() {
   pen_up();
 }
 
+void circle(float cx, float cy, float r) {
+
+  float angle = -PI;
+  PrintSettings print_settings = get_print_settings();
+  float distance_threshold = 0.9 * print_settings.points_per_lego_unit / print_settings.line_resolution;
+
+  goto_point(cx - r, cy);
+  pen_down();
+  while(angle < PI) {
+    float target_x = cx + r * cos(angle);
+    float target_y = cy  + r * sin(angle);
+
+    Point current_p;
+    current_p.x = X;
+    current_p.y = Y;
+
+    Point target_p;
+    target_p.x = target_x;
+    target_p.y = target_y;
+    float distance = compute_distance(current_p, target_p);
+    if (distance > distance_threshold) {
+      goto_position(target_x, target_y);
+    }
+    angle += 0.01;
+  }
+  close_path();
+}
+
 #endif

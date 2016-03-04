@@ -1,6 +1,7 @@
 #ifndef MATH_NXC
 #define MATH_NXC
 
+
 struct Point {
   float x;
   float y;
@@ -66,6 +67,40 @@ float atan2(float y, float x) {
   }
 
   return t3;
+}
+
+//from http://lab.polygonal.de/?p=205
+float sin(float x) {
+  // x is in radians
+  if (x < -PI)
+    x += 2 * PI;
+
+  if (x >  PI)
+    x -= 2 * PI;
+
+  float sin;
+  if (x < 0)
+  {
+    sin = 1.27323954 * x + 0.405284735 * x * x;
+    if (sin < 0)
+        sin = 0.225 * ((sin * (-sin)) - sin) + sin;
+    else
+        sin = 0.225 * ((sin * sin) - sin) + sin;
+  }
+  else
+  {
+    sin = 1.27323954 * x - 0.405284735 * x * x;
+
+    if (sin < 0)
+        sin = 0.225 * (sin *(-sin) - sin) + sin;
+    else
+        sin = 0.225 * (sin * sin - sin) + sin;
+  }
+  return sin;
+}
+
+float cos(float x) {
+  sin(x + PI/2);
 }
 
 float compute_distance(Point p1, Point p2) {
