@@ -218,7 +218,7 @@ int get_nb_params_from_command(char command) {
 
 void execute_command(char command, float& params[]) {
 
-  bool debug = true;
+  bool debug = false;
   if (debug == true) {
     string msg = char_to_string(command);
     msg += " ";
@@ -480,7 +480,7 @@ void reset_min_max_x_y() {
   MAX_Y = UNSET;
 }
 
-string get_next_token(byte& handle, char& last_read_char) {
+string get_next_token(byte& handle, char& last_read_char, bool debug) {
   string result="";
 
   while(true) {
@@ -496,20 +496,45 @@ string get_next_token(byte& handle, char& last_read_char) {
       case LDR_SUCCESS:
       {
         if (iscntrl(last_read_char)) {
-          last_read_char = NULL;
+          if (debug) {
+            display_centered_text("ctrl char");
+            Wait(100);
+            display_centered_text(NumToStr(last_read_char));
+            Wait(1000);
+          }
+
+
+          if (last_read_char == NULL) {
+            result = char_to_string(EOT);
+          } else {
+            last_read_char = NULL;
+          }
           return result;
         }
         if (isalpha(last_read_char)) {
+           if (debug) {
+             display_centered_text("alpha char");
+             Wait(100);
+           }
            result += char_to_string(last_read_char);
         }
         else
         {
           if (isspace(last_read_char) && StrLen(result) == 0) {
+            if (debug) {
+              display_centered_text("is space");
+              Wait(100);
+            }
             last_read_char = NULL;
             break;
           }
 
           if (StrLen(result) == 0) {
+            if (debug) {
+              display_centered_text("zero lenght");
+              Wait(100);
+            }
+
             result += char_to_string(last_read_char);
             last_read_char = NULL;
           }
@@ -589,7 +614,7 @@ void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close
  while(true) {
    string current_path;
    unsigned int return_code;
-   string token = get_next_token(handle, last_read_char);
+   string token = get_next_token(handle, last_read_char, false);
    if (last_read_char == EOT) {
      should_break = true;
    }
@@ -656,7 +681,7 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
  while(!circle_set && !ellipse_set && !rectangle_set) {
    string current_path;
    unsigned int return_code;
-   string token = get_next_token(handle, last_read_char);
+   string token = get_next_token(handle, last_read_char, false);
    if (last_read_char == EOT) {
      should_break = true;
    }
@@ -703,26 +728,18 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
            ry_set = true;
          }
          if (current_attribute == "x") {
-           display_centered_text("x");
-           Wait(1000);
            x = params[0];
            x_set = true;
          }
          if (current_attribute == "y") {
-           display_centered_text("y");
-           Wait(1000);
            y = params[0];
            y_set = true;
          }
          if (current_attribute == "width") {
-           display_centered_text("width");
-           Wait(1000);
            width = params[0];
            width_set = true;
          }
          if (current_attribute == "height") {
-           display_centered_text("height");
-           Wait(1000);
            height = params[0];
            height_set = true;
          }
@@ -762,8 +779,6 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
  }
 
  if (rectangle_set) {
-   display_centered_text("printing rectangle");
-   Wait(1000);
    Point p = transform_x_y(x, y);
    Point p_radius = transform_no_shift_x_y(width, height);
    rectangle(p.x, p.y, p_radius.x, p_radius.y);
@@ -775,7 +790,7 @@ void parse_svg(byte& handle) {
   char last_read_char = NULL;
   bool debug = false;
   while(true) {
-    string word = get_next_token(handle, last_read_char);
+    string word = get_next_token(handle, last_read_char, debug);
     if (debug) {
       display_centered_text(word);
       Wait(1000);
@@ -783,7 +798,7 @@ void parse_svg(byte& handle) {
     if (word == "path") {
       parse_path_instruction(handle, last_read_char);
       while(true) {
-        word = get_next_token(handle, last_read_char);
+        word = get_next_token(handle, last_read_char, false);
         if (word == ">") {
           break;
         }
@@ -794,7 +809,7 @@ void parse_svg(byte& handle) {
       bool do_close_path = (word == "polygon");
       parse_polygon_instruction(handle, last_read_char, do_close_path);
       while(true) {
-        word = get_next_token(handle, last_read_char);
+        word = get_next_token(handle, last_read_char, debug);
         if (word == ">") {
           break;
         }
@@ -803,11 +818,8 @@ void parse_svg(byte& handle) {
 
     if (word == "circle" || word == "ellipse" || word == "rect") {
       parse_circle_instruction(handle, last_read_char);
-      debug = true;
       while(true) {
-        word = get_next_token(handle, last_read_char);
-        display_centered_text(word);
-        Wait(1000);
+        word = get_next_token(handle, last_read_char, debug);
         if (word == ">") {
           break;
         }
@@ -815,7 +827,7 @@ void parse_svg(byte& handle) {
 
     }
 
-    if (StrLen(word) == 0) {
+    if (word == char_to_string(EOT)) {
       break;
     }
   }
