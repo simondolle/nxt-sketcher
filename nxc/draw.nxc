@@ -266,9 +266,17 @@ void ellipse(float cx, float cy, float rx, float ry) {
   close_path();
 }
 
-
 void circle(float cx, float cy, float r) {
   ellipse(cx, cy, r, r);
+}
+
+void rectangle(float x, float y, float width, float height) {
+  goto_point(x, y);
+  pen_down();
+  print_line(x + width, y);
+  print_line(x + width, y + height);
+  print_line(x, y + height);
+  close_path();
 }
 
 #endif

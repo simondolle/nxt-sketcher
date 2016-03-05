@@ -637,14 +637,23 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
  bool r_set = false;
  bool rx_set = false;
  bool ry_set = false;
+ bool x_set = false;
+ bool y_set = false;
+ bool width_set = false;
+ bool height_set = false;
  float cx;
  float cy;
  float r;
  float rx;
  float ry;
+ float x;
+ float y;
+ float width;
+ float height;
  bool circle_set = false;
  bool ellipse_set = false;
- while(!circle_set && !ellipse_set) {
+ bool rectangle_set = false;
+ while(!circle_set && !ellipse_set && !rectangle_set) {
    string current_path;
    unsigned int return_code;
    string token = get_next_token(handle, last_read_char);
@@ -655,7 +664,7 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
    switch (state)
    {
      case INITIAL_STATE:
-       if (token == "cx" || token == "cy" || token == "r" || token == "rx" || token == "ry") {
+       if (token == "cx" || token == "cy" || token == "r" || token == "rx" || token == "ry" || token == "x" || token == "y" || token == "width" || token == "height") {
          state = ATTRIBUTE_FOUND;
          current_attribute = token;
        }
@@ -674,8 +683,6 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
          get_params(handle, params, last_read_char);
          last_read_char = NULL; //should be a quote
          if (current_attribute == "cx") {
-           display_centered_text("cx");
-           Wait(1000);
            cx = params[0];
            cx_set = true;
          }
@@ -695,6 +702,30 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
            ry = params[0];
            ry_set = true;
          }
+         if (current_attribute == "x") {
+           display_centered_text("x");
+           Wait(1000);
+           x = params[0];
+           x_set = true;
+         }
+         if (current_attribute == "y") {
+           display_centered_text("y");
+           Wait(1000);
+           y = params[0];
+           y_set = true;
+         }
+         if (current_attribute == "width") {
+           display_centered_text("width");
+           Wait(1000);
+           width = params[0];
+           width_set = true;
+         }
+         if (current_attribute == "height") {
+           display_centered_text("height");
+           Wait(1000);
+           height = params[0];
+           height_set = true;
+         }
 
          current_attribute = "";
          state = INITIAL_STATE;
@@ -712,6 +743,11 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
 
    circle_set = cx_set && cy_set && r_set;
    ellipse_set = cx_set && cy_set && rx_set && ry_set;
+   rectangle_set = x_set && y_set && width_set && height_set;
+   if (rectangle_set) {
+     display_centered_text("rectangle_set");
+     Wait(1000);
+   }
  }
  if (circle_set) {
    Point p = transform_x_y(cx, cy);
@@ -725,14 +761,25 @@ void parse_circle_instruction(byte& handle, char& last_read_char) {
    ellipse(p.x, p.y, p_radius.x, p_radius.y);
  }
 
+ if (rectangle_set) {
+   display_centered_text("printing rectangle");
+   Wait(1000);
+   Point p = transform_x_y(x, y);
+   Point p_radius = transform_no_shift_x_y(width, height);
+   rectangle(p.x, p.y, p_radius.x, p_radius.y);
+ }
+
 }
-
-
 
 void parse_svg(byte& handle) {
   char last_read_char = NULL;
+  bool debug = false;
   while(true) {
     string word = get_next_token(handle, last_read_char);
+    if (debug) {
+      display_centered_text(word);
+      Wait(1000);
+    }
     if (word == "path") {
       parse_path_instruction(handle, last_read_char);
       while(true) {
@@ -754,14 +801,18 @@ void parse_svg(byte& handle) {
       }
     }
 
-    if (word == "circle" || word == "ellipse") {
+    if (word == "circle" || word == "ellipse" || word == "rect") {
       parse_circle_instruction(handle, last_read_char);
+      debug = true;
       while(true) {
         word = get_next_token(handle, last_read_char);
+        display_centered_text(word);
+        Wait(1000);
         if (word == ">") {
           break;
         }
       }
+
     }
 
     if (StrLen(word) == 0) {
