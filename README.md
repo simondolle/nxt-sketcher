@@ -67,8 +67,10 @@ And I am very admirative of his design.
 The sample images are downloaded from the [The Noun project](https://thenounproject.com/) and distributed under a Creative Commons license.
 - <img src="images/music_note.png" width="48"> [Music Note](https://thenounproject.com/term/music-note/55429/): created by Parker Foote
 - <img src="images/heart.png" width="48">  [Heart](https://thenounproject.com/term/heart/219/): public domain
+- <img src="images/woman.png" width="48">  [Woman](https://thenounproject.com/term/woman/5/): public domain
 - <img src="images/cat.png" width="48">  [Cat](https://thenounproject.com/term/cat/70130/): created by Francielly Costantin Senra
 - <img src="images/fish.png" width="48">  [Fish](https://thenounproject.com/term/fish/153358/): created by Mario Bieh
+- <img src="images/star.png" width="48">  [Star](https://thenounproject.com/term/star/17639/): created by Erin Standley
 - <img src="images/darth_vader.png" width="48">  [Darth Vader](https://thenounproject.com/term/darth-vader/65913/): created by Rohith M S
 - <img src="images/invader.png" width="48">  [Invader](https://thenounproject.com/term/space-invader/87949/): created by Melvin Salas
 - <img src="images/skull.png" width="48">  [Skull](https://thenounproject.com/term/death/195701/): created by Aha-Soft
