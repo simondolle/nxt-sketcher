@@ -1,0 +1,19 @@
+How to build the projet
+-----------------------
+
+- Download "nbc": http://bricxcc.sourceforge.net/nbc/
+- Put it in your PATH
+- go to the "nxc" directory
+- Launch "nbc nxt-sketcher.nxc -O=nxt-sketcher.rxe -Z2"
+
+How to build the manual
+-----------------------
+The initial model was built with Lego Digital Designer (LDD). (http://ldd.lego.com/)
+It was then exported to .ldr file
+Then it was opened in Bricksmith (or LDraw)
+where each step of the manual was described. (http://www.ldraw.org/)
+The manual itself was made with LPub using this tutorial "http://www.eurobricks.com/forum/index.php?showtopic=83642"
+
+There were some issues because of LSynth to render the cables.
+I could not manage to display nxt cables so I used an other kind of cables
+which look very similar.
