@@ -218,7 +218,7 @@ int get_nb_params_from_command(char command) {
 
 void execute_command(char command, float& params[]) {
 
-  bool debug = true;
+  bool debug = false;
   if (debug) {
     string msg = char_to_string(command);
     msg += " ";
@@ -638,8 +638,6 @@ void parse_polygon_instruction(byte& handle, char& last_read_char, bool do_close
 }
 
 void parse_basic_shape_instruction(byte& handle, char& last_read_char) {
- display_centered_text("circle instructions");
- Wait(1000);
 
  int state = INITIAL_STATE;
  bool should_break = false;
@@ -751,10 +749,6 @@ void parse_basic_shape_instruction(byte& handle, char& last_read_char) {
    circle_set = cx_set && cy_set && r_set;
    ellipse_set = cx_set && cy_set && rx_set && ry_set;
    rectangle_set = x_set && y_set && width_set && height_set;
-   if (rectangle_set) {
-     display_centered_text("rectangle_set");
-     Wait(1000);
-   }
  }
  if (circle_set) {
    Point p = transform_x_y(cx, cy);
@@ -784,8 +778,6 @@ void parse_svg(byte& handle) {
       parse_path_instruction(handle, last_read_char);
       while(true) {
         word = get_next_token(handle, last_read_char);
-        display_centered_text(word);
-        Wait(1000);
         if (word == ">") {
           break;
         }
